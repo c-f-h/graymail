@@ -1,5 +1,9 @@
 'use strict';
 
+// we don't use Forge on Chrome, so we just create an empty object
+// to keep tcp-socket from throwing an error
+window.forge = {};
+
 // use service-worker or app-cache for offline caching
 require('./offline-cache');
 
@@ -53,7 +57,7 @@ app.config(function($routeProvider, $animateProvider) {
         templateUrl: 'tpl/login-set-credentials.html',
         controller: require('./controller/login/login-set-credentials')
     });
-    $routeProvider.when('/login-privatekey-upload', {
+/*    $routeProvider.when('/login-privatekey-upload', {
         templateUrl: 'tpl/login-privatekey-upload.html',
         controller: require('./controller/login/login-privatekey-upload')
     });
@@ -76,7 +80,7 @@ app.config(function($routeProvider, $animateProvider) {
     $routeProvider.when('/login-privatekey-download', {
         templateUrl: 'tpl/login-privatekey-download.html',
         controller: require('./controller/login/login-privatekey-download')
-    });
+    }); */
     $routeProvider.when('/account', {
         templateUrl: 'tpl/desktop.html',
         controller: require('./controller/app/navigation'),

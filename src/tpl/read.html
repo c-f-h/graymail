@@ -74,15 +74,8 @@
         <div class="mail-addresses">
           <label>From:</label>
           <span ng-repeat="u in state.mailList.selected.from">
-            <span class="label" ng-class="{'label--invalid': u.secure === false, 'label--invalid-clickable': u.secure === false}" ng-mouseover="getKeyId(u.address)" wo-touch="invite(u)" wo-tooltip="#fingerprint-info">
+            <span class="label">
               {{u.name || u.address}} <span ng-show="u.name" ng-class="{'read__sender-address': !notStripped}">&#60; {{u.address}} &#62;</span>
-              <svg ng-show="u.secure === false"><use xlink:href="#icon-add_contact" /></svg>
-            </span>
-
-            <span ng-show="(state.mailList.selected.body || state.mailList.selected.html) && state.mailList.selected.signed"
-              class="signature-status" ng-class="{'signature-status--invalid': !state.mailList.selected.signaturesValid}" wo-tooltip="#signature-info">
-              <svg ng-show="state.mailList.selected.signaturesValid"><use xlink:href="#icon-signature-verified" /></svg>
-              <svg ng-show="!state.mailList.selected.signaturesValid"><use xlink:href="#icon-signature-invalid" /></svg>
             </span>
 
             <span class="mail-addresses__stripped"></span>
@@ -91,18 +84,16 @@
         <div class="mail-addresses">
           <label>To:</label>
           <span ng-repeat="u in state.mailList.selected.to">
-            <span class="label" ng-class="{'label--invalid': u.secure === false, 'label--invalid-clickable': u.secure === false}" ng-mouseover="getKeyId(u.address)" wo-touch="invite(u)" wo-tooltip="#fingerprint-info">
+            <span class="label">
               {{u.name || u.address}}
-              <svg ng-show="u.secure === false"><use xlink:href="#icon-add_contact" /></svg>
             </span>
           </span>
         </div>
         <div class="mail-addresses" ng-show="state.mailList.selected.cc && state.mailList.selected.cc.length > 0">
           <label>Cc:</label>
           <span ng-repeat="u in state.mailList.selected.cc">
-            <span class="label" ng-class="{'label--invalid': u.secure === false, 'label--invalid-clickable': u.secure === false}" ng-mouseover="getKeyId(u.address)" wo-touch="invite(u)" wo-tooltip="#fingerprint-info">
+            <span class="label">
               {{u.name || u.address}}
-              <svg ng-show="u.secure === false"><use xlink:href="#icon-add_contact" /></svg>
             </span>
           </span>
         </div>
@@ -160,17 +151,6 @@
       </ul>
     </div>
   </div><!--/read__action-toolbar-->
-
-  <!-- tooltips -->
-  <div id="fingerprint-info" class="tooltip">
-    <div class="tooltip__arrow"></div>
-    <div class="tooltip__content">{{keyId}}</div>
-  </div>
-  <div id="signature-info" class="tooltip">
-    <div class="tooltip__arrow"></div>
-    <div ng-show="state.mailList.selected.signaturesValid" class="tooltip__content">Message signature is valid.</div>
-    <div ng-show="!state.mailList.selected.signaturesValid" class="tooltip__content">Invalid message signature. This message could have been tampered with!</div>
-  </div>
 
   <!-- dropdowns -->
   <ul id="read-reply-selection" class="dropdown">

@@ -7,7 +7,7 @@ module.exports = Email;
 var config = require('../app-config').config,
     str = require('../app-config').string,
     axe = require('axe-logger'),
-    PgpMailer = require('pgpmailer'),
+    PlainMailer = require('./plainmailer'),
     ImapClient = require('imap-client');
 
 //
@@ -33,8 +33,6 @@ var MSG_ATTR_UID = 'uid';
 var MSG_ATTR_MODSEQ = 'modseq';
 var MSG_PART_ATTR_CONTENT = 'content';
 var MSG_PART_TYPE_ATTACHMENT = 'attachment';
-var MSG_PART_TYPE_ENCRYPTED = 'encrypted';
-var MSG_PART_TYPE_SIGNED = 'signed';
 var MSG_PART_TYPE_TEXT = 'text';
 var MSG_PART_TYPE_HTML = 'html';
 
@@ -48,17 +46,13 @@ var MSG_PART_TYPE_HTML = 'html';
  * High-level data access object that orchestrates everything around the handling of encrypted mails:
  * PGP de-/encryption, receiving via IMAP, sending via SMTP, MIME parsing, local db persistence
  *
- * @param {Object} keychain The keychain DAO handles keys transparently
  * @param {Object} pgp Orchestrates decryption
  * @param {Object} devicestorage Handles persistence to the local indexed db
- * @param {Object} pgpbuilder Generates and encrypts MIME and SMTP messages
  * @param {Object} mailreader Parses MIME messages received from IMAP
  */
-function Email(keychain, pgp, accountStore, pgpbuilder, mailreader, dialog, appConfig, auth) {
-    this._keychain = keychain;
+function Email(pgp, accountStore, mailreader, dialog, appConfig, auth) {
     this._pgp = pgp;
     this._devicestorage = accountStore;
-    this._pgpbuilder = pgpbuilder;
     this._mailreader = mailreader;
     this._dialog = dialog;
     this._appConfig = appConfig;
@@ -181,8 +175,6 @@ Email.prototype.unlock = function(options) {
     }
 
     function setPrivateKey(keypair) {
-        // set decrypted privateKey to pgpMailer
-        self._pgpbuilder._privateKey = self._pgp._privateKey;
         return keypair;
     }
 };
@@ -524,19 +516,6 @@ Email.prototype.getBody = function(options) {
     }
 };
 
-Email.prototype._checkSignatures = function(message) {
-    var self = this;
-    return self._keychain.getReceiverPublicKey(message.from[0].address).then(function(senderPublicKey) {
-        // get the receiver's public key to check the message signature
-        var senderKey = senderPublicKey ? senderPublicKey.publicKey : undefined;
-        if (message.clearSignedMessage) {
-            return self._pgp.verifyClearSignedMessage(message.clearSignedMessage, senderKey);
-        } else if (message.signedMessage && message.signature) {
-            return self._pgp.verifySignedMessage(message.signedMessage, message.signature, senderKey);
-        }
-    });
-};
-
 /**
  * Retrieves an attachment matching a body part for a given uid and a folder
  *
@@ -568,141 +547,13 @@ Email.prototype.getAttachment = function(options) {
 };
 
 /**
- * Decrypts a message and replaces sets the decrypted plaintext as the message's body, html, or attachment, respectively.
- * The first encrypted body part's ciphertext (in the content property) will be decrypted.
- *
- * @param {Object} options.message The message
- * @return {Promise}
- * @resolve {Object} message    The decrypted message object
- */
-Email.prototype.decryptBody = function(options) {
-    var self = this,
-        message = options.message,
-        encryptedNode;
-
-    // the message is decrypting has no body, is not encrypted or has already been decrypted
-    if (!message.bodyParts || message.decryptingBody || !message.body || !message.encrypted || message.decrypted) {
-        return new Promise(function(resolve) {
-            resolve(message);
-        });
-    }
-
-    message.decryptingBody = true;
-    self.busy();
-
-    // get the sender's public key for signature checking
-    return self._keychain.getReceiverPublicKey(message.from[0].address).then(function(senderPublicKey) {
-        // get the receiver's public key to check the message signature
-        encryptedNode = filterBodyParts(message.bodyParts, MSG_PART_TYPE_ENCRYPTED)[0];
-        var senderKey = senderPublicKey ? senderPublicKey.publicKey : undefined;
-        return self._pgp.decrypt(encryptedNode.content, senderKey);
-
-    }).then(function(pt) {
-        if (!pt.decrypted) {
-            throw new Error('Error decrypting message.');
-        }
-
-        // if the decryption worked and signatures are present, everything's fine.
-        // no error is thrown if signatures are not present
-        message.signed = typeof pt.signaturesValid !== 'undefined';
-        message.signaturesValid = pt.signaturesValid;
-
-        // if the encrypted node contains pgp/inline, we must not parse it
-        // with the mailreader as it is not well-formed MIME
-        if (encryptedNode._isPgpInline) {
-            message.body = pt.decrypted;
-            message.decrypted = true;
-            return;
-        }
-
-        // the mailparser works on the .raw property
-        encryptedNode.raw = pt.decrypted;
-        // parse the decrypted raw content in the mailparser
-        return self._parse({
-            bodyParts: [encryptedNode]
-        }).then(handleRaw);
-
-    }).then(function() {
-        self.done(); // stop the spinner
-        message.decryptingBody = false;
-        return message;
-
-    }).catch(function(err) {
-        self.done(); // stop the spinner
-        message.decryptingBody = false;
-        message.body = err.message; // display error msg in body
-        message.decrypted = true;
-        return message;
-    });
-
-    function handleRaw(root) {
-        if (message.signed) {
-            // message had a signature in the ciphertext, so we're done here
-            return setBody(root);
-        }
-
-        // message had no signature in the ciphertext, so there's a little extra effort to be done here
-        // is there a signed MIME node?
-        var signedRoot = filterBodyParts(root, MSG_PART_TYPE_SIGNED)[0];
-        if (!signedRoot) {
-            // no signed MIME node, obviously an unsigned PGP/MIME message
-            return setBody(root);
-        }
-
-        // if there is something signed in here, we're only interested in the signed content
-        message.signedMessage = signedRoot.signedMessage;
-        message.signature = signedRoot.signature;
-        root = signedRoot.content;
-
-        // check the signatures for encrypted messages
-        return self._checkSignatures(message).then(function(signaturesValid) {
-            message.signed = typeof signaturesValid !== 'undefined';
-            message.signaturesValid = signaturesValid;
-            return setBody(root);
-        });
-    }
-
-    function setBody(root) {
-        // we have successfully interpreted the descrypted message,
-        // so let's update the views on the message parts
-        message.body = _.pluck(filterBodyParts(root, MSG_PART_TYPE_TEXT), MSG_PART_ATTR_CONTENT).join('\n');
-        message.html = _.pluck(filterBodyParts(root, MSG_PART_TYPE_HTML), MSG_PART_ATTR_CONTENT).join('\n');
-        message.attachments = _.reject(filterBodyParts(root, MSG_PART_TYPE_ATTACHMENT), function(attmt) {
-            // remove the pgp-signature from the attachments
-            return attmt.mimeType === "application/pgp-signature";
-        });
-        inlineExternalImages(message);
-        message.decrypted = true;
-        return message;
-    }
-};
-
-/**
- * Encrypted (if necessary) and sends a message with a predefined clear text greeting.
- *
- * @param {Object} options.email The message to be sent
- * @param {Object} mailer an instance of the pgpmailer to be used for testing purposes only
- */
-Email.prototype.sendEncrypted = function(options, mailer) {
-    // mime encode, sign, encrypt and send email via smtp
-    return this._sendGeneric({
-        encrypt: true,
-        smtpclient: options.smtpclient, // filled solely in the integration test, undefined in normal usage
-        mail: options.email,
-        publicKeysArmored: options.email.publicKeysArmored
-    }, mailer);
-};
-
-/**
  * Sends a signed message in the plain
  *
  * @param {Object} options.email The message to be sent
  * @param {Object} mailer an instance of the pgpmailer to be used for testing purposes only
  */
 Email.prototype.sendPlaintext = function(options, mailer) {
-    // add suffix to plaintext mail
-    options.email.body += str.signature + config.keyServerUrl + '/' + this._account.emailAddress;
-    // mime encode, sign and send email via smtp
+    // mime encode and send email via smtp
     return this._sendGeneric({
         smtpclient: options.smtpclient, // filled solely in the integration test, undefined in normal usage
         mail: options.email
@@ -733,14 +584,14 @@ Email.prototype._sendGeneric = function(options, mailer) {
         credentials.smtp.tlsWorkerPath = config.workerPath + '/tcp-socket-tls-worker.min.js';
 
         // create a new pgpmailer
-        self._pgpMailer = (mailer || new PgpMailer(credentials.smtp, self._pgpbuilder));
+        self._plainMailer = (mailer || new PlainMailer(credentials.smtp));
 
         // certificate update retriggers sending after cert update is persisted
-        self._pgpMailer.onCert = self._auth.handleCertificateUpdate.bind(self._auth, 'smtp', self._sendGeneric.bind(self, options), self._dialog.error);
+        self._plainMailer.onCert = self._auth.handleCertificateUpdate.bind(self._auth, 'smtp', self._sendGeneric.bind(self, options), self._dialog.error);
     }).then(function() {
 
         // send the email
-        return self._pgpMailer.send(options);
+        return self._plainMailer.send(options);
     }).then(function(rfcText) {
         // try to upload to sent, but we don't actually care if the upload failed or not
         // this should not negatively impact the process of sending
@@ -756,21 +607,6 @@ Email.prototype._sendGeneric = function(options, mailer) {
             throw err;
         }
     }
-};
-
-/**
- * Signs and encrypts a message
- *
- * @param {Object} options.email The message to be encrypted
- * @param {Function} callback(message) Invoked when the message was encrypted, or an error occurred
- */
-Email.prototype.encrypt = function(options) {
-    var self = this;
-    self.busy();
-    return self._pgpbuilder.encrypt(options).then(function(message) {
-        self.done();
-        return message;
-    });
 };
 
 /**
@@ -946,7 +782,7 @@ Email.prototype.onDisconnect = function() {
     // discard clients
     this._account.online = false;
     this._imapClient = undefined;
-    this._pgpMailer = undefined;
+    this._plainMailer = undefined;
 
     return new Promise(function(resolve) {
         resolve(); // ASYNC ALL THE THINGS!!!
@@ -1561,59 +1397,11 @@ Email.prototype._extractBody = function(message) {
 
     }).then(function() {
         // extract the content
-        if (message.encrypted) {
-            // show the encrypted message
-            message.body = filterBodyParts(message.bodyParts, MSG_PART_TYPE_ENCRYPTED)[0].content;
-            return;
-        }
-
         var root = message.bodyParts;
-
-        if (message.signed) {
-            // PGP/MIME signed
-            var signedRoot = filterBodyParts(message.bodyParts, MSG_PART_TYPE_SIGNED)[0]; // in case of a signed message, you only want to show the signed content and ignore the rest
-            message.signedMessage = signedRoot.signedMessage;
-            message.signature = signedRoot.signature;
-            root = signedRoot.content;
-        }
 
         var body = _.pluck(filterBodyParts(root, MSG_PART_TYPE_TEXT), MSG_PART_ATTR_CONTENT).join('\n');
 
-        // if the message is plain text and contains pgp/inline, we are only interested in the encrypted content, the rest (corporate mail footer, attachments, etc.) is discarded.
-        var pgpInlineMatch = /^-{5}BEGIN PGP MESSAGE-{5}[\s\S]*-{5}END PGP MESSAGE-{5}$/im.exec(body);
-        if (pgpInlineMatch) {
-            message.body = pgpInlineMatch[0]; // show the plain text content
-            message.encrypted = true; // signal the ui that we're handling encrypted content
-
-            // replace the bodyParts info with an artificial bodyPart of type "encrypted"
-            message.bodyParts = [{
-                type: MSG_PART_TYPE_ENCRYPTED,
-                content: pgpInlineMatch[0],
-                _isPgpInline: true // used internally to avoid trying to parse non-MIME text with the mailreader
-            }];
-            return;
-        }
-
-        // any content before/after the PGP block will be discarded, untrusted attachments and html is ignored
-        var clearSignedMatch = /^-{5}BEGIN PGP SIGNED MESSAGE-{5}\nHash:[ ][^\n]+\n(?:[A-Za-z]+:[ ][^\n]+\n)*\n([\s\S]*?)\n-{5}BEGIN PGP SIGNATURE-{5}[\S\s]*-{5}END PGP SIGNATURE-{5}$/im.exec(body);
-        if (clearSignedMatch) {
-            // PGP/INLINE signed
-            message.signed = true;
-            message.clearSignedMessage = clearSignedMatch[0];
-            body = (clearSignedMatch[1] || '').replace(/^- /gm, ''); // remove dash escaping https://tools.ietf.org/html/rfc4880#section-7.1
-        }
-
-        if (!message.signed) {
-            // message is not signed, so we're done here
-            return setBody(body, root);
-        }
-
-        // check the signatures for signed messages
-        return self._checkSignatures(message).then(function(signaturesValid) {
-            message.signed = typeof signaturesValid !== 'undefined';
-            message.signaturesValid = signaturesValid;
-            setBody(body, root);
-        });
+        return setBody(body, root);
     });
 
     function setBody(body, root) {

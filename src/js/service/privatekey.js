@@ -6,14 +6,14 @@ module.exports = PrivateKey;
 
 var ImapClient = require('imap-client');
 var util = require('crypto-lib').util;
+var Mailbuild = require('mailbuild');
 
 var IMAP_KEYS_FOLDER = 'openpgp_keys';
 var MIME_TYPE = 'application/x.encrypted-pgp-key';
 var MSG_PART_TYPE_ATTACHMENT = 'attachment';
 
-function PrivateKey(auth, mailbuild, mailreader, appConfig, pgp, crypto, axe) {
+function PrivateKey(auth, mailreader, appConfig, pgp, crypto, axe) {
     this._auth = auth;
-    this._Mailbuild = mailbuild;
     this._mailreader = mailreader;
     this._appConfig = appConfig;
     this._pgp = pgp;
@@ -162,7 +162,7 @@ PrivateKey.prototype.upload = function(options) {
         payloadBuf.set(encryptedKeyBuf, offset);
 
         // create MIME tree
-        var rootNode = options.rootNode || new self._Mailbuild();
+        var rootNode = options.rootNode || new Mailbuild();
         rootNode.setHeader({
             subject: options._id,
             from: options.userId,

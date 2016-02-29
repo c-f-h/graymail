@@ -10,44 +10,39 @@ var SetCredentialsCtrl = function($scope, $location, $routeParams, $q, auth, con
     //
     // Presets and Settings
     //
+    
+    auth.getEmailAddress().then(function(email) {
+        $scope.emailAddress = email.emailAddress;
+        $scope.realname = email.realname;
+        
+        return auth.getCredentials();
+        
+    }).then(function(cred) {
+        if (cred.imap.auth.user && cred.imap.auth.user != $scope.emailAddress) {
+            $scope.username = cred.imap.user;
+        }
+        console.log(cred.imap);
+        $scope.password = cred.imap.auth.pass;
 
-    var mailConfig = $scope.state.login.mailConfig;
-    $scope.useOAuth = !!auth.oauthToken;
-    $scope.showDetails = (mailConfig.imap.source === 'guess');
+        $scope.imapHost = cred.imap.host;
+        $scope.imapPort = cred.imap.port;
+        $scope.imapEncryption = parseTLSType(cred.imap);
 
-    // set email address
-    if ($scope.useOAuth) {
-        $scope.emailAddress = auth.emailAddress;
-    } else {
-        $scope.emailAddress = $scope.state.login.emailAddress;
-    }
+        $scope.smtpHost = cred.smtp.host;
+        $scope.smtpPort = cred.smtp.port;
+        $scope.smtpEncryption = parseTLSType(cred.smtp);
+        
+        $scope.$apply();
 
-    // SMTP config
-    $scope.smtpHost = mailConfig.smtp.hostname;
-    $scope.smtpPort = parseInt(mailConfig.smtp.port, 10);
-
-    // transport encryption method
-    if (mailConfig.smtp.secure && !mailConfig.smtp.ignoreTLS) {
-        $scope.smtpEncryption = ENCRYPTION_METHOD_TLS;
-    } else if (!mailConfig.smtp.secure && !mailConfig.smtp.ignoreTLS) {
-        $scope.smtpEncryption = ENCRYPTION_METHOD_STARTTLS;
-    } else {
-        $scope.smtpEncryption = ENCRYPTION_METHOD_NONE;
-    }
-
-    // IMAP config
-    $scope.imapHost = mailConfig.imap.hostname;
-    $scope.imapPort = parseInt(mailConfig.imap.port, 10);
-
-    // transport encryption method
-    if (mailConfig.imap.secure && !mailConfig.imap.ignoreTLS) {
-        $scope.imapEncryption = ENCRYPTION_METHOD_TLS;
-    } else if (!mailConfig.imap.secure && !mailConfig.imap.ignoreTLS) {
-        $scope.imapEncryption = ENCRYPTION_METHOD_STARTTLS;
-    } else {
-        $scope.imapEncryption = ENCRYPTION_METHOD_NONE;
-    }
-
+        function parseTLSType(opts) {
+            if (opts.secure)            return ENCRYPTION_METHOD_TLS;
+            else if (opts.ignoreTLS)    return ENCRYPTION_METHOD_NONE;
+            else                        return ENCRYPTION_METHOD_STARTTLS;
+        }
+    }).catch(function (err) {
+        console.log(err);
+    });
+    
     //
     // Scope functions
     //
@@ -79,10 +74,10 @@ var SetCredentialsCtrl = function($scope, $location, $routeParams, $q, auth, con
                 ignoreTLS: smtpEncryption === ENCRYPTION_METHOD_NONE
             }
         };
-
+        
         // use the credentials in the connection doctor
         connectionDoctor.configure(credentials);
-
+        
         // run connection doctor test suite
         return $q(function(resolve) {
             $scope.busy = true;
@@ -94,6 +89,9 @@ var SetCredentialsCtrl = function($scope, $location, $routeParams, $q, auth, con
         }).then(function() {
             // persists the credentials and forwards to /login
             auth.setCredentials(credentials);
+            return auth.storeCredentials();
+        
+        }).then(function() {
             $scope.busy = false;
             $location.path('/login');
 

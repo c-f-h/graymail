@@ -92,18 +92,9 @@ var MailListCtrl = function($scope, $timeout, $location, $filter, $q, status, no
             return;
         }
 
+        // TODO: this probably doesn't need to be a promise anymore
         return $q(function(resolve) {
             resolve();
-
-        }).then(function() {
-            return keychain.refreshKeyForUserId({
-                userId: message.from[0].address
-            });
-
-        }).then(function() {
-            return email.decryptBody({
-                message: message
-            });
 
         }).then(function() {
             // if the message is unread, please sync the new state.

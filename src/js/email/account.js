@@ -4,18 +4,16 @@ var ngModule = angular.module('woEmail');
 ngModule.service('account', Account);
 module.exports = Account;
 
-var util = require('crypto-lib').util;
-
-function Account(appConfig, auth, accountStore, email, outbox, keychain, updateHandler, dialog) {
+function Account(appConfig, auth, accountStore, email, outbox, updateHandler, dialog, util) {
     this._appConfig = appConfig;
     this._auth = auth;
     this._accountStore = accountStore;
     this._emailDao = email;
     this._outbox = outbox;
-    this._keychain = keychain;
     this._updateHandler = updateHandler;
     this._dialog = dialog;
     this._accounts = []; // init accounts list
+    this.util = util;
 }
 
 /**
@@ -35,7 +33,7 @@ Account.prototype.list = function() {
 };
 
 /**
- * Fire up the database, retrieve the available keys for the user and initialize the email data access object
+ * Fire up the database and initialize the email data access object
  */
 Account.prototype.init = function(options) {
     var self = this;
@@ -48,7 +46,7 @@ Account.prototype.init = function(options) {
     };
 
     // Pre-Flight check: don't even start to initialize stuff if the email address is not valid
-    if (!util.validateEmailAddress(options.emailAddress)) {
+    if (!self.util.validateEmailAddress(options.emailAddress)) {
         return new Promise(function() {
             throw new Error('The user email address is invalid!');
         });
@@ -62,26 +60,6 @@ Account.prototype.init = function(options) {
         });
 
     }).then(function() {
-        // retrieve keypair fom devicestorage/cloud, refresh public key if signup was incomplete before
-        return self._keychain.getUserKeyPair(options.emailAddress);
-
-    }).then(function(keys) {
-        // this is either a first start on a new device, OR a subsequent start without completing the signup,
-        // since we can't differenciate those cases here, do a public key refresh because it might be outdated
-        if (keys && keys.publicKey && !keys.privateKey) {
-            return self._keychain.refreshKeyForUserId({
-                userId: options.emailAddress,
-                overridePermission: true
-            }).then(function(publicKey) {
-                return {
-                    publicKey: publicKey
-                };
-            });
-        }
-        // either signup was complete or no pubkey is available, so we're good here.
-        return keys;
-
-    }).then(function(keys) {
         // init the email data access object
         return self._emailDao.init({
             account: account
@@ -93,7 +71,7 @@ Account.prototype.init = function(options) {
             // add account object to the accounts array for the ng controllers
             self._accounts.push(account);
 
-            return keys;
+            return null; // keys;
         });
     });
 };

@@ -11,7 +11,7 @@ var NOTIFICATION_SENT_TIMEOUT = 2000;
 // Controller
 //
 
-var NavigationCtrl = function($scope, $location, $q, $timeout, account, email, outbox, notification, status, appConfig, dialog, dummy, privateKey, axe) {
+var NavigationCtrl = function($scope, $location, $q, $timeout, account, email, outbox, notification, status, appConfig, dialog, dummy, axe) {
     if (!$location.search().dev && !account.isLoggedIn()) {
         $location.path('/'); // init app
         return;
@@ -145,9 +145,6 @@ var NavigationCtrl = function($scope, $location, $q, $timeout, account, email, o
         if (!$scope.state.nav.currentFolder) {
             $scope.navigate(0);
         }
-
-        // check if the private PGP key is synced
-        $scope.checkKeySyncStatus();
     });
 
     //
@@ -177,45 +174,6 @@ var NavigationCtrl = function($scope, $location, $q, $timeout, account, email, o
         // start checking outbox periodically
         outbox.startChecking($scope.onOutboxUpdate);
     }
-
-    $scope.checkKeySyncStatus = function() {
-        return $q(function(resolve) {
-            resolve();
-
-        }).then(function() {
-            // login to imap
-            return privateKey.init();
-
-        }).then(function() {
-            // check key sync status
-            return privateKey.isSynced();
-
-        }).then(function(synced) {
-            if (!synced) {
-                dialog.confirm({
-                    title: 'Key backup',
-                    message: 'Your encryption key is not backed up. Back up now?',
-                    positiveBtnStr: 'Backup',
-                    negativeBtnStr: 'Not now',
-                    showNegativeBtn: true,
-                    callback: function(granted) {
-                        if (granted) {
-                            // logout of the current session
-                            email.onDisconnect().then(function() {
-                                // send to key upload screen
-                                $timeout(function() {
-                                    $location.path('/login-privatekey-upload');
-                                });
-                            });
-                        }
-                    }
-                });
-            }
-            // logout of imap
-            return privateKey.destroy();
-
-        }).catch(axe.error);
-    };
 };
 
 module.exports = NavigationCtrl;

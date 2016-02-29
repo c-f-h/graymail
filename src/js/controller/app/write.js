@@ -1,18 +1,13 @@
 'use strict';
 
-var util = require('crypto-lib').util;
-
 //
 // Controller
 //
 
-var WriteCtrl = function($scope, $window, $filter, $q, appConfig, auth, keychain, pgp, email, outbox, dialog, axe, status, invitation) {
+var WriteCtrl = function($scope, $window, $filter, $q, appConfig, auth, email, outbox, dialog, axe, status, util) {
 
     var str = appConfig.string;
     var cfg = appConfig.config;
-
-    // set default value so that the popover height is correct on init
-    $scope.keyId = 'XXXXXXXX';
 
     //
     // Init
@@ -53,7 +48,6 @@ var WriteCtrl = function($scope, $window, $filter, $q, appConfig, auth, keychain
         $scope.attachments = [];
         $scope.addressBookCache = undefined;
         $scope.showInvite = undefined;
-        $scope.invited = [];
     }
 
     function reportBug() {
@@ -218,7 +212,7 @@ var WriteCtrl = function($scope, $window, $filter, $q, appConfig, auth, keychain
         if (!recipient) {
             return;
         }
-
+        
         if (recipient.address) {
             // display only email address after autocomplete
             recipient.displayId = recipient.address;
@@ -239,32 +233,11 @@ var WriteCtrl = function($scope, $window, $filter, $q, appConfig, auth, keychain
             return;
         }
 
-        // check if to address is contained in known public keys
-        // when we write an email, we always need to work with the latest keys available
+        // TODO: this probably doesn't need to be a promise anymore
         return $q(function(resolve) {
             resolve();
 
         }).then(function() {
-            return keychain.refreshKeyForUserId({
-                userId: recipient.address
-            });
-
-        }).then(function(key) {
-            if (key) {
-                // compare again since model could have changed during the roundtrip
-                var userIds = pgp.getKeyParams(key.publicKey).userIds;
-                var matchingUserId = _.findWhere(userIds, {
-                    emailAddress: recipient.address
-                });
-                // compare either primary userId or (if available) multiple IDs
-                if (matchingUserId) {
-                    recipient.key = key;
-                    recipient.secure = true;
-                }
-            } else {
-                // show invite dialog if no key found
-                $scope.showInvite = true;
-            }
             $scope.checkSendStatus();
 
         }).catch(dialog.error);
@@ -278,7 +251,6 @@ var WriteCtrl = function($scope, $window, $filter, $q, appConfig, auth, keychain
         $scope.sendBtnText = undefined;
         $scope.sendBtnSecure = undefined;
 
-        var allSecure = true;
         var numReceivers = 0;
 
         // count number of receivers and check security
@@ -295,9 +267,6 @@ var WriteCtrl = function($scope, $window, $filter, $q, appConfig, auth, keychain
                 });
             }
             numReceivers++;
-            if (!recipient.secure) {
-                allSecure = false;
-            }
         }
 
         // only allow sending if receviers exist
@@ -306,23 +275,10 @@ var WriteCtrl = function($scope, $window, $filter, $q, appConfig, auth, keychain
             return;
         }
 
-        // bcc automatically disables secure sending
-        if ($scope.bcc.filter(filterEmptyAddresses).length > 0) {
-            allSecure = false;
-        }
-
-        if (allSecure) {
-            // send encrypted if all secure
-            $scope.okToSend = true;
-            $scope.sendBtnText = str.sendBtnSecure;
-            $scope.sendBtnSecure = true;
-            $scope.showInvite = false;
-        } else {
-            // send plaintext
-            $scope.okToSend = true;
-            $scope.sendBtnText = str.sendBtnClear;
-            $scope.sendBtnSecure = false;
-        }
+        // send plaintext
+        $scope.okToSend = true;
+        $scope.sendBtnText = str.sendBtnClear;
+        $scope.sendBtnSecure = false;
     };
 
     //
@@ -333,55 +289,6 @@ var WriteCtrl = function($scope, $window, $filter, $q, appConfig, auth, keychain
         $scope.attachments.splice($scope.attachments.indexOf(attachment), 1);
     };
 
-    /**
-     * Invite all users without a public key
-     */
-    $scope.invite = function() {
-        var sender = auth.emailAddress,
-            sendJobs = [],
-            invitees = [];
-
-        $scope.showInvite = false;
-
-        // get recipients with no keys
-        $scope.to.forEach(check);
-        $scope.cc.forEach(check);
-        $scope.bcc.forEach(check);
-
-        function check(recipient) {
-            if (util.validateEmailAddress(recipient.address) && !recipient.secure && $scope.invited.indexOf(recipient.address) === -1) {
-                invitees.push(recipient.address);
-            }
-        }
-
-        return $q(function(resolve) {
-            resolve();
-
-        }).then(function() {
-            invitees.forEach(function(recipientAddress) {
-                var invitationMail = invitation.createMail({
-                    sender: sender,
-                    recipient: recipientAddress
-                });
-                // send invitation mail
-                var promise = outbox.put(invitationMail).then(function() {
-                    return invitation.invite({
-                        recipient: recipientAddress,
-                        sender: sender
-                    });
-                });
-                sendJobs.push(promise);
-                // remember already invited users to prevent spamming
-                $scope.invited.push(recipientAddress);
-            });
-
-            return Promise.all(sendJobs);
-
-        }).catch(function(err) {
-            $scope.showInvite = true;
-            return dialog.error(err);
-        });
-    };
 
     //
     // Editing email body
@@ -456,9 +363,6 @@ var WriteCtrl = function($scope, $window, $filter, $q, appConfig, auth, keychain
 
     $scope.tagStyle = function(recipient) {
         var classes = ['label'];
-        if (recipient.secure === false) {
-            classes.push('label--invalid');
-        }
         return classes;
     };
 
@@ -471,7 +375,7 @@ var WriteCtrl = function($scope, $window, $filter, $q, appConfig, auth, keychain
                 return;
             }
             // populate address book cache
-            return keychain.listLocalPublicKeys().then(function(keys) {
+/*            return keychain.listLocalPublicKeys().then(function(keys) {
                 $scope.addressBookCache = keys.map(function(key) {
                     var name = pgp.getKeyParams(key.publicKey).userIds[0].name;
                     return {
@@ -479,7 +383,9 @@ var WriteCtrl = function($scope, $window, $filter, $q, appConfig, auth, keychain
                         displayId: name + ' - ' + key.userId
                     };
                 });
-            });
+            }); */
+            
+            $scope.addressBookCache = [];  // TODO: some sort of contact list (Google Contacts?)
 
         }).then(function() {
             // filter the address book cache

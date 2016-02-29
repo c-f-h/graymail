@@ -26,10 +26,9 @@ var SMTP_DB_KEY = 'smtp';
  * auth.getCredentials(...); // called to gather all the information to connect to IMAP/SMTP,
  *                              username, password / oauth token, IMAP/SMTP server host names, ...
  */
-function Auth(appConfigStore, oauth, pgp) {
+function Auth(appConfigStore, oauth) {
     this._appConfigStore = appConfigStore;
     this._oauth = oauth;
-    this._pgp = pgp;
 
     this._initialized = false;
 }
@@ -74,7 +73,7 @@ Auth.prototype.getCredentials = function() {
             return self.getOAuthToken().then(done);
         }
 
-        if (self.passwordNeedsDecryption) {
+        /*if (self.passwordNeedsDecryption) {
             // decrypt password
             return self._pgp.decrypt(self.password, undefined).then(function(pt) {
                 if (!pt.signaturesValid) {
@@ -84,7 +83,7 @@ Auth.prototype.getCredentials = function() {
                 self.passwordNeedsDecryption = false;
                 self.password = pt.decrypted;
             }).then(done);
-        }
+        } */
 
         return done();
     }
@@ -149,9 +148,7 @@ Auth.prototype.storeCredentials = function() {
 
     if (!self.credentialsDirty) {
         // nothing to store if credentials not dirty
-        return new Promise(function(resolve) {
-            resolve();
-        });
+        return Promise.resolve();
     }
 
     // persist the config
@@ -166,13 +163,15 @@ Auth.prototype.storeCredentials = function() {
             return;
         }
 
-        if (self.passwordNeedsDecryption) {
+        return self._appConfigStore.storeList([self.password], PASSWD_DB_KEY).then(resolve);
+
+        /*if (self.passwordNeedsDecryption) {
             // password is not decrypted yet, so no need to re-encrypt it before storing...
             return self._appConfigStore.storeList([self.password], PASSWD_DB_KEY).then(resolve);
         }
         return self._pgp.encrypt(self.password, undefined).then(function(ciphertext) {
             return self._appConfigStore.storeList([ciphertext], PASSWD_DB_KEY).then(resolve);
-        });
+        });*/
     });
 
     return Promise.all([
@@ -194,11 +193,9 @@ Auth.prototype.getEmailAddress = function() {
     var self = this;
 
     if (self.emailAddress) {
-        return new Promise(function(resolve) {
-            resolve({
-                emailAddress: self.emailAddress,
-                realname: self.realname
-            });
+        return Promise.resolve({
+            emailAddress: self.emailAddress,
+            realname: self.realname
         });
     }
 
@@ -269,9 +266,7 @@ Auth.prototype._loadCredentials = function() {
     var self = this;
 
     if (self.initialized) {
-        return new Promise(function(resolve) {
-            resolve();
-        });
+        return Promise.resolve();
     }
 
     return loadFromDB(SMTP_DB_KEY).then(function(smtp) {
@@ -296,7 +291,7 @@ Auth.prototype._loadCredentials = function() {
 
     }).then(function(password) {
         self.password = password;
-        self.passwordNeedsDecryption = !!password;
+        self.passwordNeedsDecryption = false; //!!password;
         self.initialized = true;
     });
 

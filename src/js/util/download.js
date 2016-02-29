@@ -4,12 +4,12 @@ var ngModule = angular.module('woUtil');
 ngModule.service('download', Download);
 module.exports = Download;
 
-var util = require('crypto-lib').util;
-
 /**
  * A download helper to abstract platform specific behavior
  */
-function Download() {}
+function Download(util) {
+    this.util = util;
+}
 
 /**
  * Create download link and click on it.
@@ -59,7 +59,7 @@ Download.prototype.createDownload = function(options) {
     } else {
         // anything else, where anything at all is better than nothing
         if (typeof content !== 'string' && content.buffer) {
-            content = util.arrBuf2BinStr(content.buffer);
+            content = this.util.arrBuf2BinStr(content.buffer);
         }
         window.open('data:' + contentType + ';base64,' + btoa(content), '_blank');
     }
