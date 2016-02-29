@@ -9,7 +9,7 @@ Graymail supports IMAP mailboxes and sending email over SMTP.
 
 Clone the git repository
 
-    git clone https://github.com/whiteout-io/mail.git
+    git clone https://github.com/c-f-h/graymail.git
 
 Build and generate the `dist/` directory:
 
