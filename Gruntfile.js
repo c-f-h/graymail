@@ -283,7 +283,6 @@ module.exports = function(grunt) {
                     'node_modules/iframe-resizer/js/iframeResizer.min.js',
                     'src/lib/fastclick/fastclick.js',
                     'src/lib/lawnchair/lawnchair-git.js',
-                    'src/lib/lawnchair/lawnchair-adapter-webkit-sqlite-git.js',
                     'src/lib/lawnchair/lawnchair-adapter-indexed-db-git.js',
                     'dist/js/app.browserified.js',
                     '<%= ngtemplates.mail.dest %>'
@@ -325,7 +324,6 @@ module.exports = function(grunt) {
                     'src/lib/angular/angular-route.js',
                     'src/lib/angular/angular-mocks.js',
                     'src/lib/lawnchair/lawnchair-git.js',
-                    'src/lib/lawnchair/lawnchair-adapter-webkit-sqlite-git.js',
                     'src/lib/lawnchair/lawnchair-adapter-indexed-db-git.js',
                     'test/unit/index.browserified.js'
                 ],
@@ -341,7 +339,6 @@ module.exports = function(grunt) {
                     'src/lib/angular/angular.js',
                     'src/lib/angular/angular-mocks.js',
                     'src/lib/lawnchair/lawnchair-git.js',
-                    'src/lib/lawnchair/lawnchair-adapter-webkit-sqlite-git.js',
                     'src/lib/lawnchair/lawnchair-adapter-indexed-db-git.js',
                     'test/integration/index.browserified.js'
                 ],
