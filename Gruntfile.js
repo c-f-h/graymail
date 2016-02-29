@@ -516,7 +516,7 @@ module.exports = function(grunt) {
         watch: {
             css: {
                 files: ['src/sass/**/*.scss'],
-                tasks: ['dist-css', 'offline-cache', 'dist-styleguide']
+                tasks: ['dist-css', 'dist-styleguide']
             },
             styleguide: {
                 files: ['src/styleguide/**/*.hbs', 'src/styleguide/**/*.js'],
@@ -536,15 +536,15 @@ module.exports = function(grunt) {
             },
             icons: {
                 files: ['src/index.html', 'src/img/icons/*.svg', '!src/img/icons/all.svg'],
-                tasks: ['svgmin', 'svgstore', 'string-replace', 'dist-styleguide', 'offline-cache']
+                tasks: ['svgmin', 'svgstore', 'string-replace', 'dist-styleguide']
             },
             lib: {
                 files: ['src/lib/**/*.js'],
-                tasks: ['copy:lib', 'offline-cache']
+                tasks: ['copy:lib']
             },
             app: {
                 files: ['src/*.js', 'src/*.html', 'src/tpl/**/*.html', 'src/**/*.json', 'src/manifest.*', 'src/img/**/*', 'src/font/**/*'],
-                tasks: ['copy:app', 'copy:tpl', 'copy:img', 'copy:font', 'manifest-dev', 'offline-cache']
+                tasks: ['copy:app', 'copy:tpl', 'copy:img', 'copy:font', 'manifest-dev']
             }
         },
 
@@ -561,138 +561,6 @@ module.exports = function(grunt) {
                 src: ['**/*'],
                 dest: 'release/'
             }
-        },
-
-        // Offline caching
-
-        swPrecache: {
-            prod: {
-                handleFetch: true,
-                rootDir: 'dist'
-            }
-        },
-
-        manifest: {
-            generate: {
-                options: {
-                    basePath: 'dist/',
-                    timestamp: true,
-                    hash: true,
-                    exclude: [
-                        'appcache.manifest',
-                        'manifest.webapp',
-                        'manifest.mobile.json',
-                        'background.js',
-                        'service-worker.js',
-                        'styleguide/css/styleguide.min.css',
-                        'styleguide/index.html',
-                        'js/app.templates.js',
-                        'js/app.js.map',
-                        'js/app.min.js.map',
-                        'js/app.browserified.js',
-                        'js/app.browserified.js.map',
-                        'js/crypto/pbkdf2-worker.browserified.js',
-                        'js/pbkdf2-worker.browserified.js',
-                        'js/pbkdf2-worker.min.js.map',
-                        'js/read-sandbox.min.js.map',
-                        'js/mailreader-parser-worker.browserified.js',
-                        'js/mailreader-parser-worker.min.js.map',
-                        'js/tcp-socket-tls-worker.browserified.js',
-                        'js/tcp-socket-tls-worker.min.js.map',
-                        'js/browserbox-compression-worker.browserified.js',
-                        'js/browserbox-compression-worker.min.js.map',
-                        'img/icon-100-ios.png',
-                        'img/icon-114-ios.png',
-                        'img/icon-120-ios.png',
-                        'img/icon-128-chrome.png',
-                        'img/icon-144-android.png',
-                        'img/icon-144-ios.png',
-                        'img/icon-152-ios.png',
-                        'img/icon-180-ios.png',
-                        'img/icon-192-android.png',
-                        'img/icon-29-ios.png',
-                        'img/icon-36-android.png',
-                        'img/icon-40-ios.png',
-                        'img/icon-48-android.png',
-                        'img/icon-50-ios.png',
-                        'img/icon-57-ios.png',
-                        'img/icon-58-ios.png',
-                        'img/icon-60-android.png',
-                        'img/icon-60-ios.png',
-                        'img/icon-72-android.png',
-                        'img/icon-72-ios.png',
-                        'img/icon-76-ios.png',
-                        'img/icon-78-android.png',
-                        'img/icon-80-ios.png',
-                        'img/icon-87-ios.png',
-                        'img/icon-96-android.png',
-                        'img/Default-568h@2x~iphone.png',
-                        'img/Default-667h.png',
-                        'img/Default-736h.png',
-                        'img/Default-Landscape-736h.png',
-                        'img/Default-Landscape@2x~ipad.png',
-                        'img/Default-Landscape~ipad.png',
-                        'img/Default-Portrait@2x~ipad.png',
-                        'img/Default-Portrait~ipad.png',
-                        'img/Default@2x~iphone.png',
-                        'img/Default~iphone.png'
-                    ],
-                    master: ['index.html']
-                },
-                src: ['**/*.*'],
-                dest: 'dist/appcache.manifest'
-            }
-        }
-
-    });
-
-    // generate service-worker stasks
-    grunt.registerMultiTask('swPrecache', function() {
-        var fs = require('fs');
-        var path = require('path');
-        var swPrecache = require('sw-precache');
-        var packageJson = require('./package.json');
-
-        var done = this.async();
-        var rootDir = this.data.rootDir;
-        var handleFetch = this.data.handleFetch;
-
-        generateServiceWorkerFileContents(rootDir, handleFetch, function(error, serviceWorkerFileContents) {
-            if (error) {
-                grunt.fail.warn(error);
-            }
-            fs.writeFile(path.join(rootDir, 'service-worker.js'), serviceWorkerFileContents, function(error) {
-                if (error) {
-                    grunt.fail.warn(error);
-                }
-                done();
-            });
-        });
-
-        function generateServiceWorkerFileContents(rootDir, handleFetch, callback) {
-            var config = {
-                cacheId: packageJson.name,
-                // If handleFetch is false (i.e. because this is called from swPrecache:dev), then
-                // the service worker will precache resources but won't actually serve them.
-                // This allows you to test precaching behavior without worry about the cache preventing your
-                // local changes from being picked up during the development cycle.
-                handleFetch: handleFetch,
-                logger: grunt.log.writeln,
-                staticFileGlobs: [
-                    rootDir + '/*.html',
-                    rootDir + '/tpl/*.html',
-                    rootDir + '/js/**/*.min.js',
-                    rootDir + '/css/**/*.css',
-                    rootDir + '/img/**/*.svg',
-                    rootDir + '/img/*-universal.png',
-                    rootDir + '/font/**.*',
-                    rootDir + '/*.json'
-                ],
-                maximumFileSizeToCacheInBytes: 100 * 1024 * 1024,
-                stripPrefix: path.join(rootDir, path.sep)
-            };
-
-            swPrecache(config, callback);
         }
     });
 
@@ -709,7 +577,6 @@ module.exports = function(grunt) {
     grunt.loadNpmTasks('grunt-contrib-watch');
     grunt.loadNpmTasks('grunt-contrib-copy');
     grunt.loadNpmTasks('grunt-contrib-compress');
-    grunt.loadNpmTasks('grunt-manifest');
     grunt.loadNpmTasks('grunt-mocha-phantomjs');
     grunt.loadNpmTasks('grunt-exorcise');
     grunt.loadNpmTasks('grunt-string-replace');
@@ -729,8 +596,7 @@ module.exports = function(grunt) {
         'ngtemplates',
         'concat:app',
         'concat:readSandbox',
-        'concat:pbkdf2Worker',
-        'offline-cache'
+        'concat:pbkdf2Worker'
     ]);
     grunt.registerTask('dist-js-unitTest', [
         'browserify:unitTest',
@@ -746,9 +612,7 @@ module.exports = function(grunt) {
     grunt.registerTask('dist-assets', ['svgmin', 'svgstore', 'string-replace']);
     grunt.registerTask('dist-styleguide', ['sass:styleguide', 'autoprefixer:styleguide', 'csso:styleguide', 'assemble:styleguide']);
     // generate styleguide after manifest to forward version number to styleguide
-    grunt.registerTask('dist', ['clean:dist', 'shell', 'dist-css', 'dist-js', 'dist-assets', 'dist-copy', 'manifest', 'dist-styleguide']);
-
-    grunt.registerTask('offline-cache', ['manifest', 'swPrecache:prod']);
+    grunt.registerTask('dist', ['clean:dist', 'shell', 'dist-css', 'dist-js', 'dist-assets', 'dist-copy', 'dist-styleguide']);
 
     // Test/Dev tasks
     grunt.registerTask('dev', ['connect:dev']);
@@ -809,9 +673,9 @@ module.exports = function(grunt) {
         fs.writeFileSync(path, JSON.stringify(manifest, null, 2));
     }
 
-    grunt.registerTask('release-dev', ['dist', 'manifest-dev', 'swPrecache:prod', 'compress']);
-    grunt.registerTask('release-test', ['dist', 'manifest-test', 'clean:release', 'swPrecache:prod', 'compress']);
-    grunt.registerTask('release-prod', ['dist', 'manifest-prod', 'clean:release', 'swPrecache:prod', 'compress']);
+    grunt.registerTask('release-dev', ['dist', 'manifest-dev', 'compress']);
+    grunt.registerTask('release-test', ['dist', 'manifest-test', 'clean:release', 'compress']);
+    grunt.registerTask('release-prod', ['dist', 'manifest-prod', 'clean:release', 'compress']);
     grunt.registerTask('default', ['release-dev']);
 
 };

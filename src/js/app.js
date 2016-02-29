@@ -4,9 +4,6 @@
 // to keep tcp-socket from throwing an error
 window.forge = {};
 
-// use service-worker or app-cache for offline caching
-require('./offline-cache');
-
 //
 // Angular app config
 //
