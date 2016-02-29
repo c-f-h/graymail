@@ -61,14 +61,6 @@ if (typeof chrome !== 'undefined' && chrome.runtime && chrome.runtime.getManifes
 function setConfigParams(manifest) {
     var cfg = appCfg.config;
 
-    function getUrl(beginsWith) {
-        return _.find(manifest.permissions, function(permission) {
-            return typeof permission === 'string' && permission.indexOf(beginsWith) === 0;
-        }).replace(/\/$/, ''); // remove last '/' from url due to required syntax in manifest
-    }
-
-    // get key server base url
-    //cfg.keyServerUrl = getUrl('https://keys');
     // get the app version
     cfg.appVersion = manifest.version;
 }

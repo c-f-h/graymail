@@ -361,7 +361,7 @@ var WriteCtrl = function($scope, $window, $filter, $q, appConfig, auth, email, o
     // Tag input & Autocomplete
     //
 
-    $scope.tagStyle = function(recipient) {
+    $scope.tagStyle = function(/* recipient */) {
         var classes = ['label'];
         return classes;
     };

@@ -1,6 +1,6 @@
 'use strict';
 
-var AccountCtrl = function($scope, $q, auth, keychain, pgp, appConfig, download, dialog) {
+var AccountCtrl = function($scope, auth) {
     var userId = auth.emailAddress;
     if (!userId) {
         return;

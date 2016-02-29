@@ -1,11 +1,7 @@
 'use strict';
 
 (function(factory) {
-    if (typeof define === 'function' && define.amd) {
-        define(['./plainbuilder', 'smtpclient'], factory);
-    } else if (typeof exports === 'object') {
-        module.exports = factory(require('./plainbuilder'), require('wo-smtpclient'));
-    }
+    module.exports = factory(require('./plainbuilder'), require('wo-smtpclient'));
 }(function(PlainBuilder, SmtpClient) {
     /**
      * Constructor for the high level api.

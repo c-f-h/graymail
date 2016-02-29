@@ -5,7 +5,6 @@ ngModule.service('email', Email);
 module.exports = Email;
 
 var config = require('../app-config').config,
-    str = require('../app-config').string,
     axe = require('axe-logger'),
     PlainMailer = require('./plainmailer'),
     ImapClient = require('imap-client');
@@ -1390,8 +1389,6 @@ Email.prototype._localDeleteMessage = function(options) {
  * @param {Object} message DTO
  */
 Email.prototype._extractBody = function(message) {
-    var self = this;
-
     return new Promise(function(resolve) {
         resolve();
 

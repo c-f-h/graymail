@@ -32,7 +32,7 @@ factory('util', function() {
         
             return str;
         }
-    }
+    };
 });
 
 require('./axe');

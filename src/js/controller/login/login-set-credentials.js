@@ -18,7 +18,7 @@ var SetCredentialsCtrl = function($scope, $location, $routeParams, $q, auth, con
         return auth.getCredentials();
         
     }).then(function(cred) {
-        if (cred.imap.auth.user && cred.imap.auth.user != $scope.emailAddress) {
+        if (cred.imap.auth.user && cred.imap.auth.user !== $scope.emailAddress) {
             $scope.username = cred.imap.user;
         }
         console.log(cred.imap);
@@ -35,9 +35,9 @@ var SetCredentialsCtrl = function($scope, $location, $routeParams, $q, auth, con
         $scope.$apply();
 
         function parseTLSType(opts) {
-            if (opts.secure)            return ENCRYPTION_METHOD_TLS;
-            else if (opts.ignoreTLS)    return ENCRYPTION_METHOD_NONE;
-            else                        return ENCRYPTION_METHOD_STARTTLS;
+            if (opts.secure)            { return ENCRYPTION_METHOD_TLS; }
+            else if (opts.ignoreTLS)    { return ENCRYPTION_METHOD_NONE; }
+            else                        { return ENCRYPTION_METHOD_STARTTLS; }
         }
     }).catch(function (err) {
         console.log(err);
