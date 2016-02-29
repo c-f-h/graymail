@@ -7,7 +7,7 @@ var ImapClient = require('imap-client'),
     LawnchairDAO = require('../../src/js/service/lawnchair'),
     DeviceStorageDAO = require('../../src/js/service/devicestorage'),
     mailreader = require('mailreader'),
-    PgpMailer = require('pgpmailer'),
+    PgpMailer = require('../../src/js/email/plainmailer'),
     config = require('../../src/js/app-config').config,
     str = require('../../src/js/app-config').string;
 

@@ -2,8 +2,8 @@
 
 var mailreader = require('mailreader'),
     ImapClient = require('imap-client'),
-    PgpMailer = require('pgpmailer'),
-    PgpBuilder = require('pgpbuilder'),
+    PgpMailer = require('../../../src/js/email/plainmailer'),
+    PgpBuilder = require('../../../src/js/email/plainbuilder'),
     cfg = require('../../../src/js/app-config').config,
     EmailDAO = require('../../../src/js/email/email'),
     KeychainDAO = require('../../../src/js/service/keychain'),
