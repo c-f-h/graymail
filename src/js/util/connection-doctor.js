@@ -6,7 +6,7 @@ module.exports = ConnectionDoctor;
 
 var TCPSocket = require('emailjs-tcp-socket'),
     ImapClient = require('imap-client'),
-    SmtpClient = require('wo-smtpclient');
+    SmtpClient = require('emailjs-smtp-client');
 
 /**
  * The connection doctor can check your connection. In essence, it reconstructs what happens when

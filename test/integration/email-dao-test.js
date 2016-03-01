@@ -3,7 +3,7 @@
 var ImapClient = require('imap-client'),
     BrowserCrow = require('browsercrow'),
     BrowserSMTP = require('browsersmtp'),
-    SmtpClient = require('wo-smtpclient'),
+    SmtpClient = require('emailjs-smtp-client'),
     LawnchairDAO = require('../../src/js/service/lawnchair'),
     DeviceStorageDAO = require('../../src/js/service/devicestorage'),
     mailreader = require('mailreader'),

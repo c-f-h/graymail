@@ -2,7 +2,7 @@
 
 var TCPSocket = require('tcp-socket'),
     ImapClient = require('imap-client'),
-    SmtpClient = require('wo-smtpclient'),
+    SmtpClient = require('emailjs-smtp-client'),
     ConnectionDoctor = require('../../../src/js/util/connection-doctor'),
     appConfig = require('../../../src/js/app-config'),
     cfg = appConfig.config;

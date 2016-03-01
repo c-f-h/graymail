@@ -1,7 +1,7 @@
 'use strict';
 
 (function(factory) {
-    module.exports = factory(require('./plainbuilder'), require('wo-smtpclient'));
+    module.exports = factory(require('./plainbuilder'), require('emailjs-smtp-client'));
 }(function(PlainBuilder, SmtpClient) {
     /**
      * Constructor for the high level api.
