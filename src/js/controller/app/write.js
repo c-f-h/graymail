@@ -374,17 +374,8 @@ var WriteCtrl = function($scope, $window, $filter, $q, appConfig, auth, email, o
             if ($scope.addressBookCache) {
                 return;
             }
-            // populate address book cache
-/*            return keychain.listLocalPublicKeys().then(function(keys) {
-                $scope.addressBookCache = keys.map(function(key) {
-                    var name = pgp.getKeyParams(key.publicKey).userIds[0].name;
-                    return {
-                        address: key.userId,
-                        displayId: name + ' - ' + key.userId
-                    };
-                });
-            }); */
-            
+
+            // entries should be of the form { address: '', displayId: '' }
             $scope.addressBookCache = [];  // TODO: some sort of contact list (Google Contacts?)
 
         }).then(function() {

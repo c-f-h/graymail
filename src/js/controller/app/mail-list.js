@@ -11,7 +11,7 @@ var INIT_DISPLAY_LEN = 50,
     FOLDER_TYPE_INBOX = 'Inbox',
     NOTIFICATION_INBOX_TIMEOUT = 5000;
 
-var MailListCtrl = function($scope, $timeout, $location, $filter, $q, status, notification, email, keychain, dialog, search, dummy) {
+var MailListCtrl = function($scope, $timeout, $location, $filter, $q, status, notification, email, dialog, search, dummy) {
 
     //
     // scope state

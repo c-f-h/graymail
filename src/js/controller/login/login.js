@@ -1,6 +1,6 @@
 'use strict';
 
-var LoginCtrl = function($scope, $timeout, $location, updateHandler, account, auth, email, keychain, dialog, appConfig) {
+var LoginCtrl = function($scope, $timeout, $location, updateHandler, account, auth, dialog, appConfig) {
 
     //
     // Scope functions
