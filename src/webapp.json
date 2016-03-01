@@ -1,6 +1,6 @@
 {
-  "name": "Whiteout Mail",
-  "short_name": "Whiteout",
+  "name": "Graymail",
+  "short_name": "Graymail",
   "start_url": "index.html",
   "display": "standalone",
   "icons": [{
