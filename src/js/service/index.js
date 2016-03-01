@@ -7,7 +7,6 @@ require('./invitation');
 require('./mail-config');
 require('./newsletter');
 require('./oauth');
-require('./privatekey');
 require('./publickey');
 require('./hkp');
 require('./admin');
