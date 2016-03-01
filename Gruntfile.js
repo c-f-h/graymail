@@ -45,10 +45,7 @@ module.exports = function(grunt) {
                     'node_modules/sinon/pkg/sinon.js',
                     'node_modules/browsercrow/src/*.js',
                     'node_modules/browsersmtp/src/*.js',
-                    'node_modules/openpgp/dist/openpgp.min.js',
-                    'node_modules/openpgp/dist/openpgp.worker.min.js',
-                    'src/lib/forge/forge.min.js',
-                    'dist/js/pbkdf2-worker.min.js'
+                    'src/lib/forge/forge.min.js'
                 ],
                 dest: 'test/lib/'
             },
@@ -57,8 +54,6 @@ module.exports = function(grunt) {
                 flatten: true,
                 cwd: './',
                 src: [
-                    'node_modules/openpgp/dist/openpgp.min.js',
-                    'node_modules/openpgp/dist/openpgp.worker.min.js',
                     'src/lib/forge/forge.min.js'
                 ],
                 dest: 'dist/js/'
@@ -281,10 +276,6 @@ module.exports = function(grunt) {
                 ],
                 dest: 'dist/js/read-sandbox.min.js'
             },
-            pbkdf2Worker: {
-                src: ['dist/js/pbkdf2-worker.browserified.js'],
-                dest: 'dist/js/pbkdf2-worker.min.js'
-            },
             mailreaderWorker: {
                 src: ['dist/js/mailreader-parser-worker.browserified.js'],
                 dest: 'dist/js/mailreader-parser-worker.min.js'
@@ -350,11 +341,6 @@ module.exports = function(grunt) {
                 options: {
                     sourceMap: true,
                     sourceMapName: 'dist/js/read-sandbox.min.js.map'
-                }
-            },
-            pbkdf2Worker: {
-                files: {
-                    'dist/js/pbkdf2-worker.min.js': ['dist/js/pbkdf2-worker.min.js']
                 }
             },
             mailreaderWorker: {
@@ -572,12 +558,10 @@ module.exports = function(grunt) {
     grunt.registerTask('dist-js', ['browserify', 'exorcise', 'ngtemplates', 'concat', 'uglify']);
     grunt.registerTask('dist-js-app', [
         'browserify:app',
-        'browserify:pbkdf2Worker',
         'exorcise:app',
         'ngtemplates',
         'concat:app',
-        'concat:readSandbox',
-        'concat:pbkdf2Worker'
+        'concat:readSandbox'
     ]);
     grunt.registerTask('dist-js-unitTest', [
         'browserify:unitTest',

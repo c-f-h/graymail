@@ -45,6 +45,5 @@ Then load the `dist/` directory as an unpacked extension in Chrome.
 
 The following open source libraries are used in this software:
 
-* [OpenPGP.js](http://openpgpjs.org) (LGPL license): An implementation of OpenPGP in Javascript
 * [email.js](http://emailjs.org) (MIT license): IMAP, SMTP, MIME-building and MIME-parsing engine
 * [Forge](https://github.com/digitalbazaar/forge) (BSD license): An implementation of TLS in JavaScript
