@@ -1,7 +1,6 @@
 'use strict';
 
 var Account = require('../../../src/js/email/account'),
-    appConfig = require('../../../src/js/app-config'),
     Auth = require('../../../src/js/service/auth'),
     DeviceStorageDAO = require('../../../src/js/service/devicestorage'),
     Email = require('../../../src/js/email/email'),
@@ -24,7 +23,7 @@ describe('Account Service unit test', function() {
         outboxStub = sinon.createStubInstance(Outbox);
         updateHandlerStub = sinon.createStubInstance(UpdateHandler);
         dialogStub = sinon.createStubInstance(Dialog);
-        account = new Account(appConfig, authStub, devicestorageStub, emailStub, outboxStub, updateHandlerStub, dialogStub);
+        account = new Account(authStub, devicestorageStub, emailStub, outboxStub, updateHandlerStub, dialogStub);
     });
 
     afterEach(function() {});

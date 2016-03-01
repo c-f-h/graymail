@@ -4,8 +4,7 @@ var ngModule = angular.module('woEmail');
 ngModule.service('account', Account);
 module.exports = Account;
 
-function Account(appConfig, auth, accountStore, email, outbox, updateHandler, dialog, util) {
-    this._appConfig = appConfig;
+function Account(auth, accountStore, email, outbox, updateHandler, dialog, util) {
     this._auth = auth;
     this._accountStore = accountStore;
     this._emailDao = email;
@@ -41,8 +40,7 @@ Account.prototype.init = function(options) {
     // account information for the email dao
     var account = {
         realname: options.realname,
-        emailAddress: options.emailAddress,
-        asymKeySize: this._appConfig.config.asymKeySize
+        emailAddress: options.emailAddress
     };
 
     // Pre-Flight check: don't even start to initialize stuff if the email address is not valid

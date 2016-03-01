@@ -65,7 +65,6 @@ Outbox.prototype.put = function(mail) {
         });
     }
 
-    mail.publicKeysArmored = []; // gather the public keys
     mail.uid = mail.id = this.util.UUID(); // the mail needs a random id & uid for storage in the database
 
     return storeAndForward(mail);

@@ -19,7 +19,6 @@
 
     /**
      * Sends a mail object.
-     * @param {Boolean} options.encrypt (optional) If true, the message will be encrypted with the public keys in options.publicKeysArmored. Otherwise, the message will be signed with the private key and sent in the clear. Default: false
      * @param {Object} options.mail.from Array containing one object with the ASCII string representing the sender address, e.g. 'foo@bar.io'
      * @param {Array} options.mail.to (optional) Array of objects with the ASCII string representing the recipient (e.g. ['the.dude@lebowski.com', 'donny@kerabatsos.com'])
      * @param {Object} options.mail.cc (optional) Array of objects with the ASCII string representing the recipient, see mail.to
@@ -28,8 +27,6 @@
      * @param {String} options.mail.headers Object custom headers to add to the message header
      * @param {String} options.mail.body Plain text body to be sent with the mail
      * @param {Array} options.mail.attachments (optional) Array of attachment objects with filename {String}, content {Uint8Array}, and mimeType {String}
-     * @param {Boolean} options.mail.encrypted Indicating if the mail is already encrypted
-     * @param {Array} options.publicKeysArmored The public keys with which the message should be encrypted
      *
      * * @return {Promise<String>} Resolves with the mail source when the mail has been sent
      */
