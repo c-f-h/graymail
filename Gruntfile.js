@@ -44,8 +44,7 @@ module.exports = function(grunt) {
                     'node_modules/chai/chai.js',
                     'node_modules/sinon/pkg/sinon.js',
                     'node_modules/browsercrow/src/*.js',
-                    'node_modules/browsersmtp/src/*.js',
-                    'src/lib/forge/forge.min.js'
+                    'node_modules/browsersmtp/src/*.js'
                 ],
                 dest: 'test/lib/'
             },
@@ -54,7 +53,6 @@ module.exports = function(grunt) {
                 flatten: true,
                 cwd: './',
                 src: [
-                    'src/lib/forge/forge.min.js'
                 ],
                 dest: 'dist/js/'
             },
