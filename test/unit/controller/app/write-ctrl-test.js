@@ -3,7 +3,6 @@
 var WriteCtrl = require('../../../../src/js/controller/app/write'),
     Email = require('../../../../src/js/email/email'),
     Outbox = require('../../../../src/js/email/outbox'),
-    Keychain = require('../../../../src/js/service/keychain'),
     Auth = require('../../../../src/js/service/auth'),
     PGP = require('../../../../src/js/crypto/pgp'),
     Status = require('../../../../src/js/util/status'),
@@ -12,7 +11,7 @@ var WriteCtrl = require('../../../../src/js/controller/app/write'),
 
 describe('Write controller unit test', function() {
     var ctrl, scope,
-        authMock, pgpMock, dialogMock, emailMock, keychainMock, outboxMock, statusMock, invitationMock,
+        authMock, pgpMock, dialogMock, emailMock, outboxMock, statusMock, invitationMock,
         emailAddress, realname;
 
     beforeEach(function() {
@@ -22,7 +21,6 @@ describe('Write controller unit test', function() {
         dialogMock = sinon.createStubInstance(Dialog);
         outboxMock = sinon.createStubInstance(Outbox);
         emailMock = sinon.createStubInstance(Email);
-        keychainMock = sinon.createStubInstance(Keychain);
         statusMock = sinon.createStubInstance(Status);
         invitationMock = sinon.createStubInstance(Invitation);
 
@@ -40,7 +38,6 @@ describe('Write controller unit test', function() {
                 $scope: scope,
                 $q: window.qMock,
                 auth: authMock,
-                keychain: keychainMock,
                 pgp: pgpMock,
                 email: emailMock,
                 outbox: outboxMock,
@@ -184,102 +181,6 @@ describe('Write controller unit test', function() {
             expect(recipient.key).to.be.undefined;
             expect(recipient.secure).to.be.undefined;
             expect(scope.checkSendStatus.callCount).to.equal(2);
-            expect(keychainMock.getReceiverPublicKey.called).to.be.false;
-        });
-
-        it('should not work for error in keychain', function(done) {
-            var recipient = {
-                address: 'asds@example.com'
-            };
-
-            keychainMock.refreshKeyForUserId.withArgs({
-                userId: recipient.address
-            }).returns(rejects({
-                errMsg: '404 not found yadda yadda'
-            }));
-
-            scope.verify(recipient).then(function() {
-                expect(dialogMock.error.calledOnce).to.be.true;
-                expect(recipient.key).to.be.undefined;
-                expect(recipient.secure).to.be.false;
-                expect(scope.checkSendStatus.callCount).to.equal(1);
-                expect(keychainMock.refreshKeyForUserId.calledOnce).to.be.true;
-                done();
-            });
-        });
-
-        it('should work for no key in keychain', function(done) {
-            var recipient = {
-                address: 'asds@example.com'
-            };
-
-            keychainMock.refreshKeyForUserId.withArgs({
-                userId: recipient.address
-            }).returns(resolves());
-
-            scope.verify(recipient).then(function() {
-                expect(recipient.key).to.be.undefined;
-                expect(recipient.secure).to.be.false;
-                expect(scope.showInvite).to.be.true;
-                expect(scope.checkSendStatus.callCount).to.equal(2);
-                expect(keychainMock.refreshKeyForUserId.calledOnce).to.be.true;
-                done();
-            });
-        });
-
-        it('should work for main userId', function(done) {
-            var recipient = {
-                address: 'asdf@example.com'
-            };
-
-            keychainMock.refreshKeyForUserId.withArgs({
-                userId: recipient.address
-            }).returns(resolves({
-                userId: 'asdf@example.com'
-            }));
-            pgpMock.getKeyParams.returns({
-                userIds: [{
-                    emailAddress: recipient.address
-                }]
-            });
-
-            scope.verify(recipient).then(function() {
-                expect(recipient.key).to.deep.equal({
-                    userId: 'asdf@example.com'
-                });
-                expect(recipient.secure).to.be.true;
-                expect(scope.showInvite).to.be.undefined;
-                expect(scope.checkSendStatus.callCount).to.equal(2);
-                expect(keychainMock.refreshKeyForUserId.calledOnce).to.be.true;
-                done();
-            });
-        });
-
-        it('should work for secondary userId', function(done) {
-            var recipient = {
-                address: 'asdf@example.com'
-            };
-            var key = {
-                userId: 'qwertz@example.com'
-            };
-
-            keychainMock.refreshKeyForUserId.withArgs({
-                userId: recipient.address
-            }).returns(resolves(key));
-            pgpMock.getKeyParams.returns({
-                userIds: [{
-                    emailAddress: recipient.address
-                }]
-            });
-
-            scope.verify(recipient).then(function() {
-                expect(recipient.key).to.deep.equal(key);
-                expect(recipient.secure).to.be.true;
-                expect(scope.showInvite).to.be.undefined;
-                expect(scope.checkSendStatus.callCount).to.equal(2);
-                expect(keychainMock.refreshKeyForUserId.calledOnce).to.be.true;
-                done();
-            });
         });
     });
 
@@ -476,15 +377,11 @@ describe('Write controller unit test', function() {
 
     describe('lookupAddressBook', function() {
         it('should work', function(done) {
-            keychainMock.listLocalPublicKeys.returns(resolves([{
-                userId: 'test@asdf.com',
-                publicKey: 'KEY'
-            }]));
-            pgpMock.getKeyParams.returns({
-                userIds: [{
-                    name: 'Bob'
-                }]
-            });
+            //mock.listLocalPublicKeys.returns(resolves([{
+            //    name: 'Bob'
+            //    userId: 'test@asdf.com',
+            //    publicKey: 'KEY'
+            //}]));
 
             var result = scope.lookupAddressBook('test');
 

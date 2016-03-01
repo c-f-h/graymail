@@ -2,13 +2,12 @@
 
 var MailListCtrl = require('../../../../src/js/controller/app/mail-list'),
     EmailDAO = require('../../../../src/js/email/email'),
-    KeychainDAO = require('../../../../src/js/service/keychain'),
     Status = require('../../../../src/js/util/status'),
     Dialog = require('../../../../src/js/util/dialog'),
     Search = require('../../../../src/js/email/search');
 
 describe('Mail List controller unit test', function() {
-    var scope, ctrl, statusMock, notificationMock, emailMock, keychainMock, dialogMock, searchMock,
+    var scope, ctrl, statusMock, notificationMock, emailMock, dialogMock, searchMock,
         emailAddress, emails, location;
 
     beforeEach(function() {
@@ -29,7 +28,6 @@ describe('Mail List controller unit test', function() {
 
         statusMock = sinon.createStubInstance(Status);
         emailMock = sinon.createStubInstance(EmailDAO);
-        keychainMock = sinon.createStubInstance(KeychainDAO);
         dialogMock = sinon.createStubInstance(Dialog);
         searchMock = sinon.createStubInstance(Search);
 
@@ -48,7 +46,6 @@ describe('Mail List controller unit test', function() {
                 status: statusMock,
                 notification: notificationMock,
                 email: emailMock,
-                keychain: keychainMock,
                 dialog: dialogMock,
                 search: searchMock
             });
@@ -273,13 +270,8 @@ describe('Mail List controller unit test', function() {
                 }
             };
 
-            keychainMock.refreshKeyForUserId.withArgs({
-                userId: mail.from[0].address
-            }).returns(resolves());
-
             scope.select(mail).then(function() {
                 expect(emailMock.decryptBody.calledOnce).to.be.true;
-                expect(keychainMock.refreshKeyForUserId.calledOnce).to.be.true;
                 expect(scope.state.mailList.selected).to.equal(mail);
                 expect(notificationMock.close.calledWith('asd')).to.be.true;
                 expect(notificationMock.close.calledOnce).to.be.true;
@@ -309,13 +301,8 @@ describe('Mail List controller unit test', function() {
                 }
             };
 
-            keychainMock.refreshKeyForUserId.withArgs({
-                userId: mail.from[0].address
-            }).returns(resolves());
-
             scope.select(mail).then(function() {
                 expect(emailMock.decryptBody.calledOnce).to.be.true;
-                expect(keychainMock.refreshKeyForUserId.calledOnce).to.be.true;
                 expect(scope.state.mailList.selected).to.equal(mail);
                 done();
             });

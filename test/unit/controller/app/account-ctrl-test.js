@@ -3,7 +3,6 @@
 var AccountCtrl = require('../../../../src/js/controller/app/account'),
     PGP = require('../../../../src/js/crypto/pgp'),
     Download = require('../../../../src/js/util/download'),
-    Keychain = require('../../../../src/js/service/keychain'),
     Auth = require('../../../../src/js/service/auth'),
     Dialog = require('../../../../src/js/util/dialog');
 
@@ -11,12 +10,11 @@ describe('Account Controller unit test', function() {
     var scope, accountCtrl,
         dummyFingerprint, expectedFingerprint,
         dummyKeyId, expectedKeyId,
-        emailAddress, keySize, pgpStub, keychainStub, authStub, dialogStub, downloadStub;
+        emailAddress, keySize, pgpStub, authStub, dialogStub, downloadStub;
 
     beforeEach(function() {
         pgpStub = sinon.createStubInstance(PGP);
         authStub = sinon.createStubInstance(Auth);
-        keychainStub = sinon.createStubInstance(Keychain);
         dialogStub = sinon.createStubInstance(Dialog);
         downloadStub = sinon.createStubInstance(Download);
 
@@ -45,7 +43,6 @@ describe('Account Controller unit test', function() {
                 $scope: scope,
                 $q: window.qMock,
                 auth: authStub,
-                keychain: keychainStub,
                 pgp: pgpStub,
                 download: downloadStub,
                 dialog: dialogStub
@@ -61,38 +58,6 @@ describe('Account Controller unit test', function() {
             expect(scope.keyId).to.equal(expectedKeyId);
             expect(scope.fingerprint).to.equal(expectedFingerprint);
             expect(scope.keysize).to.equal(keySize);
-        });
-    });
-    describe('export to key file', function() {
-        it('should work', function(done) {
-            keychainStub.getUserKeyPair.withArgs(emailAddress).returns(resolves({
-                publicKey: {
-                    _id: dummyKeyId,
-                    publicKey: 'a'
-                },
-                privateKey: {
-                    encryptedKey: 'b'
-                }
-            }));
-            downloadStub.createDownload.withArgs(sinon.match(function(arg) {
-                return arg.content === 'a\r\nb' && arg.filename === 'whiteout_mail_' + emailAddress + '_' + expectedKeyId + '.asc' && arg.contentType === 'text/plain';
-            })).returns();
-
-            scope.exportKeyFile().then(function() {
-                expect(scope.state.lightbox).to.equal(undefined);
-                expect(keychainStub.getUserKeyPair.calledOnce).to.be.true;
-                expect(downloadStub.createDownload.calledOnce).to.be.true;
-                done();
-            });
-        });
-
-        it('should not work when key export failed', function(done) {
-            keychainStub.getUserKeyPair.returns(rejects(new Error()));
-
-            scope.exportKeyFile().then(function() {
-                expect(dialogStub.error.calledOnce).to.be.true;
-                done();
-            });
         });
     });
 });

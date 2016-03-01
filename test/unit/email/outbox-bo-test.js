@@ -1,12 +1,11 @@
 'use strict';
 
 var OutboxBO = require('../../../src/js/email/outbox'),
-    KeychainDAO = require('../../../src/js/service/keychain'),
     EmailDAO = require('../../../src/js/email/email'),
     DeviceStorageDAO = require('../../../src/js/service/devicestorage');
 
 describe('Outbox unit test', function() {
-    var outbox, emailDaoStub, devicestorageStub, keychainStub,
+    var outbox, emailDaoStub, devicestorageStub,
         dummyUser = 'spiderpig@springfield.com';
 
     chai.config.includeStack = true;
@@ -21,8 +20,7 @@ describe('Outbox unit test', function() {
             online: true
         };
         devicestorageStub = sinon.createStubInstance(DeviceStorageDAO);
-        keychainStub = sinon.createStubInstance(KeychainDAO);
-        outbox = new OutboxBO(emailDaoStub, keychainStub, devicestorageStub);
+        outbox = new OutboxBO(emailDaoStub, devicestorageStub);
     });
 
     afterEach(function() {});
@@ -62,7 +60,6 @@ describe('Outbox unit test', function() {
 
             outbox.put(mail).catch(function(err) {
                 expect(err).to.exist;
-                expect(keychainStub.getReceiverPublicKey.called).to.be.false;
                 done();
             });
         });
@@ -91,10 +88,6 @@ describe('Outbox unit test', function() {
                 cc: [],
                 bcc: []
             };
-
-            keychainStub.getReceiverPublicKey.withArgs(mail.from[0].address).returns(resolves(senderKey));
-            keychainStub.getReceiverPublicKey.withArgs(mail.to[0].address).returns(resolves(receiverKey));
-            keychainStub.getReceiverPublicKey.withArgs(mail.to[1].address).returns(resolves());
 
             devicestorageStub.storeList.withArgs([mail]).returns(resolves());
 
@@ -130,7 +123,6 @@ describe('Outbox unit test', function() {
 
             outbox.put(mail).then(function() {
                 expect(mail.publicKeysArmored.length).to.equal(0);
-                expect(keychainStub.getReceiverPublicKey.called).to.be.false;
                 expect(emailDaoStub.encrypt.called).to.be.false;
                 expect(devicestorageStub.storeList.calledOnce).to.be.true;
 
@@ -162,10 +154,6 @@ describe('Outbox unit test', function() {
                 cc: [],
                 bcc: []
             };
-
-            keychainStub.getReceiverPublicKey.withArgs(mail.from[0].address).returns(resolves(senderKey));
-            keychainStub.getReceiverPublicKey.withArgs(mail.to[0].address).returns(resolves(receiverKey));
-            keychainStub.getReceiverPublicKey.withArgs(mail.to[1].address).returns(resolves(receiverKey));
 
             emailDaoStub.encrypt.withArgs({
                 mail: mail,
@@ -270,7 +258,6 @@ describe('Outbox unit test', function() {
                 expect(emailDaoStub.sendPlaintext.callCount).to.equal(2);
                 expect(devicestorageStub.listItems.callCount).to.equal(1);
                 expect(devicestorageStub.removeList.callCount).to.equal(4);
-                expect(keychainStub.getReceiverPublicKey.callCount).to.equal(0);
 
                 done();
             }

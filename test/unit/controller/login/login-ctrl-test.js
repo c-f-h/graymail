@@ -5,19 +5,17 @@ var LoginCtrl = require('../../../../src/js/controller/login/login'),
     Account = require('../../../../src/js/email/account'),
     Dialog = require('../../../../src/js/util/dialog'),
     UpdateHandler = require('../../../../src/js/util/update/update-handler'),
-    Auth = require('../../../../src/js/service/auth'),
-    Keychain = require('../../../../src/js/service/keychain');
+    Auth = require('../../../../src/js/service/auth');
 
 describe('Login Controller unit test', function() {
     var scope, location, ctrl,
-        emailMock, keychainMock, authMock, accountMock, dialogMock, updateHandlerMock, goToStub,
+        emailMock, authMock, accountMock, dialogMock, updateHandlerMock, goToStub,
         emailAddress = 'fred@foo.com';
 
     beforeEach(function() {
         emailMock = sinon.createStubInstance(Email);
         accountMock = sinon.createStubInstance(Account);
         authMock = sinon.createStubInstance(Auth);
-        keychainMock = sinon.createStubInstance(Keychain);
         dialogMock = sinon.createStubInstance(Dialog);
         updateHandlerMock = sinon.createStubInstance(UpdateHandler);
 
@@ -41,7 +39,6 @@ describe('Login Controller unit test', function() {
                 account: accountMock,
                 auth: authMock,
                 email: emailMock,
-                keychain: keychainMock,
                 dialog: dialogMock,
                 appConfig: {
                     preventAutoStart: true

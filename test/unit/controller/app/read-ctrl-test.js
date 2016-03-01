@@ -1,7 +1,6 @@
 'use strict';
 
-var Keychain = require('../../../../src/js/service/keychain'),
-    InvitationDAO = require('../../../../src/js/service/invitation'),
+var InvitationDAO = require('../../../../src/js/service/invitation'),
     Email = require('../../../../src/js/email/email'),
     PGP = require('../../../../src/js/crypto/pgp'),
     ReadCtrl = require('../../../../src/js/controller/app/read'),
@@ -11,10 +10,9 @@ var Keychain = require('../../../../src/js/service/keychain'),
     Download = require('../../../../src/js/util/download');
 
 describe('Read Controller unit test', function() {
-    var scope, ctrl, keychainMock, invitationMock, emailMock, pgpMock, outboxMock, dialogMock, authMock, downloadMock;
+    var scope, ctrl, invitationMock, emailMock, pgpMock, outboxMock, dialogMock, authMock, downloadMock;
 
     beforeEach(function() {
-        keychainMock = sinon.createStubInstance(Keychain);
         invitationMock = sinon.createStubInstance(InvitationDAO);
         pgpMock = sinon.createStubInstance(PGP);
         outboxMock = sinon.createStubInstance(Outbox);
@@ -35,7 +33,6 @@ describe('Read Controller unit test', function() {
                 invitation: invitationMock,
                 outbox: outboxMock,
                 pgp: pgpMock,
-                keychain: keychainMock,
                 download: downloadMock,
                 auth: authMock,
                 dialog: dialogMock
@@ -68,7 +65,6 @@ describe('Read Controller unit test', function() {
 
         it('should show searching on error', function(done) {
             expect(scope.keyId).to.equal('No key found.');
-            keychainMock.getReceiverPublicKey.returns(rejects(42));
 
             scope.getKeyId(address).then(function() {
                 expect(dialogMock.error.calledOnce).to.be.true;
@@ -78,8 +74,6 @@ describe('Read Controller unit test', function() {
         });
 
         it('should allow invitation on empty key', function(done) {
-            keychainMock.getReceiverPublicKey.returns(resolves());
-
             scope.getKeyId(address).then(function() {
                 expect(scope.keyId).to.equal('User has no key. Click to invite.');
                 done();
@@ -87,10 +81,6 @@ describe('Read Controller unit test', function() {
         });
 
         it('should show searching on error', function(done) {
-            keychainMock.getReceiverPublicKey.returns(resolves({
-                publicKey: 'PUBLIC KEY'
-            }));
-
             pgpMock.getFingerprint.returns('XXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXX');
 
             scope.getKeyId(address).then(function() {

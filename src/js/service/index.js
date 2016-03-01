@@ -14,4 +14,3 @@ require('./admin');
 require('./lawnchair');
 require('./devicestorage');
 require('./auth');
-require('./keychain');

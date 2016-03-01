@@ -6,12 +6,11 @@ var Account = require('../../../src/js/email/account'),
     DeviceStorageDAO = require('../../../src/js/service/devicestorage'),
     Email = require('../../../src/js/email/email'),
     Outbox = require('../../../src/js/email/outbox'),
-    Keychain = require('../../../src/js/service/keychain'),
     UpdateHandler = require('../../../src/js/util/update/update-handler'),
     Dialog = require('../../../src/js/util/dialog');
 
 describe('Account Service unit test', function() {
-    var account, authStub, outboxStub, emailStub, devicestorageStub, keychainStub, updateHandlerStub, dialogStub,
+    var account, authStub, outboxStub, emailStub, devicestorageStub, updateHandlerStub, dialogStub,
         realname = 'John Doe',
         dummyUser = 'spiderpig@springfield.com';
 
@@ -23,10 +22,9 @@ describe('Account Service unit test', function() {
         devicestorageStub = sinon.createStubInstance(DeviceStorageDAO);
         emailStub = sinon.createStubInstance(Email);
         outboxStub = sinon.createStubInstance(Outbox);
-        keychainStub = sinon.createStubInstance(Keychain);
         updateHandlerStub = sinon.createStubInstance(UpdateHandler);
         dialogStub = sinon.createStubInstance(Dialog);
-        account = new Account(appConfig, authStub, devicestorageStub, emailStub, outboxStub, keychainStub, updateHandlerStub, dialogStub);
+        account = new Account(appConfig, authStub, devicestorageStub, emailStub, outboxStub, updateHandlerStub, dialogStub);
     });
 
     afterEach(function() {});
@@ -85,56 +83,6 @@ describe('Account Service unit test', function() {
             });
         });
 
-        it('should fail for _keychain.getUserKeyPair', function() {
-            devicestorageStub.init.returns(resolves());
-            updateHandlerStub.update.returns(resolves());
-            keychainStub.getUserKeyPair.returns(rejects(new Error('asdf')));
-
-            account.init({
-                emailAddress: dummyUser,
-                realname: realname
-            }).catch(function(err) {
-                expect(err.message).to.match(/asdf/);
-            });
-        });
-
-        it('should fail for _keychain.refreshKeyForUserId', function() {
-            var storedKeys = {
-                publicKey: 'publicKey'
-            };
-
-            devicestorageStub.init.returns(resolves());
-            updateHandlerStub.update.returns(resolves());
-            keychainStub.getUserKeyPair.returns(resolves(storedKeys));
-            keychainStub.refreshKeyForUserId.returns(rejects(new Error('asdf')));
-
-            account.init({
-                emailAddress: dummyUser,
-                realname: realname
-            }).catch(function(err) {
-                expect(err.message).to.match(/asdf/);
-            });
-        });
-
-        it('should fail for _emailDao.init after _keychain.refreshKeyForUserId', function() {
-            var storedKeys = {
-                publicKey: 'publicKey'
-            };
-
-            devicestorageStub.init.returns(resolves());
-            updateHandlerStub.update.returns(resolves());
-            keychainStub.getUserKeyPair.returns(resolves(storedKeys));
-            keychainStub.refreshKeyForUserId.returns(resolves(storedKeys));
-            emailStub.init.returns(rejects(new Error('asdf')));
-
-            account.init({
-                emailAddress: dummyUser,
-                realname: realname
-            }).catch(function(err) {
-                expect(err.message).to.match(/asdf/);
-            });
-        });
-
         it('should fail for _emailDao.init', function() {
             var storedKeys = {
                 publicKey: 'publicKey',
@@ -143,7 +91,6 @@ describe('Account Service unit test', function() {
 
             devicestorageStub.init.returns(resolves());
             updateHandlerStub.update.returns(resolves());
-            keychainStub.getUserKeyPair.returns(resolves(storedKeys));
             emailStub.init.returns(rejects(new Error('asdf')));
 
             account.init({
@@ -151,27 +98,6 @@ describe('Account Service unit test', function() {
                 realname: realname
             }).catch(function(err) {
                 expect(err.message).to.match(/asdf/);
-            });
-        });
-
-        it('should work after _keychain.refreshKeyForUserId', function() {
-            var storedKeys = {
-                publicKey: 'publicKey'
-            };
-
-            devicestorageStub.init.returns(resolves());
-            updateHandlerStub.update.returns(resolves());
-            keychainStub.getUserKeyPair.returns(resolves(storedKeys));
-            keychainStub.refreshKeyForUserId.returns(resolves('publicKey'));
-            emailStub.init.returns(resolves());
-
-            account.init({
-                emailAddress: dummyUser,
-                realname: realname
-            }, function onInit(keys) {
-                expect(keys).to.deep.equal(storedKeys);
-                expect(keychainStub.refreshKeyForUserId.calledOnce).to.be.true;
-                expect(emailStub.init.calledOnce).to.be.true;
             });
         });
 
@@ -183,7 +109,6 @@ describe('Account Service unit test', function() {
 
             devicestorageStub.init.returns(resolves());
             updateHandlerStub.update.returns(resolves());
-            keychainStub.getUserKeyPair.returns(resolves(storedKeys));
             emailStub.init.returns(resolves());
 
             account.init({
@@ -191,7 +116,6 @@ describe('Account Service unit test', function() {
                 realname: realname
             }, function onInit(keys) {
                 expect(keys).to.equal(storedKeys);
-                expect(keychainStub.refreshKeyForUserId.called).to.be.false;
                 expect(emailStub.init.calledOnce).to.be.true;
                 expect(account._accounts.length).to.equal(1);
             });
