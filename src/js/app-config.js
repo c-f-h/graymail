@@ -13,7 +13,6 @@ module.exports = appCfg;
  */
 appCfg.config = {
     pgpComment: 'Whiteout Mail - https://whiteout.io',
-    settingsUrl: 'https://settings.whiteout.io/autodiscovery/',
     mailServer: {
         domain: 'wmail.io',
         imap: {
@@ -67,11 +66,6 @@ appCfg.string = {
     verificationSubject: '[whiteout] New public key uploaded',
     sendBtnClear: 'Send',
     sendBtnSecure: 'Send securely',
-    updatePublicKeyTitle: 'Public Key Updated',
-    updatePublicKeyMsgNewKey: '{0} updated his key and may not be able to read encrypted messages sent with his old key. Update the key?',
-    updatePublicKeyMsgRemovedKey: '{0} revoked his key and may no longer be able to read encrypted messages. Remove the key?',
-    updatePublicKeyPosBtn: 'Yes',
-    updatePublicKeyNegBtn: 'No',
     outdatedCertificateTitle: 'Warning',
     outdatedCertificateMessage: 'The SSL certificate for the mail server {0} changed, the connection was refused.',
     updateCertificateTitle: 'Warning',
