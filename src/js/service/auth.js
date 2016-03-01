@@ -291,7 +291,7 @@ Auth.prototype._loadCredentials = function() {
 
     }).then(function(password) {
         self.password = password;
-        self.passwordNeedsDecryption = false; //!!password;
+        self.passwordNeedsDecryption = false;
         self.initialized = true;
     });
 

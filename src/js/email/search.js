@@ -45,7 +45,7 @@ Search.prototype.filter = function(messages, query) {
     }
 
     /**
-     * Filter meta data first and then only look at plaintext and decrypted message bodies
+     * Filter meta data first and then only look at plaintext and message bodies
      */
     function matchMetaDataFirst(m) {
         // compare subject
@@ -57,19 +57,11 @@ Search.prototype.filter = function(messages, query) {
             return true;
         }
         // compare plaintext body
-        if (m.body && !m.encrypted && contains(m.body)) {
-            return true;
-        }
-        // compare decrypted body
-        if (m.body && m.encrypted && m.decrypted && contains(m.body)) {
+        if (m.body && contains(m.body)) {
             return true;
         }
         // compare plaintex html body
-        if (m.html && !m.encrypted && contains(m.html)) {
-            return true;
-        }
-        // compare decrypted html body
-        if (m.html && m.encrypted && m.decrypted && contains(m.html)) {
+        if (m.html && contains(m.html)) {
             return true;
         }
         return false;

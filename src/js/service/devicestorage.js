@@ -35,7 +35,7 @@ DeviceStorage.prototype.init = function(dbName) {
 };
 
 /**
- * Stores a list of encrypted items in the object store
+ * Stores a list of items in the object store
  * @param list [Array] The list of items to be persisted
  * @param type [String] The type of item to be persisted e.g. 'email'
  * @return {Promise}

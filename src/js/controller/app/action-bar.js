@@ -14,8 +14,6 @@ var ActionBarCtrl = function($scope, $q, email, dialog, status) {
     $scope.CHECKREAD = 3;
     $scope.CHECKFLAGGED = 4;
     $scope.CHECKUNFLAGGED = 5;
-    $scope.CHECKENCRYPTED = 6;
-    $scope.CHECKUNENCRYPTED = 7;
 
     $scope.check = function(option) {
         currentFolder().messages.forEach(function(email) {
@@ -36,10 +34,6 @@ var ActionBarCtrl = function($scope, $q, email, dialog, status) {
                 email.checked = !!email.flagged;
             } else if (option === $scope.CHECKUNFLAGGED) {
                 email.checked = !email.flagged;
-            } else if (option === $scope.CHECKENCRYPTED) {
-                email.checked = !!email.encrypted;
-            } else if (option === $scope.CHECKUNENCRYPTED) {
-                email.checked = !email.encrypted;
             }
         });
     };

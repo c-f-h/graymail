@@ -53,7 +53,7 @@ Outbox.prototype.stopChecking = function() {
 /**
  * Put a email dto in the outbox for sending when ready
  * @param  {Object}   mail     The Email DTO
- * @param  {Function} callback Invoked when the object was encrypted and persisted to disk
+ * @param  {Function} callback Invoked when the object was persisted to disk
  * @returns {Promise}
  */
 Outbox.prototype.put = function(mail) {

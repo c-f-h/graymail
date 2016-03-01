@@ -42,7 +42,7 @@ var MSG_PART_TYPE_HTML = 'html';
 //
 
 /**
- * High-level data access object that orchestrates everything around the handling of encrypted mails:
+ * High-level data access object that orchestrates everything around the handling of mails:
  * receiving via IMAP, sending via SMTP, MIME parsing, local db persistence
  *
  * @param {Object} devicestorage Handles persistence to the local indexed db
@@ -1121,7 +1121,7 @@ Email.prototype._fetchMessages = function(options) {
         var jobs = [];
 
         messages.forEach(function(message) {
-            // fetch only the content for non-attachment body parts (encrypted, signed, text, html, resources referenced from the html)
+            // fetch only the content for non-attachment body parts (signed, text, html, resources referenced from the html)
             var contentParts = message.bodyParts.filter(function(bodyPart) {
                 return bodyPart.type !== MSG_PART_TYPE_ATTACHMENT || (bodyPart.type === MSG_PART_TYPE_ATTACHMENT && bodyPart.id);
             });
@@ -1211,7 +1211,7 @@ Email.prototype._getBodyParts = function(options) {
 //
 
 /**
- * persist encrypted list in device storage
+ * persist list of folders in device storage
  * note: the folders in the ui also include the messages array, so let's create a clean array here
  */
 Email.prototype._localStoreFolders = function() {

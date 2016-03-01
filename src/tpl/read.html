@@ -42,15 +42,15 @@
 
   <!-- working spinner -->
   <div class="read__working"
-    ng-if="state.mailList.selected && state.mailList.selected.html === undefined && (state.mailList.selected.body === undefined || (state.mailList.selected.encrypted && !state.mailList.selected.decrypted))">
+    ng-if="state.mailList.selected && state.mailList.selected.html === undefined && (state.mailList.selected.body === undefined)">
     <div>
       <span class="spinner"></span>
-      <strong ng-bind="(state.mailList.selected.decryptingBody) ? 'Decrypting...' : 'Loading...' "></strong>
+      <strong>Loading...</strong>
     </div>
   </div><!--/read__working-->
 
   <div class="read__content"
-    ng-show="(state.mailList.selected && !state.mailList.selected.encrypted) || (state.mailList.selected.encrypted && state.mailList.selected.decrypted)">
+    ng-show="state.mailList.selected">
     <header class="read__header">
       <div class="read__controls__dummy"></div>
 
