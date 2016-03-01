@@ -12,29 +12,13 @@ module.exports = appCfg;
  * Global app configurations
  */
 appCfg.config = {
-    pgpComment: 'Whiteout Mail - https://whiteout.io',
-    mailServer: {
-        domain: 'wmail.io',
-        imap: {
-            hostname: 'imap.wmail.io',
-            port: 993,
-            secure: true
-        },
-        smtp: {
-            hostname: 'smtp.wmail.io',
-            port: 465,
-            secure: true
-        }
-    },
+    pgpComment: 'Graymail',
     oauthDomains: [/\.gmail\.com$/, /\.googlemail\.com$/],
     ignoreUploadOnSentDomains: [/\.gmail\.com$/, /\.googlemail\.com$/],
-    serverPrivateKeyId: 'EE342F0DDBB0F3BE',
     workerPath: 'js',
     reconnectInterval: 10000,
     checkOutboxInterval: 5000,
     iconPath: '/img/icon-128-chrome.png',
-    verificationUrl: '/verify/',
-    verificationUuidLength: 36,
     dbVersion: 6,
     appVersion: undefined,
     outboxMailboxPath: 'OUTBOX',
@@ -63,20 +47,16 @@ function setConfigParams(manifest) {
  */
 appCfg.string = {
     fallbackSubject: '(no subject)',
-    verificationSubject: '[whiteout] New public key uploaded',
     sendBtnClear: 'Send',
     sendBtnSecure: 'Send securely',
-    outdatedCertificateTitle: 'Warning',
-    outdatedCertificateMessage: 'The SSL certificate for the mail server {0} changed, the connection was refused.',
     updateCertificateTitle: 'Warning',
     updateCertificateMessage: 'The SSL certificate for the mail server {0} changed. Do you want to proceed?',
     updateCertificatePosBtn: 'Yes',
     updateCertificateNegBtn: 'No',
-    certificateFaqLink: 'https://github.com/whiteout-io/mail-html5/wiki/FAQ#what-does-the-ssl-certificate-for-the-mail-server--changed-mean',
     bugReportTitle: 'Report a bug',
     bugReportSubject: '[Bug] I want to report a bug',
     bugReportBody: 'Steps to reproduce\n1. \n2. \n3. \n\nWhat happens?\n\n\nWhat do you expect to happen instead?\n\n\n\n== PLEASE DONT PUT ANY KEYS HERE! ==\n\n\n## Log\n\nBelow is the log. It includes your interactions with your email provider from the point where you started the app for the last time. Login data and email content has been stripped. Any information provided by you will be used for the purpose of locating and fixing the bug you reported. It will be deleted subsequently. However, you can edit this log and/or remove log data in the event that something would show up.\n\nUser-Agent: {0}\nVersion: {1}\n\n',
-    supportAddress: 'mail.support@whiteout.io',
+    supportAddress: 'mail.support@invalid.org',
     connDocOffline: 'It appears that you are offline. Please retry when you are online.',
     connDocTlsWrongCert: 'A connection to {0} was rejected because the TLS certificate is invalid. Please have a look at the FAQ for information on how to fix this error.',
     connDocHostUnreachable: 'We could not establish a connection to {0}. Please check the server settings!',

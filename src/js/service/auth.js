@@ -333,7 +333,6 @@ Auth.prototype.handleCertificateUpdate = function(component, reconnectCallback, 
         positiveBtnStr: str.updateCertificatePosBtn,
         negativeBtnStr: str.updateCertificateNegBtn,
         showNegativeBtn: true,
-        faqLink: str.certificateFaqLink,
         callback: function(granted) {
             if (!granted) {
                 return;
