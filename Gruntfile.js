@@ -193,7 +193,6 @@ module.exports = function(grunt) {
                         'test/unit/service/lawnchair-dao-test.js',
                         'test/unit/service/devicestorage-dao-test.js',
                         'test/unit/service/mail-config-service-test.js',
-                        'test/unit/service/invitation-dao-test.js',
                         'test/unit/email/outbox-bo-test.js',
                         'test/unit/email/email-dao-test.js',
                         'test/unit/email/account-test.js',

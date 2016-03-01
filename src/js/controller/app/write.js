@@ -47,7 +47,6 @@ var WriteCtrl = function($scope, $window, $filter, $q, appConfig, auth, email, o
         $scope.body = '';
         $scope.attachments = [];
         $scope.addressBookCache = undefined;
-        $scope.showInvite = undefined;
     }
 
     function reportBug() {
@@ -244,7 +243,7 @@ var WriteCtrl = function($scope, $window, $filter, $q, appConfig, auth, email, o
     };
 
     /**
-     * Check if it is ok to send an email depending on the invitation state of the addresses
+     * Check if it is ok to send an email depending on validity of the addresses
      */
     $scope.checkSendStatus = function() {
         $scope.okToSend = false;
@@ -271,7 +270,6 @@ var WriteCtrl = function($scope, $window, $filter, $q, appConfig, auth, email, o
 
         // only allow sending if receviers exist
         if (numReceivers < 1) {
-            $scope.showInvite = false;
             return;
         }
 

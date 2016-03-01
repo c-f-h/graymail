@@ -2,20 +2,6 @@
 
 var ngModule = angular.module('woServices');
 
-// rest dao for use in the public key service
-ngModule.factory('publicKeyRestDao', function(appConfig) {
-    var dao = new RestDAO();
-    dao.setBaseUri(appConfig.config.keyServerUrl);
-    return dao;
-});
-
-// rest dao for use in the invitation service
-ngModule.factory('invitationRestDao', function(appConfig) {
-    var dao = new RestDAO();
-    dao.setBaseUri(appConfig.config.keyServerUrl);
-    return dao;
-});
-
 // rest dao for use in the oauth service
 ngModule.factory('oauthRestDao', function() {
     var dao = new RestDAO();

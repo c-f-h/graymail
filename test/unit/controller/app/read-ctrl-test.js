@@ -1,7 +1,6 @@
 'use strict';
 
-var InvitationDAO = require('../../../../src/js/service/invitation'),
-    Email = require('../../../../src/js/email/email'),
+var Email = require('../../../../src/js/email/email'),
     PGP = require('../../../../src/js/crypto/pgp'),
     ReadCtrl = require('../../../../src/js/controller/app/read'),
     Outbox = require('../../../../src/js/email/outbox'),
@@ -10,10 +9,9 @@ var InvitationDAO = require('../../../../src/js/service/invitation'),
     Download = require('../../../../src/js/util/download');
 
 describe('Read Controller unit test', function() {
-    var scope, ctrl, invitationMock, emailMock, pgpMock, outboxMock, dialogMock, authMock, downloadMock;
+    var scope, ctrl, emailMock, pgpMock, outboxMock, dialogMock, authMock, downloadMock;
 
     beforeEach(function() {
-        invitationMock = sinon.createStubInstance(InvitationDAO);
         pgpMock = sinon.createStubInstance(PGP);
         outboxMock = sinon.createStubInstance(Outbox);
         emailMock = sinon.createStubInstance(Email);
@@ -30,7 +28,6 @@ describe('Read Controller unit test', function() {
                 $scope: scope,
                 $q: window.qMock,
                 email: emailMock,
-                invitation: invitationMock,
                 outbox: outboxMock,
                 pgp: pgpMock,
                 download: downloadMock,
@@ -73,66 +70,11 @@ describe('Read Controller unit test', function() {
             });
         });
 
-        it('should allow invitation on empty key', function(done) {
-            scope.getKeyId(address).then(function() {
-                expect(scope.keyId).to.equal('User has no key. Click to invite.');
-                done();
-            });
-        });
-
         it('should show searching on error', function(done) {
             pgpMock.getFingerprint.returns('XXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXX');
 
             scope.getKeyId(address).then(function() {
                 expect(scope.keyId).to.equal('PGP key: XXXXXXXX');
-                done();
-            });
-        });
-    });
-
-    describe('invite', function() {
-        it('not allow invitation for secure users', function() {
-            expect(scope.keyId).to.equal('No key found.');
-
-            scope.invite({
-                secure: true,
-                address: 'asdf@asdf.de'
-            });
-
-            expect(scope.keyId).to.equal('No key found.');
-        });
-
-        it('should show error on invitation dao invite error', function(done) {
-            invitationMock.invite.returns(rejects(42));
-
-            scope.invite({
-                address: 'asdf@asdf.de'
-            }).then(function() {
-                expect(dialogMock.error.calledOnce).to.be.true;
-                done();
-            });
-        });
-
-        it('should show error on outbox put error', function(done) {
-            invitationMock.invite.returns(resolves());
-            outboxMock.put.returns(rejects(42));
-
-            scope.invite({
-                address: 'asdf@asdf.de'
-            }).then(function() {
-                expect(dialogMock.error.calledOnce).to.be.true;
-                done();
-            });
-        });
-
-        it('should work', function(done) {
-            invitationMock.invite.returns(resolves());
-            outboxMock.put.returns(resolves());
-
-            scope.invite({
-                address: 'asdf@asdf.de'
-            }).then(function() {
-                expect(dialogMock.error.calledOnce).to.be.false;
                 done();
             });
         });

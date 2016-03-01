@@ -3,7 +3,6 @@
 angular.module('woServices', ['woAppConfig', 'woUtil', 'woCrypto']);
 
 require('./rest');
-require('./invitation');
 require('./mail-config');
 require('./oauth');
 require('./hkp');
