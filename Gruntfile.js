@@ -207,7 +207,6 @@ module.exports = function(grunt) {
                         'test/unit/controller/login/login-ctrl-test.js',
                         'test/unit/controller/app/dialog-ctrl-test.js',
                         'test/unit/controller/app/account-ctrl-test.js',
-                        'test/unit/controller/app/set-passphrase-ctrl-test.js',
                         'test/unit/controller/app/contacts-ctrl-test.js',
                         'test/unit/controller/app/read-ctrl-test.js',
                         'test/unit/controller/app/navigation-ctrl-test.js',
