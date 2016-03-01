@@ -153,12 +153,6 @@ module.exports = function(grunt) {
                 },
                 options: browserifyOpt
             },
-            pbkdf2Worker: {
-                files: {
-                    'dist/js/pbkdf2-worker.browserified.js': ['src/js/crypto/pbkdf2-worker.js']
-                },
-                options: browserifyOpt
-            },
             mailreaderWorker: {
                 files: {
                     'dist/js/mailreader-parser-worker.browserified.js': ['node_modules/mailreader/src/mailreader-parser-worker-browserify.js']
@@ -185,8 +179,6 @@ module.exports = function(grunt) {
                         'test/unit/util/connection-doctor-test.js',
                         'test/unit/util/update-handler-test.js',
                         'test/unit/util/status-display-test.js',
-                        'test/unit/crypto/pgp-test.js',
-                        'test/unit/crypto/crypto-test.js',
                         'test/unit/service/rest-dao-test.js',
                         'test/unit/service/auth-test.js',
                         'test/unit/service/oauth-test.js',

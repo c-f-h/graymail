@@ -41,7 +41,6 @@ axe.removeAppender(axe.defaultAppender);
 // include angular modules
 require('../src/js/app-config');
 require('../src/js/util');
-require('../src/js/crypto');
 require('../src/js/service');
 require('../src/js/email');
 

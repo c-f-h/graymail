@@ -2,7 +2,6 @@
 
 var Auth = require('../../../src/js/service/auth'),
     OAuth = require('../../../src/js/service/oauth'),
-    PGP = require('../../../src/js/crypto/pgp'),
     DeviceStorageDAO = require('../../../src/js/service/devicestorage');
 
 describe('Auth unit tests', function() {
@@ -19,7 +18,7 @@ describe('Auth unit tests', function() {
     var auth;
 
     // Dependencies
-    var storageStub, oauthStub, pgpStub;
+    var storageStub, oauthStub;
 
     // test data
     var emailAddress = 'bla@blubb.com';
@@ -44,8 +43,7 @@ describe('Auth unit tests', function() {
     beforeEach(function() {
         storageStub = sinon.createStubInstance(DeviceStorageDAO);
         oauthStub = sinon.createStubInstance(OAuth);
-        pgpStub = sinon.createStubInstance(PGP);
-        auth = new Auth(storageStub, oauthStub, pgpStub);
+        auth = new Auth(storageStub, oauthStub);
     });
 
     describe('#init', function() {
@@ -74,10 +72,6 @@ describe('Auth unit tests', function() {
             storageStub.listItems.withArgs(REALNAME_DB_KEY).returns(resolves([realname]));
             storageStub.listItems.withArgs(IMAP_DB_KEY).returns(resolves([imap]));
             storageStub.listItems.withArgs(SMTP_DB_KEY).returns(resolves([smtp]));
-            pgpStub.decrypt.withArgs(encryptedPassword, undefined).returns(resolves({
-                decrypted: password,
-                signaturesValid: true
-            }));
 
             auth.getCredentials().then(function(cred) {
                 expect(auth.emailAddress).to.equal(emailAddress);
@@ -98,7 +92,6 @@ describe('Auth unit tests', function() {
                 expect(cred.smtp.auth.pass).to.equal(password);
 
                 expect(storageStub.listItems.callCount).to.equal(6);
-                expect(pgpStub.decrypt.calledOnce).to.be.true;
 
                 done();
             });
@@ -142,11 +135,9 @@ describe('Auth unit tests', function() {
             storageStub.storeList.withArgs([realname], REALNAME_DB_KEY).returns(resolves());
             storageStub.storeList.withArgs([imap], IMAP_DB_KEY).returns(resolves());
             storageStub.storeList.withArgs([smtp], SMTP_DB_KEY).returns(resolves());
-            pgpStub.encrypt.withArgs(password).returns(resolves(encryptedPassword));
 
             auth.storeCredentials().then(function() {
                 expect(storageStub.storeList.callCount).to.equal(6);
-                expect(pgpStub.encrypt.calledOnce).to.be.true;
 
                 done();
             });

@@ -6,7 +6,6 @@ var mailreader = require('mailreader'),
     PgpBuilder = require('../../../src/js/email/plainbuilder'),
     cfg = require('../../../src/js/app-config').config,
     EmailDAO = require('../../../src/js/email/email'),
-    PGP = require('../../../src/js/crypto/pgp'),
     DeviceStorageDAO = require('../../../src/js/service/devicestorage'),
     appConfig = require('../../../src/js/app-config'),
     Auth = require('../../../src/js/service/auth'),
@@ -21,7 +20,7 @@ describe('Email DAO unit tests', function() {
     var dao;
 
     // mocks
-    var imapClientStub, pgpMailerStub, pgpBuilderStub, pgpStub, devicestorageStub, parseStub, dialogStub, authStub;
+    var imapClientStub, pgpMailerStub, pgpBuilderStub, devicestorageStub, parseStub, dialogStub, authStub;
 
     // config
     var emailAddress, passphrase, asymKeySize, account;
@@ -128,7 +127,6 @@ describe('Email DAO unit tests', function() {
         imapClientStub = sinon.createStubInstance(ImapClient);
         pgpMailerStub = sinon.createStubInstance(PgpMailer);
         pgpBuilderStub = sinon.createStubInstance(PgpBuilder);
-        pgpStub = sinon.createStubInstance(PGP);
         parseStub = sinon.stub(mailreader, 'parse');
         devicestorageStub = sinon.createStubInstance(DeviceStorageDAO);
         dialogStub = sinon.createStubInstance(Dialog);
@@ -145,7 +143,6 @@ describe('Email DAO unit tests', function() {
         //
         // check configuration
         //
-        expect(dao._pgp).to.equal(pgpStub);
         expect(dao._devicestorage).to.equal(devicestorageStub);
         expect(dao._mailreader).to.equal(mailreader);
         expect(dao._pgpbuilder).to.equal(pgpBuilderStub);
@@ -170,105 +167,6 @@ describe('Email DAO unit tests', function() {
                 account: account
             }).then(function() {
                 expect(devicestorageStub.listItems.calledOnce).to.be.true;
-
-                done();
-            });
-        });
-    });
-
-    describe('#unlock', function() {
-        it('should unlock', function(done) {
-            pgpStub.getKeyParams.returns({
-                _id: mockKeyPair.publicKey._id,
-                userId: emailAddress,
-                userIds: [{
-                    emailAddress: emailAddress
-                }]
-            });
-
-            pgpStub.importKeys.withArgs({
-                passphrase: passphrase,
-                privateKeyArmored: mockKeyPair.privateKey.encryptedKey,
-                publicKeyArmored: mockKeyPair.publicKey.publicKey
-            }).returns(resolves());
-            pgpStub._privateKey = {
-                foo: 'bar'
-            };
-
-            dao.unlock({
-                passphrase: passphrase,
-                keypair: mockKeyPair
-            }).then(function() {
-                expect(pgpStub.importKeys.calledOnce).to.be.true;
-                expect(dao._pgpbuilder._privateKey).to.equal(pgpStub._privateKey);
-
-                done();
-            });
-        });
-
-        it('should generate a keypair and unlock', function(done) {
-            var keypair = {
-                keyId: 123,
-                publicKeyArmored: mockKeyPair.publicKey.publicKey,
-                privateKeyArmored: mockKeyPair.privateKey.encryptedKey
-            };
-            var name = 'Hans Dampf';
-
-            pgpStub.generateKeys.withArgs({
-                emailAddress: emailAddress,
-                realname: name,
-                keySize: asymKeySize,
-                passphrase: passphrase
-            }).returns(resolves(keypair));
-
-            pgpStub.importKeys.withArgs({
-                passphrase: passphrase,
-                privateKeyArmored: mockKeyPair.privateKey.encryptedKey,
-                publicKeyArmored: mockKeyPair.publicKey.publicKey
-            }).returns(resolves());
-
-            dao.unlock({
-                realname: name,
-                passphrase: passphrase
-            }).then(function() {
-                expect(pgpStub.generateKeys.calledOnce).to.be.true;
-                expect(pgpStub.importKeys.calledOnce).to.be.true;
-
-                done();
-            });
-        });
-
-        it('should fail when import fails', function(done) {
-            var keypair = {
-                keyId: 123,
-                publicKeyArmored: 'qwerty',
-                privateKeyArmored: 'asdfgh'
-            };
-
-            pgpStub.generateKeys.withArgs().returns(resolves(keypair));
-            pgpStub.importKeys.withArgs().returns(rejects({}));
-
-            dao.unlock({
-                passphrase: passphrase
-            }).catch(function(err) {
-                expect(err).to.exist;
-
-                expect(pgpStub.generateKeys.calledOnce).to.be.true;
-                expect(pgpStub.importKeys.calledOnce).to.be.true;
-
-                done();
-            });
-        });
-
-        it('should fail when generation fails', function(done) {
-            pgpStub.generateKeys.returns(rejects({}));
-
-            dao.unlock({
-                passphrase: passphrase
-            }).catch(function(err) {
-                expect(err).to.exist;
-
-                expect(pgpStub.generateKeys.calledOnce).to.be.true;
 
                 done();
             });
@@ -864,7 +762,6 @@ describe('Email DAO unit tests', function() {
                 expect(message.loadingBody).to.be.false;
 
                 expect(localListStub.calledOnce).to.be.true;
-                expect(pgpStub.verifySignedMessage.calledOnce).to.be.true;
 
                 done();
             });
@@ -937,7 +834,6 @@ describe('Email DAO unit tests', function() {
                 expect(message.loadingBody).to.be.false;
 
                 expect(localListStub.calledOnce).to.be.true;
-                expect(pgpStub.verifyClearSignedMessage.calledOnce).to.be.true;
 
                 done();
             });
@@ -972,7 +868,6 @@ describe('Email DAO unit tests', function() {
                 expect(message.loadingBody).to.be.false;
 
                 expect(localListStub.calledOnce).to.be.true;
-                expect(pgpStub.verifyClearSignedMessage.calledOnce).to.be.true;
 
                 done();
             });
@@ -1185,10 +1080,6 @@ describe('Email DAO unit tests', function() {
                 }]
             };
 
-            pgpStub.decrypt.withArgs(ct, mockKeyPair.publicKey.publicKey).returns(resolves({
-                decrypted: pt,
-                signaturesValid: true
-            }));
             parseStub.withArgs({
                 bodyParts: [{
                     type: 'encrypted',
@@ -1212,7 +1103,6 @@ describe('Email DAO unit tests', function() {
                 expect(message.signaturesValid).to.be.true;
                 expect(message.body).to.equal(parsed);
                 expect(message.decryptingBody).to.be.false;
-                expect(pgpStub.decrypt.calledOnce).to.be.true;
                 expect(parseStub.calledOnce).to.be.true;
 
                 done();
@@ -1242,12 +1132,6 @@ describe('Email DAO unit tests', function() {
                 }]
             };
 
-            pgpStub.decrypt.withArgs(ct, mockKeyPair.publicKey.publicKey).returns(resolves({
-                decrypted: pt,
-                signaturesValid: undefined
-            }));
-            pgpStub.verifySignedMessage.withArgs(signedMimeTree, signature, mockKeyPair.publicKey.publicKey).returns(resolves(true));
-
             parseStub.withArgs({
                 bodyParts: [{
                     type: 'encrypted',
@@ -1276,8 +1160,6 @@ describe('Email DAO unit tests', function() {
                 expect(message.signed).to.be.true;
                 expect(message.signaturesValid).to.be.true;
                 expect(message.decryptingBody).to.be.false;
-                expect(pgpStub.decrypt.calledOnce).to.be.true;
-                expect(pgpStub.verifySignedMessage.calledOnce).to.be.true;
                 expect(parseStub.calledOnce).to.be.true;
 
                 done();
@@ -1304,11 +1186,6 @@ describe('Email DAO unit tests', function() {
                 }]
             };
 
-            pgpStub.decrypt.withArgs(ct, mockKeyPair.publicKey.publicKey).returns(resolves({
-                decrypted: pt,
-                signaturesValid: true
-            }));
-
             dao.decryptBody({
                 message: message
             }).then(function(msg) {
@@ -1318,7 +1195,6 @@ describe('Email DAO unit tests', function() {
                 expect(message.decryptingBody).to.be.false;
                 expect(message.signed).to.be.true;
                 expect(message.signaturesValid).to.be.true;
-                expect(pgpStub.decrypt.calledOnce).to.be.true;
                 expect(parseStub.called).to.be.false;
 
                 done();
@@ -1340,15 +1216,12 @@ describe('Email DAO unit tests', function() {
                 }]
             };
 
-            pgpStub.decrypt.returns(rejects(new Error('fail.')));
-
             dao.decryptBody({
                 message: message
             }).then(function(msg) {
                 expect(msg.body).to.equal('fail.');
                 expect(msg).to.exist;
                 expect(message.decryptingBody).to.be.false;
-                expect(pgpStub.decrypt.calledOnce).to.be.true;
                 expect(parseStub.called).to.be.false;
 
                 done();
@@ -1373,7 +1246,6 @@ describe('Email DAO unit tests', function() {
             }).then(function(msg) {
                 expect(msg).to.equal(message);
                 expect(message.decryptingBody).to.be.false;
-                expect(pgpStub.decrypt.called).to.be.true;
                 expect(parseStub.called).to.be.false;
 
                 done();
@@ -1776,11 +1648,8 @@ describe('Email DAO unit tests', function() {
                     clearSignedMessage: 'trallalalalala'
                 };
 
-                pgpStub.verifyClearSignedMessage.withArgs(message.clearSignedMessage, mockKeyPair.publicKey.publicKey).returns(resolves(true));
-
                 dao._checkSignatures(message).then(function(signaturesValid) {
                     expect(signaturesValid).to.be.true;
-                    expect(pgpStub.verifyClearSignedMessage.calledOnce).to.be.true;
                     done();
                 });
             });
@@ -1794,11 +1663,8 @@ describe('Email DAO unit tests', function() {
                     signature: 'ugauga'
                 };
 
-                pgpStub.verifySignedMessage.withArgs(message.signedMessage, message.signature, mockKeyPair.publicKey.publicKey).returns(resolves(true));
-
                 dao._checkSignatures(message).then(function(signaturesValid) {
                     expect(signaturesValid).to.be.true;
-                    expect(pgpStub.verifySignedMessage.calledOnce).to.be.true;
                     done();
                 });
             });
@@ -1812,11 +1678,8 @@ describe('Email DAO unit tests', function() {
                     signature: 'ugauga'
                 };
 
-                pgpStub.verifySignedMessage.returns(rejects(new Error()));
-
                 dao._checkSignatures(message).catch(function(error) {
                     expect(error).to.exist;
-                    expect(pgpStub.verifySignedMessage.calledOnce).to.be.true;
                     done();
                 });
             });
@@ -1832,7 +1695,6 @@ describe('Email DAO unit tests', function() {
 
                 dao._checkSignatures(message).catch(function(error) {
                     expect(error).to.exist;
-                    expect(pgpStub.verifySignedMessage.called).to.be.false;
                     done();
                 });
             });

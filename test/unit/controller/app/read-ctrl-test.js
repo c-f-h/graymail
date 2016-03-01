@@ -1,7 +1,6 @@
 'use strict';
 
 var Email = require('../../../../src/js/email/email'),
-    PGP = require('../../../../src/js/crypto/pgp'),
     ReadCtrl = require('../../../../src/js/controller/app/read'),
     Outbox = require('../../../../src/js/email/outbox'),
     Dialog = require('../../../../src/js/util/dialog'),
@@ -9,10 +8,9 @@ var Email = require('../../../../src/js/email/email'),
     Download = require('../../../../src/js/util/download');
 
 describe('Read Controller unit test', function() {
-    var scope, ctrl, emailMock, pgpMock, outboxMock, dialogMock, authMock, downloadMock;
+    var scope, ctrl, emailMock, outboxMock, dialogMock, authMock, downloadMock;
 
     beforeEach(function() {
-        pgpMock = sinon.createStubInstance(PGP);
         outboxMock = sinon.createStubInstance(Outbox);
         emailMock = sinon.createStubInstance(Email);
         dialogMock = sinon.createStubInstance(Dialog);
@@ -29,7 +27,6 @@ describe('Read Controller unit test', function() {
                 $q: window.qMock,
                 email: emailMock,
                 outbox: outboxMock,
-                pgp: pgpMock,
                 download: downloadMock,
                 auth: authMock,
                 dialog: dialogMock
@@ -71,8 +68,6 @@ describe('Read Controller unit test', function() {
         });
 
         it('should show searching on error', function(done) {
-            pgpMock.getFingerprint.returns('XXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXX');
-
             scope.getKeyId(address).then(function() {
                 expect(scope.keyId).to.equal('PGP key: XXXXXXXX');
                 done();

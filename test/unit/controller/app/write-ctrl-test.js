@@ -4,19 +4,17 @@ var WriteCtrl = require('../../../../src/js/controller/app/write'),
     Email = require('../../../../src/js/email/email'),
     Outbox = require('../../../../src/js/email/outbox'),
     Auth = require('../../../../src/js/service/auth'),
-    PGP = require('../../../../src/js/crypto/pgp'),
     Status = require('../../../../src/js/util/status'),
     Dialog = require('../../../../src/js/util/dialog');
 
 describe('Write controller unit test', function() {
     var ctrl, scope,
-        authMock, pgpMock, dialogMock, emailMock, outboxMock, statusMock,
+        authMock, dialogMock, emailMock, outboxMock, statusMock,
         emailAddress, realname;
 
     beforeEach(function() {
 
         authMock = sinon.createStubInstance(Auth);
-        pgpMock = sinon.createStubInstance(PGP);
         dialogMock = sinon.createStubInstance(Dialog);
         outboxMock = sinon.createStubInstance(Outbox);
         emailMock = sinon.createStubInstance(Email);
@@ -36,7 +34,6 @@ describe('Write controller unit test', function() {
                 $scope: scope,
                 $q: window.qMock,
                 auth: authMock,
-                pgp: pgpMock,
                 email: emailMock,
                 outbox: outboxMock,
                 dialog: dialogMock,

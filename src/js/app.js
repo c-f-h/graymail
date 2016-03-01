@@ -14,7 +14,6 @@ var axe = require('axe-logger');
 require('./app-config');
 require('./directive');
 require('./util');
-require('./crypto');
 require('./service');
 require('./email');
 
@@ -26,7 +25,6 @@ var app = angular.module('mail', [
     'woAppConfig',
     'woDirectives',
     'woUtil',
-    'woCrypto',
     'woServices',
     'woEmail',
     'infinite-scroll'

@@ -1,14 +1,12 @@
 'use strict';
 
 var ContactsCtrl = require('../../../../src/js/controller/app/contacts'),
-    PGP = require('../../../../src/js/crypto/pgp'),
     Dialog = require('../../../../src/js/util/dialog');
 
 describe('Contacts Controller unit test', function() {
-    var scope, contactsCtrl, pgpStub, dialogStub;
+    var scope, contactsCtrl, dialogStub;
 
     beforeEach(function() {
-        pgpStub = sinon.createStubInstance(PGP);
         dialogStub = sinon.createStubInstance(Dialog);
 
         angular.module('contactstest', ['woServices']);
@@ -19,7 +17,6 @@ describe('Contacts Controller unit test', function() {
             contactsCtrl = $controller(ContactsCtrl, {
                 $scope: scope,
                 $q: window.qMock,
-                pgp: pgpStub,
                 dialog: dialogStub
             });
         });

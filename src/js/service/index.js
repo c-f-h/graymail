@@ -1,6 +1,6 @@
 'use strict';
 
-angular.module('woServices', ['woAppConfig', 'woUtil', 'woCrypto']);
+angular.module('woServices', ['woAppConfig', 'woUtil']);
 
 require('./rest');
 require('./oauth');

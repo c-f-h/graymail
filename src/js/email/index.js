@@ -1,6 +1,6 @@
 'use strict';
 
-angular.module('woEmail', ['woAppConfig', 'woUtil', 'woServices', 'woCrypto']);
+angular.module('woEmail', ['woAppConfig', 'woUtil', 'woServices']);
 
 require('./mailreader');
 require('./email');
