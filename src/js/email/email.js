@@ -460,7 +460,7 @@ Email.prototype.getAttachment = function(options) {
  * Sends a signed message in the plain
  *
  * @param {Object} options.email The message to be sent
- * @param {Object} mailer an instance of the pgpmailer to be used for testing purposes only
+ * @param {Object} mailer an instance of the PlainMailer to be used for testing purposes only
  */
 Email.prototype.sendPlaintext = function(options, mailer) {
     // mime encode and send email via smtp
@@ -471,9 +471,9 @@ Email.prototype.sendPlaintext = function(options, mailer) {
 };
 
 /**
- * This funtion wraps error handling for sending via pgpMailer and uploading to imap.
+ * This funtion wraps error handling for sending via PlainMailer and uploading to imap.
  * @param {Object} options.email The message to be sent
- * @param {Object} mailer an instance of the pgpmailer to be used for testing purposes only
+ * @param {Object} mailer an instance of the PlainMailer to be used for testing purposes only
  */
 Email.prototype._sendGeneric = function(options, mailer) {
     var self = this;
@@ -493,7 +493,7 @@ Email.prototype._sendGeneric = function(options, mailer) {
         // tls socket worker path for multithreaded tls in non-native tls environments
         credentials.smtp.tlsWorkerPath = config.workerPath + '/tcp-socket-tls-worker.min.js';
 
-        // create a new pgpmailer
+        // create a new PlainMailer
         self._plainMailer = (mailer || new PlainMailer(credentials.smtp));
 
         // certificate update retriggers sending after cert update is persisted
@@ -679,7 +679,7 @@ Email.prototype.onConnect = function(imap) {
 
 /**
  * This handler should be invoked when navigator.onLine === false.
- * It will discard the imap client and pgp mailer
+ * It will discard the imap client and PlainMailer
  */
 Email.prototype.onDisconnect = function() {
     // logout of imap-client
