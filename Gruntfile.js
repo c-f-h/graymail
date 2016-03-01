@@ -199,7 +199,6 @@ module.exports = function(grunt) {
                         'test/unit/service/newsletter-service-test.js',
                         'test/unit/service/mail-config-service-test.js',
                         'test/unit/service/invitation-dao-test.js',
-                        'test/unit/service/publickey-verifier-test.js',
                         'test/unit/email/outbox-bo-test.js',
                         'test/unit/email/email-dao-test.js',
                         'test/unit/email/account-test.js',
@@ -225,7 +224,6 @@ module.exports = function(grunt) {
                     'test/integration/index.browserified.js': [
                         'test/main.js',
                         'test/integration/email-dao-test.js',
-                        'test/integration/publickey-verifier-test.js'
                     ]
                 },
                 options: browserifyOpt
