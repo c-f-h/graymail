@@ -4,7 +4,7 @@ var ngModule = angular.module('woUtil');
 ngModule.service('connectionDoctor', ConnectionDoctor);
 module.exports = ConnectionDoctor;
 
-var TCPSocket = require('tcp-socket'),
+var TCPSocket = require('emailjs-tcp-socket'),
     ImapClient = require('imap-client'),
     SmtpClient = require('wo-smtpclient');
 
@@ -17,7 +17,7 @@ var TCPSocket = require('tcp-socket'),
  */
 function ConnectionDoctor(appConfig) {
     this._appConfig = appConfig;
-    this._workerPath = appConfig.config.workerPath + '/tcp-socket-tls-worker.min.js';
+    this._workerPath = undefined;
 }
 
 //

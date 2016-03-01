@@ -490,9 +490,6 @@ Email.prototype._sendGeneric = function(options, mailer) {
         // gmail does not require you to upload to the sent items folder after successful sending, whereas most other providers do
         self.ignoreUploadOnSent = self.checkIgnoreUploadOnSent(credentials.smtp.host);
 
-        // tls socket worker path for multithreaded tls in non-native tls environments
-        credentials.smtp.tlsWorkerPath = config.workerPath + '/tcp-socket-tls-worker.min.js';
-
         // create a new PlainMailer
         self._plainMailer = (mailer || new PlainMailer(credentials.smtp));
 
@@ -592,8 +589,6 @@ Email.prototype.onConnect = function(imap) {
         // add the maximum update batch size for imap folders to the imap configuration
         credentials.imap.maxUpdateSize = config.imapUpdateBatchSize;
 
-        // tls socket worker path for multithreaded tls in non-native tls environments
-        credentials.imap.tlsWorkerPath = config.workerPath + '/tcp-socket-tls-worker.min.js';
         // enable multithreaded compression handling
         credentials.imap.compressionWorkerPath = config.workerPath + '/browserbox-compression-worker.min.js';
 

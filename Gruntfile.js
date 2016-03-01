@@ -152,12 +152,6 @@ module.exports = function(grunt) {
                 },
                 options: browserifyOpt
             },
-            tlsWorker: {
-                files: {
-                    'dist/js/tcp-socket-tls-worker.browserified.js': ['node_modules/tcp-socket/src/tcp-socket-tls-worker.js']
-                },
-                options: browserifyOpt
-            },
             compressionWorker: {
                 files: {
                     'dist/js/browserbox-compression-worker.browserified.js': ['node_modules/imap-client/node_modules/browserbox/src/browserbox-compression-worker.js']
@@ -278,10 +272,6 @@ module.exports = function(grunt) {
                 src: ['dist/js/mailreader-parser-worker.browserified.js'],
                 dest: 'dist/js/mailreader-parser-worker.min.js'
             },
-            tlsWorker: {
-                src: ['dist/js/tcp-socket-tls-worker.browserified.js'],
-                dest: 'dist/js/tcp-socket-tls-worker.min.js'
-            },
             compressionWorker: {
                 src: ['dist/js/browserbox-compression-worker.browserified.js'],
                 dest: 'dist/js/browserbox-compression-worker.min.js'
@@ -348,15 +338,6 @@ module.exports = function(grunt) {
                 options: {
                     sourceMap: true,
                     sourceMapName: 'dist/js/mailreader-parser-worker.min.js.map'
-                }
-            },
-            tlsWorker: {
-                files: {
-                    'dist/js/tcp-socket-tls-worker.min.js': ['dist/js/tcp-socket-tls-worker.min.js']
-                },
-                options: {
-                    sourceMap: true,
-                    sourceMapName: 'dist/js/tcp-socket-tls-worker.min.js.map'
                 }
             },
             compressionWorker: {
