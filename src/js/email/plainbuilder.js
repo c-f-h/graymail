@@ -6,7 +6,7 @@ if (typeof exports === 'object' && typeof define !== 'function') {
 }
 
 define(function(require) {
-    var Mailbuild = require('mailbuild'),
+    var Mailbuild = require('emailjs-mime-builder'),
         PlainBuilder;
 
     /**
