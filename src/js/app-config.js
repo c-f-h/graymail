@@ -15,7 +15,6 @@ appCfg.config = {
     pgpComment: 'Whiteout Mail - https://whiteout.io',
     keyServerUrl: 'https://keys.whiteout.io',
     hkpUrl: 'http://keyserver.ubuntu.com',
-    adminUrl: 'https://admin-node.whiteout.io',
     settingsUrl: 'https://settings.whiteout.io/autodiscovery/',
     mailServer: {
         domain: 'wmail.io',

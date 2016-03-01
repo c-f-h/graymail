@@ -16,13 +16,6 @@ ngModule.factory('invitationRestDao', function(appConfig) {
     return dao;
 });
 
-// rest dao for use in the admin service
-ngModule.factory('adminRestDao', function(appConfig) {
-    var dao = new RestDAO();
-    dao.setBaseUri(appConfig.config.adminUrl);
-    return dao;
-});
-
 // rest dao for use in the oauth service
 ngModule.factory('oauthRestDao', function() {
     var dao = new RestDAO();

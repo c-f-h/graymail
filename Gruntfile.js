@@ -188,7 +188,6 @@ module.exports = function(grunt) {
                         'test/unit/crypto/pgp-test.js',
                         'test/unit/crypto/crypto-test.js',
                         'test/unit/service/rest-dao-test.js',
-                        'test/unit/service/admin-dao-test.js',
                         'test/unit/service/auth-test.js',
                         'test/unit/service/oauth-test.js',
                         'test/unit/service/lawnchair-dao-test.js',
