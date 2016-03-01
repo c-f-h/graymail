@@ -43,14 +43,12 @@ var MSG_PART_TYPE_HTML = 'html';
 
 /**
  * High-level data access object that orchestrates everything around the handling of encrypted mails:
- * PGP de-/encryption, receiving via IMAP, sending via SMTP, MIME parsing, local db persistence
+ * receiving via IMAP, sending via SMTP, MIME parsing, local db persistence
  *
- * @param {Object} pgp Orchestrates decryption
  * @param {Object} devicestorage Handles persistence to the local indexed db
  * @param {Object} mailreader Parses MIME messages received from IMAP
  */
-function Email(pgp, accountStore, mailreader, dialog, appConfig, auth) {
-    this._pgp = pgp;
+function Email(accountStore, mailreader, dialog, appConfig, auth) {
     this._devicestorage = accountStore;
     this._mailreader = mailreader;
     this._dialog = dialog;
@@ -89,93 +87,6 @@ Email.prototype.init = function(options) {
         self._account.folders = stored[0] || [];
         return self._initFolders();
     });
-};
-
-/**
- * Unlocks the keychain by either decrypting an existing private key or generating a new keypair
- * @param {String} options.passphrase The passphrase to decrypt the private key
- */
-Email.prototype.unlock = function(options) {
-    var self = this,
-        generatedKeypair;
-
-    if (options.keypair) {
-        // import existing key pair into crypto module
-        return handleExistingKeypair(options.keypair);
-    }
-
-    // no keypair for is stored for the user... generate a new one
-    return self._pgp.generateKeys({
-        emailAddress: self._account.emailAddress,
-        realname: options.realname,
-        keySize: self._account.asymKeySize,
-        passphrase: options.passphrase
-    }).then(function(keypair) {
-        generatedKeypair = keypair;
-        // import the new key pair into crypto module
-        return self._pgp.importKeys({
-            passphrase: options.passphrase,
-            privateKeyArmored: generatedKeypair.privateKeyArmored,
-            publicKeyArmored: generatedKeypair.publicKeyArmored
-        });
-
-    }).then(function() {
-        // persist newly generated keypair
-        return {
-            publicKey: {
-                _id: generatedKeypair.keyId,
-                userId: self._account.emailAddress,
-                publicKey: generatedKeypair.publicKeyArmored
-            },
-            privateKey: {
-                _id: generatedKeypair.keyId,
-                userId: self._account.emailAddress,
-                encryptedKey: generatedKeypair.privateKeyArmored
-            }
-        };
-
-    }).then(setPrivateKey);
-
-    function handleExistingKeypair(keypair) {
-        return new Promise(function(resolve) {
-            var privKeyParams = self._pgp.getKeyParams(keypair.privateKey.encryptedKey);
-            var pubKeyParams = self._pgp.getKeyParams(keypair.publicKey.publicKey);
-
-            // check if key IDs match
-            if (!keypair.privateKey._id || keypair.privateKey._id !== keypair.publicKey._id || keypair.privateKey._id !== privKeyParams._id || keypair.publicKey._id !== pubKeyParams._id) {
-                throw new Error('Key IDs dont match!');
-            }
-
-            // check that key userIds contain email address of user account
-            var matchingPrivUserId = _.findWhere(privKeyParams.userIds, {
-                emailAddress: self._account.emailAddress
-            });
-            var matchingPubUserId = _.findWhere(pubKeyParams.userIds, {
-                emailAddress: self._account.emailAddress
-            });
-
-            if (!matchingPrivUserId || !matchingPubUserId || keypair.privateKey.userId !== self._account.emailAddress || keypair.publicKey.userId !== self._account.emailAddress) {
-                throw new Error('User IDs dont match!');
-            }
-
-            resolve();
-
-        }).then(function() {
-            // import existing key pair into crypto module
-            return self._pgp.importKeys({
-                passphrase: options.passphrase,
-                privateKeyArmored: keypair.privateKey.encryptedKey,
-                publicKeyArmored: keypair.publicKey.publicKey
-            }).then(function() {
-                return keypair;
-            });
-
-        }).then(setPrivateKey);
-    }
-
-    function setPrivateKey(keypair) {
-        return keypair;
-    }
 };
 
 /**
