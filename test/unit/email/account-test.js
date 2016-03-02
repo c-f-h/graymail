@@ -4,12 +4,10 @@ var Account = require('../../../src/js/email/account'),
     Auth = require('../../../src/js/service/auth'),
     DeviceStorageDAO = require('../../../src/js/service/devicestorage'),
     Email = require('../../../src/js/email/email'),
-    Outbox = require('../../../src/js/email/outbox'),
-    UpdateHandler = require('../../../src/js/util/update/update-handler'),
-    Dialog = require('../../../src/js/util/dialog');
+    UpdateHandler = require('../../../src/js/util/update/update-handler');
 
 describe('Account Service unit test', function() {
-    var account, authStub, outboxStub, emailStub, devicestorageStub, updateHandlerStub, dialogStub,
+    var account, authStub, emailStub, devicestorageStub, updateHandlerStub,
         realname = 'John Doe',
         dummyUser = 'spiderpig@springfield.com';
 
@@ -17,13 +15,10 @@ describe('Account Service unit test', function() {
 
     beforeEach(function() {
         authStub = sinon.createStubInstance(Auth);
-        outboxStub = sinon.createStubInstance(Outbox);
         devicestorageStub = sinon.createStubInstance(DeviceStorageDAO);
         emailStub = sinon.createStubInstance(Email);
-        outboxStub = sinon.createStubInstance(Outbox);
         updateHandlerStub = sinon.createStubInstance(UpdateHandler);
-        dialogStub = sinon.createStubInstance(Dialog);
-        account = new Account(authStub, devicestorageStub, emailStub, outboxStub, updateHandlerStub, dialogStub);
+        account = new Account(authStub, devicestorageStub, emailStub, updateHandlerStub);
     });
 
     afterEach(function() {});

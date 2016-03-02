@@ -4,13 +4,11 @@ var ngModule = angular.module('woEmail');
 ngModule.service('account', Account);
 module.exports = Account;
 
-function Account(auth, accountStore, email, outbox, updateHandler, dialog, util) {
+function Account(auth, accountStore, email, updateHandler, util) {
     this._auth = auth;
     this._accountStore = accountStore;
     this._emailDao = email;
-    this._outbox = outbox;
     this._updateHandler = updateHandler;
-    this._dialog = dialog;
     this._accounts = []; // init accounts list
     this.util = util;
 }
