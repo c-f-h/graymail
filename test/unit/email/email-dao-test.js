@@ -7,7 +7,6 @@ var mailreader = require('mailreader'),
     cfg = require('../../../src/js/app-config').config,
     EmailDAO = require('../../../src/js/email/email'),
     DeviceStorageDAO = require('../../../src/js/service/devicestorage'),
-    appConfig = require('../../../src/js/app-config'),
     Auth = require('../../../src/js/service/auth'),
     Dialog = require('../../../src/js/util/dialog');
 
@@ -135,7 +134,7 @@ describe('Email DAO unit tests', function() {
         //
         // setup the SUT
         //
-        dao = new EmailDAO(devicestorageStub, mailreader, dialogStub, appConfig, authStub);
+        dao = new EmailDAO(devicestorageStub, mailreader, dialogStub, authStub);
         dao._account = account;
         dao._pgpMailer = pgpMailerStub;
         dao._imapClient = imapClientStub;

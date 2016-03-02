@@ -48,11 +48,10 @@ var MSG_PART_TYPE_HTML = 'html';
  * @param {Object} devicestorage Handles persistence to the local indexed db
  * @param {Object} mailreader Parses MIME messages received from IMAP
  */
-function Email(accountStore, mailreader, dialog, appConfig, auth) {
+function Email(accountStore, mailreader, dialog, auth) {
     this._devicestorage = accountStore;
     this._mailreader = mailreader;
     this._dialog = dialog;
-    this._appConfig = appConfig;
     this._auth = auth;
 }
 
