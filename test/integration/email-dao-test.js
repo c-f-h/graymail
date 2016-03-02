@@ -202,7 +202,6 @@ describe('Email DAO integration tests', function() {
         navigator.online = true;
 
         sinon.stub(mailreader, 'startWorker', function() {});
-        sinon.stub(openpgp, 'initWorker', function() {});
 
         // build and inject angular services
         angular.module('email-integration-test', ['woEmail']);
@@ -299,7 +298,6 @@ describe('Email DAO integration tests', function() {
     });
 
     afterEach(function(done) {
-        openpgp.initWorker.restore();
         mailreader.startWorker.restore();
 
         imapClient.stopListeningForChanges().then(function() {
