@@ -23,7 +23,7 @@ describe('Connection Doctor', function() {
             }
         };
 
-        workerPath = '../lib/tcp-socket-tls-worker.min.js';
+        workerPath = undefined; //'../lib/tcp-socket-tls-worker.min.js';
         imapStub = sinon.createStubInstance(ImapClient);
         smtpStub = sinon.createStubInstance(SmtpClient);
 
@@ -87,9 +87,7 @@ describe('Connection Doctor', function() {
                     ca: credentials.imap.ca,
                     tlsWorkerPath: workerPath
                 })).to.be.true;
-
-                done();
-            });
+            }).then(done, done);
 
             socketStub.oncert();
             socketStub.onopen();
@@ -111,9 +109,7 @@ describe('Connection Doctor', function() {
                     ca: credentials.imap.ca,
                     tlsWorkerPath: workerPath
                 })).to.be.true;
-
-                done();
-            });
+            }).then(done, done);
 
             socketStub.onopen();
         });
@@ -128,9 +124,7 @@ describe('Connection Doctor', function() {
                     ca: credentials.imap.ca,
                     tlsWorkerPath: workerPath
                 })).to.be.true;
-
-                done();
-            });
+            }).then(done, done);
 
             socketStub.oncert();
             socketStub.onerror();
@@ -143,7 +137,7 @@ describe('Connection Doctor', function() {
                 expect(TCPSocket.open.calledOnce).to.be.true;
 
                 done();
-            });
+            }).catch(done);
 
             socketStub.onerror({
                 data: new Error()
@@ -159,9 +153,7 @@ describe('Connection Doctor', function() {
                 expect(error.code).to.equal(ConnectionDoctor.HOST_TIMEOUT);
                 expect(TCPSocket.open.calledOnce).to.be.true;
                 cfg.connDocTimeout = origTimeout;
-
-                done();
-            });
+            }).then(done, done);
         });
     });
 
@@ -177,9 +169,7 @@ describe('Connection Doctor', function() {
                 expect(imapStub.login.calledOnce).to.be.true;
                 expect(imapStub.listWellKnownFolders.calledOnce).to.be.true;
                 expect(imapStub.logout.calledOnce).to.be.true;
-
-                done();
-            });
+            }).then(done, done);
         });
 
         it('should fail w/ generic error on logout', function(done) {
@@ -197,7 +187,7 @@ describe('Connection Doctor', function() {
                 expect(imapStub.logout.calledOnce).to.be.true;
 
                 done();
-            });
+            }).catch(done);
         });
 
         it('should fail w/ generic error on inbox missing', function(done) {
@@ -213,7 +203,7 @@ describe('Connection Doctor', function() {
                 expect(imapStub.logout.called).to.be.false;
 
                 done();
-            });
+            }).catch(done);
         });
 
         it('should fail w/ generic error on listing folders fails', function(done) {
@@ -228,7 +218,7 @@ describe('Connection Doctor', function() {
                 expect(imapStub.logout.called).to.be.false;
 
                 done();
-            });
+            }).catch(done);
         });
 
         it('should fail w/ auth rejected', function(done) {
@@ -246,7 +236,7 @@ describe('Connection Doctor', function() {
                 expect(imapStub.logout.called).to.be.false;
 
                 done();
-            });
+            }).catch(done);
         });
     });
 
@@ -255,9 +245,7 @@ describe('Connection Doctor', function() {
             doctor._checkSmtp().then(function() {
                 expect(smtpStub.connect.calledOnce).to.be.true;
                 expect(smtpStub.quit.calledOnce).to.be.true;
-
-                done();
-            });
+            }).then(done, done);
 
             smtpStub.onidle();
             smtpStub.onclose();
@@ -271,7 +259,7 @@ describe('Connection Doctor', function() {
                 expect(smtpStub.quit.called).to.be.false;
 
                 done();
-            });
+            }).catch(done);
 
             smtpStub.onerror(new Error());
         });
@@ -297,9 +285,7 @@ describe('Connection Doctor', function() {
                 expect(doctor._checkReachable.calledTwice).to.be.true;
                 expect(doctor._checkImap.calledOnce).to.be.true;
                 expect(doctor._checkSmtp.calledOnce).to.be.true;
-
-                done();
-            });
+            }).then(done, done);
         });
 
         it('should fail for smtp', function(done) {
@@ -317,7 +303,7 @@ describe('Connection Doctor', function() {
                 expect(doctor._checkSmtp.calledOnce).to.be.true;
 
                 done();
-            });
+            }).catch(done);
         });
 
         it('should fail for imap', function(done) {
@@ -334,7 +320,7 @@ describe('Connection Doctor', function() {
                 expect(doctor._checkSmtp.called).to.be.false;
 
                 done();
-            });
+            }).catch(done);
         });
 
         it('should fail for smtp reachability', function(done) {
@@ -350,7 +336,7 @@ describe('Connection Doctor', function() {
                 expect(doctor._checkSmtp.called).to.be.false;
 
                 done();
-            });
+            }).catch(done);
         });
 
         it('should fail for imap reachability', function(done) {
@@ -365,7 +351,7 @@ describe('Connection Doctor', function() {
                 expect(doctor._checkSmtp.called).to.be.false;
 
                 done();
-            });
+            }).catch(done);
         });
 
         it('should fail for offline', function(done) {
@@ -379,7 +365,7 @@ describe('Connection Doctor', function() {
                 expect(doctor._checkSmtp.called).to.be.false;
 
                 done();
-            });
+            }).catch(done);
         });
 
         it('should fail w/o config', function(done) {
@@ -393,7 +379,7 @@ describe('Connection Doctor', function() {
                 expect(doctor._checkSmtp.called).to.be.false;
 
                 done();
-            });
+            }).catch(done);
         });
     });
 });

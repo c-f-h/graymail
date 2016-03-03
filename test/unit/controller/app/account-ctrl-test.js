@@ -7,21 +7,14 @@ var AccountCtrl = require('../../../../src/js/controller/app/account'),
 
 describe('Account Controller unit test', function() {
     var scope, accountCtrl,
-        dummyFingerprint, expectedFingerprint,
-        dummyKeyId, expectedKeyId,
-        emailAddress, keySize, authStub, dialogStub, downloadStub;
+        emailAddress, authStub, dialogStub, downloadStub;
 
     beforeEach(function() {
         authStub = sinon.createStubInstance(Auth);
         dialogStub = sinon.createStubInstance(Dialog);
         downloadStub = sinon.createStubInstance(Download);
 
-        dummyFingerprint = '3A2D39B4E1404190B8B949DE7D7E99036E712926';
-        expectedFingerprint = '3A2D 39B4 E140 4190 B8B9 49DE 7D7E 9903 6E71 2926';
-        dummyKeyId = '9FEB47936E712926';
-        expectedKeyId = '6E712926';
         emailAddress = 'fred@foo.com';
-        keySize = 1234;
         authStub.emailAddress = emailAddress;
 
         angular.module('accounttest', ['woServices']);
@@ -44,9 +37,6 @@ describe('Account Controller unit test', function() {
     describe('scope variables', function() {
         it('should be set correctly', function() {
             expect(scope.eMail).to.equal(emailAddress);
-            expect(scope.keyId).to.equal(expectedKeyId);
-            expect(scope.fingerprint).to.equal(expectedFingerprint);
-            expect(scope.keysize).to.equal(keySize);
         });
     });
 });

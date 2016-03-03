@@ -32,40 +32,25 @@ describe('Contacts Controller unit test', function() {
 
     describe('listKeys', function() {
 
-        it('should work', function(done) {
-            scope.listKeys().then(function() {
+        it('should work', function() {
+            return scope.listKeys().then(function() {
                 //expect(scope.keys.length).to.equal(1);
                 //expect(scope.keys[0]._id).to.equal('12345');
                 //expect(scope.keys[0].fingerprint).to.equal('asdf');
                 //expect(scope.keys[0].fullUserId).to.equal('Firstname Lastname <first.last@example.com>');
-                done();
             });
         });
     });
 
-    describe('getFingerprint', function() {
-        it('should work', function() {
-            var key = {
-                fingerprint: 'YYYYYYYYYYYYYYYYYYYYYYYYYYYYYYYYYYYYYYYY'
-            };
-
-            scope.getFingerprint(key);
-
-            expect(scope.fingerprint).to.equal('YYYY YYYY YYYY YYYY YYYY ... YYYY YYYY YYYY YYYY YYYY');
-        });
-    });
-
     describe('removeKey', function() {
-        it('should work', function(done) {
+        it('should work', function() {
             var key = {
                 _id: '12345'
             };
 
             scope.listKeys = function() {};
 
-            scope.removeKey(key).then(function() {
-                done();
-            });
+            return scope.removeKey(key);
         });
     });
 });

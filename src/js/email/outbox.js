@@ -66,15 +66,11 @@ Outbox.prototype.put = function(mail) {
 
     mail.uid = mail.id = uuid.v4(); // the mail needs a random id & uid for storage in the database
 
-    return storeAndForward(mail);
-
-    function storeAndForward(mail) {
-        // store in outbox
-        return self._devicestorage.storeList([mail], outboxDb).then(function() {
-            // don't wait for next round
-            self._processOutbox(self._onUpdate);
-        });
-    }
+    // store in outbox
+    return self._devicestorage.storeList([mail], outboxDb).then(function() {
+        // don't wait for next round
+        self._processOutbox(self._onUpdate);
+    });
 };
 
 /**

@@ -19,6 +19,8 @@ describe('Login (Set Credentials) Controller unit test', function() {
         auth = sinon.createStubInstance(Auth);
         doctor = sinon.createStubInstance(ConnectionDoctor);
 
+        auth.getEmailAddress.returns(resolves('email@address.com'));
+
         // setup the controller
         angular.module('setcredentialstest', []);
         angular.mock.module('setcredentialstest');

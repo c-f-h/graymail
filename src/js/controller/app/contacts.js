@@ -24,12 +24,14 @@ var ContactsCtrl = function($scope) {
 
     $scope.listKeys = function() {
         // TODO fill $scope.keys
+        $scope.keys = [];
+        return Promise.resolve();
     };
 
     $scope.removeKey = function(/*key*/) {
         // TODO
         // update displayed keys
-        // return $scope.listKeys();
+        return $scope.listKeys();
     };
 };
 

@@ -88,10 +88,4 @@ describe('Navigation Controller unit test', function() {
             });
         });
     });
-
-    describe('checkKeySyncStatus', function() {
-        it('should work', function(done) {
-            scope.checkKeySyncStatus().then(done);
-        });
-    });
 });

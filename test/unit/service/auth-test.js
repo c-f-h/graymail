@@ -65,15 +65,15 @@ describe('Auth unit tests', function() {
     });
 
     describe('#getCredentials', function() {
-        it('should load credentials and retrieve credentials from cfg', function(done) {
+        it('should load credentials and retrieve credentials from cfg', function() {
             storageStub.listItems.withArgs(EMAIL_ADDR_DB_KEY).returns(resolves([emailAddress]));
-            storageStub.listItems.withArgs(PASSWD_DB_KEY).returns(resolves([encryptedPassword]));
+            storageStub.listItems.withArgs(PASSWD_DB_KEY).returns(resolves([password]));
             storageStub.listItems.withArgs(USERNAME_DB_KEY).returns(resolves([username]));
             storageStub.listItems.withArgs(REALNAME_DB_KEY).returns(resolves([realname]));
             storageStub.listItems.withArgs(IMAP_DB_KEY).returns(resolves([imap]));
             storageStub.listItems.withArgs(SMTP_DB_KEY).returns(resolves([smtp]));
 
-            auth.getCredentials().then(function(cred) {
+            return auth.getCredentials().then(function(cred) {
                 expect(auth.emailAddress).to.equal(emailAddress);
                 expect(auth.password).to.equal(password);
 
@@ -92,8 +92,6 @@ describe('Auth unit tests', function() {
                 expect(cred.smtp.auth.pass).to.equal(password);
 
                 expect(storageStub.listItems.callCount).to.equal(6);
-
-                done();
             });
         });
     });
@@ -129,7 +127,7 @@ describe('Auth unit tests', function() {
             auth.smtp = smtp;
             auth.imap = imap;
 
-            storageStub.storeList.withArgs([encryptedPassword], PASSWD_DB_KEY).returns(resolves());
+            storageStub.storeList.withArgs([password], PASSWD_DB_KEY).returns(resolves());
             storageStub.storeList.withArgs([emailAddress], EMAIL_ADDR_DB_KEY).returns(resolves());
             storageStub.storeList.withArgs([username], USERNAME_DB_KEY).returns(resolves());
             storageStub.storeList.withArgs([realname], REALNAME_DB_KEY).returns(resolves());
@@ -228,7 +226,7 @@ describe('Auth unit tests', function() {
     describe('#_loadCredentials', function() {
         it('should work', function(done) {
             storageStub.listItems.withArgs(EMAIL_ADDR_DB_KEY).returns(resolves([emailAddress]));
-            storageStub.listItems.withArgs(PASSWD_DB_KEY).returns(resolves([encryptedPassword]));
+            storageStub.listItems.withArgs(PASSWD_DB_KEY).returns(resolves([password]));
             storageStub.listItems.withArgs(USERNAME_DB_KEY).returns(resolves([username]));
             storageStub.listItems.withArgs(REALNAME_DB_KEY).returns(resolves([realname]));
             storageStub.listItems.withArgs(IMAP_DB_KEY).returns(resolves([imap]));
@@ -236,13 +234,13 @@ describe('Auth unit tests', function() {
 
             auth._loadCredentials().then(function() {
                 expect(auth.emailAddress).to.equal(emailAddress);
-                expect(auth.password).to.equal(encryptedPassword);
+                expect(auth.password).to.equal(password);
                 expect(auth.imap).to.equal(imap);
                 expect(auth.smtp).to.equal(smtp);
                 expect(auth.username).to.equal(username);
                 expect(auth.realname).to.equal(realname);
 
-                expect(auth.passwordNeedsDecryption).to.be.true;
+                expect(auth.passwordNeedsDecryption).to.be.false;
 
                 expect(storageStub.listItems.callCount).to.equal(6);
 

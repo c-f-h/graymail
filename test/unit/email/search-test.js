@@ -39,8 +39,7 @@ describe('Search Service unit test', function() {
                 }],
                 subject: 'subject3',
                 body: 'body1',
-                html: 'html1',
-                encrypted: true
+                html: 'html1'
             },
             message4 = {
                 to: [{
@@ -49,9 +48,7 @@ describe('Search Service unit test', function() {
                 }],
                 subject: 'subject4',
                 body: 'body1',
-                html: 'html1',
-                encrypted: true,
-                decrypted: true
+                html: 'html1'
             },
             testMessages = [message1, message2, message3, message4];
 
@@ -78,18 +75,20 @@ describe('Search Service unit test', function() {
             expect(result[0]).to.equal(message1);
         });
 
-        it('return plaintext and decrypted messages on matching body', function() {
+        it('return messages on matching body', function() {
             var result = search.filter(testMessages, 'body1');
-            expect(result.length).to.equal(2);
+            expect(result.length).to.equal(3);
             expect(result[0]).to.equal(message1);
-            expect(result[1]).to.equal(message4);
+            expect(result[1]).to.equal(message3);
+            expect(result[2]).to.equal(message4);
         });
 
-        it('return plaintext and decrypted messages on matching html', function() {
+        it('return messages on matching html', function() {
             var result = search.filter(testMessages, 'html1');
-            expect(result.length).to.equal(2);
+            expect(result.length).to.equal(3);
             expect(result[0]).to.equal(message1);
-            expect(result[1]).to.equal(message4);
+            expect(result[1]).to.equal(message3);
+            expect(result[2]).to.equal(message4);
         });
     });
 

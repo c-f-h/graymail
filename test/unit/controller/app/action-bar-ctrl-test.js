@@ -74,24 +74,6 @@ describe('Action Bar Controller unit test', function() {
             expect(scope.state.nav.currentFolder.messages[4].checked).to.be.false;
         });
 
-        it('should check encrypted', function() {
-            scope.check(scope.CHECKENCRYPTED);
-            expect(scope.state.nav.currentFolder.messages[0].checked).to.be.false;
-            expect(scope.state.nav.currentFolder.messages[1].checked).to.be.false;
-            expect(scope.state.nav.currentFolder.messages[2].checked).to.be.false;
-            expect(scope.state.nav.currentFolder.messages[3].checked).to.be.true;
-            expect(scope.state.nav.currentFolder.messages[4].checked).to.be.false;
-        });
-
-        it('should check unencrypted', function() {
-            scope.check(scope.CHECKUNENCRYPTED);
-            expect(scope.state.nav.currentFolder.messages[0].checked).to.be.true;
-            expect(scope.state.nav.currentFolder.messages[1].checked).to.be.true;
-            expect(scope.state.nav.currentFolder.messages[2].checked).to.be.true;
-            expect(scope.state.nav.currentFolder.messages[3].checked).to.be.false;
-            expect(scope.state.nav.currentFolder.messages[4].checked).to.be.true;
-        });
-
         it('should check unread', function() {
             scope.check(scope.CHECKUNREAD);
             expect(scope.state.nav.currentFolder.messages[0].checked).to.be.false;

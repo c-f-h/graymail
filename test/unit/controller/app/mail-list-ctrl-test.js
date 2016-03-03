@@ -245,7 +245,7 @@ describe('Mail List controller unit test', function() {
     });
 
     describe('select', function() {
-        it('should decrypt, focus mark an unread mail as read', function(done) {
+        it('should focus and mark an unread mail as read', function() {
             scope.pendingNotifications = ['asd'];
             sinon.stub(notificationMock, 'close');
 
@@ -270,18 +270,16 @@ describe('Mail List controller unit test', function() {
                 }
             };
 
-            scope.select(mail).then(function() {
-                expect(emailMock.decryptBody.calledOnce).to.be.true;
+            return scope.select(mail).then(function() {
                 expect(scope.state.mailList.selected).to.equal(mail);
                 expect(notificationMock.close.calledWith('asd')).to.be.true;
                 expect(notificationMock.close.calledOnce).to.be.true;
 
                 notificationMock.close.restore();
-                done();
             });
         });
 
-        it('should decrypt and focus a read mail', function(done) {
+        it('should focus a read mail', function() {
             var mail = {
                 from: [{
                     address: 'asd'
@@ -301,10 +299,8 @@ describe('Mail List controller unit test', function() {
                 }
             };
 
-            scope.select(mail).then(function() {
-                expect(emailMock.decryptBody.calledOnce).to.be.true;
+            return scope.select(mail).then(function() {
                 expect(scope.state.mailList.selected).to.equal(mail);
-                done();
             });
         });
     });

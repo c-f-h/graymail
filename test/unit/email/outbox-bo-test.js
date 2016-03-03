@@ -64,16 +64,8 @@ describe('Outbox unit test', function() {
             });
         });
 
-        it('should not encrypt and store a mail', function(done) {
-            var mail, senderKey, receiverKey;
-
-            senderKey = {
-                publicKey: 'SENDER PUBLIC KEY'
-            };
-            receiverKey = {
-                publicKey: 'RECEIVER PUBLIC KEY'
-            };
-            mail = {
+        it('should store a mail', function() {
+            var mail = {
                 from: [{
                     name: 'member',
                     address: 'member@whiteout.io'
@@ -91,83 +83,8 @@ describe('Outbox unit test', function() {
 
             devicestorageStub.storeList.withArgs([mail]).returns(resolves());
 
-            outbox.put(mail).then(function() {
-                expect(mail.publicKeysArmored.length).to.equal(2);
-                expect(emailDaoStub.encrypt.called).to.be.false;
+            return outbox.put(mail).then(function() {
                 expect(devicestorageStub.storeList.calledOnce).to.be.true;
-
-                done();
-            });
-        });
-
-        it('should not encrypt a mail with bcc and store a mail', function(done) {
-            var mail;
-
-            mail = {
-                from: [{
-                    name: 'member',
-                    address: 'member@whiteout.io'
-                }],
-                to: [{
-                    name: 'member',
-                    address: 'member@whiteout.io'
-                }],
-                cc: [],
-                bcc: [{
-                    name: 'member',
-                    address: 'member@whiteout.io'
-                }]
-            };
-
-            devicestorageStub.storeList.withArgs([mail]).returns(resolves());
-
-            outbox.put(mail).then(function() {
-                expect(mail.publicKeysArmored.length).to.equal(0);
-                expect(emailDaoStub.encrypt.called).to.be.false;
-                expect(devicestorageStub.storeList.calledOnce).to.be.true;
-
-                done();
-            });
-        });
-
-        it('should encrypt and store a mail', function(done) {
-            var mail, senderKey, receiverKey;
-
-            senderKey = {
-                publicKey: 'SENDER PUBLIC KEY'
-            };
-            receiverKey = {
-                publicKey: 'RECEIVER PUBLIC KEY'
-            };
-            mail = {
-                from: [{
-                    name: 'member',
-                    address: 'member@whiteout.io'
-                }],
-                to: [{
-                    name: 'member',
-                    address: 'member'
-                }, {
-                    name: 'notamember',
-                    address: 'notamember'
-                }],
-                cc: [],
-                bcc: []
-            };
-
-            emailDaoStub.encrypt.withArgs({
-                mail: mail,
-                publicKeysArmored: [senderKey.publicKey, receiverKey.publicKey, receiverKey.publicKey]
-            }).returns(resolves());
-
-            devicestorageStub.storeList.withArgs([mail]).returns(resolves());
-
-            outbox.put(mail).then(function() {
-                expect(mail.publicKeysArmored.length).to.equal(3);
-                expect(emailDaoStub.encrypt.calledOnce).to.be.true;
-                expect(devicestorageStub.storeList.calledOnce).to.be.true;
-
-                done();
             });
         });
     });
@@ -187,7 +104,6 @@ describe('Outbox unit test', function() {
                     name: 'member',
                     address: 'member'
                 }],
-                encrypted: true,
                 publicKeysArmored: ['ARMORED KEY OF MEMBER'],
                 unregisteredUsers: []
             };
@@ -224,7 +140,6 @@ describe('Outbox unit test', function() {
                     name: 'newlyjoined',
                     address: 'newlyjoined'
                 }],
-                encrypted: true,
                 publicKeysArmored: [],
                 unregisteredUsers: [{
                     name: 'newlyjoined',
@@ -241,28 +156,17 @@ describe('Outbox unit test', function() {
 
             emailDaoStub.sendPlaintext.returns(resolves());
 
-            emailDaoStub.sendEncrypted.withArgs({
-                email: newlyjoined
-            }).returns(resolves());
-
-            emailDaoStub.sendEncrypted.withArgs({
-                email: member
-            }).returns(resolves());
-
             devicestorageStub.removeList.returns(resolves());
 
-            function onOutboxUpdate(err) {
+            outbox._processOutbox(function(err) {
                 expect(err).to.not.exist;
                 expect(outbox._outboxBusy).to.be.false;
-                expect(emailDaoStub.sendEncrypted.callCount).to.equal(2);
-                expect(emailDaoStub.sendPlaintext.callCount).to.equal(2);
+                expect(emailDaoStub.sendPlaintext.callCount).to.equal(4);
                 expect(devicestorageStub.listItems.callCount).to.equal(1);
                 expect(devicestorageStub.removeList.callCount).to.equal(4);
 
                 done();
-            }
-
-            outbox._processOutbox(onOutboxUpdate);
+            });
         });
 
         it('should not process outbox in offline mode', function(done) {

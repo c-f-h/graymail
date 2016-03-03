@@ -54,27 +54,6 @@ describe('Read Controller unit test', function() {
         });
     });
 
-    describe('getKeyId', function() {
-        var address = 'asfd@asdf.com';
-
-        it('should show searching on error', function(done) {
-            expect(scope.keyId).to.equal('No key found.');
-
-            scope.getKeyId(address).then(function() {
-                expect(dialogMock.error.calledOnce).to.be.true;
-                expect(scope.keyId).to.equal('Searching...');
-                done();
-            });
-        });
-
-        it('should show searching on error', function(done) {
-            scope.getKeyId(address).then(function() {
-                expect(scope.keyId).to.equal('PGP key: XXXXXXXX');
-                done();
-            });
-        });
-    });
-
     describe('parseConversation', function() {
         it.skip('should work', function() {
             var body = 'foo\n' +
