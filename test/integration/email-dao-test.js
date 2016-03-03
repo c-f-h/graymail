@@ -12,7 +12,7 @@ var ImapClient = require('../../src/js/email/imap-client'),
     str = require('../../src/js/app-config').string;
 
 describe('Email DAO integration tests', function() {
-    this.timeout(100000);
+    this.timeout(10000);
 
     var accountService, emailDao, imapClient, pgpMailer, imapMessages, imapFolders, imapServer, smtpServer, smtpClient, userStorage, auth,
         mockKeyPair, inbox, spam;
