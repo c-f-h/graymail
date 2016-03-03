@@ -4,13 +4,14 @@ var ngModule = angular.module('woEmail');
 ngModule.service('account', Account);
 module.exports = Account;
 
-function Account(auth, accountStore, email, updateHandler, util) {
+var validateEmailAddress = require('../util/validate-email');
+
+function Account(auth, accountStore, email, updateHandler) {
     this._auth = auth;
     this._accountStore = accountStore;
     this._emailDao = email;
     this._updateHandler = updateHandler;
     this._accounts = []; // init accounts list
-    this.util = util;
 }
 
 /**
@@ -42,7 +43,7 @@ Account.prototype.init = function(options) {
     };
 
     // Pre-Flight check: don't even start to initialize stuff if the email address is not valid
-    if (!self.util.validateEmailAddress(options.emailAddress)) {
+    if (!validateEmailAddress(options.emailAddress)) {
         return new Promise(function() {
             throw new Error('The user email address is invalid!');
         });

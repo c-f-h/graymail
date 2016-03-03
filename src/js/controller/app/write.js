@@ -4,7 +4,9 @@
 // Controller
 //
 
-var WriteCtrl = function($scope, $window, $filter, $q, appConfig, auth, email, outbox, dialog, axe, status, util) {
+var validateEmailAddress = require('../../util/validate-email');
+
+var WriteCtrl = function($scope, $window, $filter, $q, appConfig, auth, email, outbox, dialog, axe, status) {
 
     var str = appConfig.string;
     var cfg = appConfig.config;
@@ -215,7 +217,7 @@ var WriteCtrl = function($scope, $window, $filter, $q, appConfig, auth, email, o
         $scope.checkSendStatus();
 
         // verify email address
-        if (!util.validateEmailAddress(recipient.address)) {
+        if (!validateEmailAddress(recipient.address)) {
             recipient.secure = undefined;
             $scope.checkSendStatus();
             return;
@@ -247,8 +249,7 @@ var WriteCtrl = function($scope, $window, $filter, $q, appConfig, auth, email, o
         $scope.bcc.forEach(check);
 
         function check(recipient) {
-            // validate address
-            if (!util.validateEmailAddress(recipient.address)) {
+            if (!validateEmailAddress(recipient.address)) {
                 return dialog.info({
                     title: 'Warning',
                     message: 'Invalid recipient address!'

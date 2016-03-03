@@ -5,6 +5,7 @@ ngModule.service('outbox', Outbox);
 module.exports = Outbox;
 
 var config = require('../app-config').config,
+    uuid = require('node-uuid'),
     outboxDb = 'email_OUTBOX';
 
 /**
@@ -12,7 +13,7 @@ var config = require('../app-config').config,
  * The local outbox takes care of the emails before they are being sent.
  * It also checks periodically if there are any mails in the local device storage to be sent.
  */
-function Outbox(email, accountStore, util) {
+function Outbox(email, accountStore) {
     /** @private */
     this._emailDao = email;
 
@@ -23,8 +24,6 @@ function Outbox(email, accountStore, util) {
      * Semaphore-esque flag to avoid 'concurrent' calls to _processOutbox when the timeout fires, but a call is still in process.
      * @private */
     this._outboxBusy = false;
-    
-    this.util = util;
 }
 
 /**
@@ -65,7 +64,7 @@ Outbox.prototype.put = function(mail) {
         });
     }
 
-    mail.uid = mail.id = this.util.UUID(); // the mail needs a random id & uid for storage in the database
+    mail.uid = mail.id = uuid.v4(); // the mail needs a random id & uid for storage in the database
 
     return storeAndForward(mail);
 
