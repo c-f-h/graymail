@@ -243,7 +243,6 @@ module.exports = function(grunt) {
             app: {
                 src: [
                     'src/lib/underscore/underscore.js',
-                    'node_modules/jquery/dist/jquery.min.js',
                     'src/lib/angular/angular.js',
                     'src/lib/angular/angular-route.js',
                     'src/lib/angular/angular-animate.js',
@@ -280,7 +279,6 @@ module.exports = function(grunt) {
             unitTest: {
                 src: [
                     'src/lib/underscore/underscore.js',
-                    'node_modules/jquery/dist/jquery.min.js',
                     'src/lib/angular/angular.js',
                     'src/lib/angular/angular-route.js',
                     'src/lib/angular/angular-mocks.js',
@@ -296,7 +294,6 @@ module.exports = function(grunt) {
             integrationTest: {
                 src: [
                     'src/lib/underscore/underscore.js',
-                    'node_modules/jquery/dist/jquery.min.js',
                     'src/lib/angular/angular.js',
                     'src/lib/angular/angular-mocks.js',
                     'src/lib/lawnchair/lawnchair-git.js',
