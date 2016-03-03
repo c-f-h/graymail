@@ -5,7 +5,7 @@ ngModule.service('connectionDoctor', ConnectionDoctor);
 module.exports = ConnectionDoctor;
 
 var TCPSocket = require('emailjs-tcp-socket'),
-    ImapClient = require('imap-client'),
+    ImapClient = require('../email/imap-client'),
     SmtpClient = require('emailjs-smtp-client');
 
 /**

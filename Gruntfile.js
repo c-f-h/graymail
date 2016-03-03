@@ -154,7 +154,7 @@ module.exports = function(grunt) {
             },
             compressionWorker: {
                 files: {
-                    'dist/js/browserbox-compression-worker.browserified.js': ['node_modules/imap-client/node_modules/browserbox/src/browserbox-compression-worker.js']
+                    'dist/js/browserbox-compression-worker.browserified.js': ['node_modules/emailjs-imap-client/src/browserbox-compression-worker.js']
                 },
                 options: browserifyOpt
             },
@@ -534,7 +534,7 @@ module.exports = function(grunt) {
 
     // Build tasks
     grunt.registerTask('dist-css', ['sass:dist', 'autoprefixer:dist', 'csso:dist']);
-    grunt.registerTask('dist-js', ['browserify', 'exorcise', 'ngtemplates', 'concat', 'uglify']);
+    grunt.registerTask('dist-js', ['browserify', 'exorcise', 'ngtemplates', 'concat' /*, 'uglify'*/]);
     grunt.registerTask('dist-js-app', [
         'browserify:app',
         'exorcise:app',

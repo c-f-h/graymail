@@ -1,6 +1,6 @@
 'use strict';
 
-var ImapClient = require('imap-client'),
+var ImapClient = require('../../src/js/email/imap-client'),
     BrowserCrow = require('browsercrow'),
     BrowserSMTP = require('browsersmtp'),
     SmtpClient = require('emailjs-smtp-client'),

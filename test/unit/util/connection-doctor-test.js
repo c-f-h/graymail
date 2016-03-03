@@ -1,7 +1,7 @@
 'use strict';
 
-var TCPSocket = require('tcp-socket'),
-    ImapClient = require('imap-client'),
+var TCPSocket = require('emailjs-tcp-socket'),
+    ImapClient = require('../../../src/js/email/imap-client'),
     SmtpClient = require('emailjs-smtp-client'),
     ConnectionDoctor = require('../../../src/js/util/connection-doctor'),
     appConfig = require('../../../src/js/app-config'),

@@ -7,7 +7,7 @@ module.exports = Email;
 var config = require('../app-config').config,
     axe = require('axe-logger'),
     PlainMailer = require('./plainmailer'),
-    ImapClient = require('imap-client');
+    ImapClient = require('./imap-client');
 
 //
 //
