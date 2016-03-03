@@ -97,11 +97,7 @@ Email.prototype.init = function(options) {
  */
 Email.prototype.openFolder = function(options) {
     var self = this;
-    return new Promise(function(resolve) {
-        self.checkOnline();
-        resolve();
-
-    }).then(function() {
+    return self.checkOnline().then(function() {
         if (options.folder.path !== config.outboxMailboxPath) {
             return self._imapClient.selectMailbox({
                 path: options.folder.path
@@ -135,11 +131,7 @@ Email.prototype.deleteMessage = function(options) {
         return deleteLocal().then(done).catch(done);
     }
 
-    return new Promise(function(resolve) {
-        self.checkOnline();
-        resolve();
-
-    }).then(function() {
+    return self.checkOnline().then(function() {
         // delete from IMAP
         return self._imapDeleteMessage({
             folder: folder,
@@ -186,9 +178,7 @@ Email.prototype.setFlags = function(options) {
 
     // no-op if the message if not present anymore (for whatever reason)
     if (folder.messages.indexOf(message) < 0) {
-        return new Promise(function(resolve) {
-            resolve();
-        });
+        return Promise.resolve();
     }
 
     self.busy(); // start the spinner
@@ -199,11 +189,7 @@ Email.prototype.setFlags = function(options) {
         return markStorage().then(done).catch(done);
     }
 
-    return new Promise(function(resolve) {
-        self.checkOnline();
-        resolve();
-
-    }).then(function() {
+    return self.checkOnline().then(function() {
         // mark a message unread/answered on IMAP
         return self._imapMark({
             folder: folder,
@@ -271,11 +257,7 @@ Email.prototype.moveMessage = function(options) {
         message = options.message;
 
     self.busy();
-    return new Promise(function(resolve) {
-        self.checkOnline();
-        resolve();
-
-    }).then(function() {
+    return self.checkOnline().then(function() {
         folder.messages.splice(folder.messages.indexOf(message), 1);
 
         // delete from IMAP
@@ -325,9 +307,7 @@ Email.prototype.getBody = function(options) {
     });
 
     if (!messages.length) {
-        return new Promise(function(resolve) {
-            resolve();
-        });
+        return Promise.resolve();
     }
 
     messages.forEach(function(message) {
@@ -477,11 +457,7 @@ Email.prototype.sendPlaintext = function(options, mailer) {
 Email.prototype._sendGeneric = function(options, mailer) {
     var self = this;
     self.busy();
-    return new Promise(function(resolve) {
-        self.checkOnline();
-        resolve();
-
-    }).then(function() {
+    return self.checkOnline().then(function() {
         // get the smtp credentials
         return self._auth.getCredentials();
 
@@ -576,9 +552,7 @@ Email.prototype.onConnect = function(imap) {
 
     if (!self.isOnline()) {
         // don't try to connect when navigator is offline
-        return new Promise(function(resolve) {
-            resolve();
-        });
+        return Promise.resolve();
     }
 
     self._account.loggingIn = true;
@@ -688,9 +662,7 @@ Email.prototype.onDisconnect = function() {
     this._imapClient = undefined;
     this._plainMailer = undefined;
 
-    return new Promise(function(resolve) {
-        resolve(); // ASYNC ALL THE THINGS!!!
-    });
+    return Promise.resolve();
 };
 
 /**
@@ -1002,10 +974,7 @@ Email.prototype.done = function() {
 Email.prototype._imapMark = function(options) {
     var self = this;
 
-    return new Promise(function(resolve) {
-        self.checkOnline();
-        resolve();
-    }).then(function() {
+    return self.checkOnline().then(function() {
         options.path = options.folder.path;
         return self._imapClient.updateFlags(options);
     });
@@ -1021,11 +990,7 @@ Email.prototype._imapMark = function(options) {
  */
 Email.prototype._imapDeleteMessage = function(options) {
     var self = this;
-    return new Promise(function(resolve) {
-        self.checkOnline();
-        resolve();
-
-    }).then(function() {
+    return self.checkOnline().then(function() {
         var trash = _.findWhere(self._account.folders, {
             type: FOLDER_TYPE_TRASH
         });
@@ -1056,10 +1021,7 @@ Email.prototype._imapDeleteMessage = function(options) {
  */
 Email.prototype._imapMoveMessage = function(options) {
     var self = this;
-    return new Promise(function(resolve) {
-        self.checkOnline();
-        resolve();
-    }).then(function() {
+    return self.checkOnline().then(function() {
         return self._imapClient.moveMessage({
             path: options.folder.path,
             destination: options.destination.path,
@@ -1091,11 +1053,7 @@ Email.prototype._fetchMessages = function(options) {
         messages = options.messages,
         folder = options.folder;
 
-    return new Promise(function(resolve) {
-        self.checkOnline();
-        resolve();
-
-    }).then(function() {
+    return self.checkOnline().then(function() {
         // fetch all the metadata at once
         return self._imapClient.listMessages({
             path: folder.path,
@@ -1178,10 +1136,7 @@ Email.prototype._fetchMessages = function(options) {
  */
 Email.prototype._getBodyParts = function(options) {
     var self = this;
-    return new Promise(function(resolve) {
-        self.checkOnline();
-        resolve();
-    }).then(function() {
+    return self.checkOnline().then(function() {
         options.path = options.folder.path;
         return self._imapClient.getBodyParts(options);
     }).then(function() {
@@ -1294,10 +1249,7 @@ Email.prototype._localDeleteMessage = function(options) {
  * @param {Object} message DTO
  */
 Email.prototype._extractBody = function(message) {
-    return new Promise(function(resolve) {
-        resolve();
-
-    }).then(function() {
+    return Promise.resolve().then(function() {
         // extract the content
         var root = message.bodyParts;
 
@@ -1343,10 +1295,7 @@ Email.prototype._parse = function(options) {
 Email.prototype._uploadToSent = function(options) {
     var self = this;
     self.busy();
-    return new Promise(function(resolve) {
-        resolve();
-
-    }).then(function() {
+    return Promise.resolve().then(function() {
         // upload the sent message to the sent folder if necessary
         var sentFolder = _.findWhere(self._account.folders, {
             type: FOLDER_TYPE_SENT
@@ -1375,10 +1324,12 @@ Email.prototype._uploadToSent = function(options) {
  * Check if the client is online and throw an error if this is not the case.
  */
 Email.prototype.checkOnline = function() {
-    if (!this._account.online) {
+    if (this._account.online) {
+        return Promise.resolve();
+    } else {
         var err = new Error('Client is currently offline!');
         err.code = 42;
-        throw err;
+        return Promise.reject(err);
     }
 };
 

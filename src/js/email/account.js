@@ -67,8 +67,6 @@ Account.prototype.init = function(options) {
 
             // add account object to the accounts array for the ng controllers
             self._accounts.push(account);
-
-            return null; // keys;
         });
     });
 };
