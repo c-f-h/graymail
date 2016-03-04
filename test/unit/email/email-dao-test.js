@@ -1024,7 +1024,7 @@ describe('Email DAO unit tests', function() {
 
     describe('event handlers', function() {
 
-        describe('#onConnect', function() {
+        describe('#connectImap', function() {
             var initFoldersStub, credentials;
 
             beforeEach(function() {
@@ -1047,7 +1047,7 @@ describe('Email DAO unit tests', function() {
                 imapClientStub.listenForChanges.returns(resolves());
                 initFoldersStub.returns(resolves());
 
-                return dao.onConnect(imapClientStub).then(function() {
+                return dao.connectImap(imapClientStub).then(function() {
                     expect(imapClientStub.login.calledOnce).to.be.true;
                     expect(imapClientStub.selectMailbox.calledOnce).to.be.true;
                     expect(initFoldersStub.calledOnce).to.be.true;
@@ -1065,23 +1065,23 @@ describe('Email DAO unit tests', function() {
             it('should not connect when user agent is offline', function() {
                 dao.isOnline.returns(false);
 
-                return dao.onConnect(imapClientStub).then(function() {
+                return dao.connectImap(imapClientStub).then(function() {
                     expect(authStub.getCredentials.called).to.be.false;
                 });
             });
         });
 
-        describe('#onDisconnect', function() {
-            it('should discard imapClient and pgpMailer', function() {
+        describe('#disconnectImap', function() {
+            it('should discard imapClient and plainMailer', function() {
                 imapClientStub.stopListeningForChanges.returns(resolves());
                 imapClientStub.logout.returns(resolves());
 
-                return dao.onDisconnect().then(function() {
+                return dao.disconnectImap().then(function() {
                     expect(imapClientStub.stopListeningForChanges.calledOnce).to.be.true;
                     expect(imapClientStub.logout.calledOnce).to.be.true;
                     expect(dao._account.online).to.be.false;
                     expect(dao._imapClient).to.not.exist;
-                    expect(dao._pgpMailer).to.not.exist;
+                    expect(dao._plainMailer).to.not.exist;
                 });
 
             });

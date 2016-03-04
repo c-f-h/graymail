@@ -135,7 +135,7 @@ var NavigationCtrl = function($scope, $location, $q, $timeout, account, email, o
     initializeFolders();
 
     // connect imap/smtp clients on first startup
-    account.onConnect(function(err) {
+    account.onOnline(function(err) {
         if (err) {
             dialog.error(err);
             return;

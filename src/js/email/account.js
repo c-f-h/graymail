@@ -62,8 +62,8 @@ Account.prototype.init = function(options) {
             account: account
         }).then(function() {
             // Handle offline and online gracefully ... arm dom event
-            window.addEventListener('online', self.onConnect.bind(self));
-            window.addEventListener('offline', self.onDisconnect.bind(self));
+            window.addEventListener('online', self.onOnline.bind(self));
+            window.addEventListener('offline', self.onOffline.bind(self));
 
             // add account object to the accounts array for the ng controllers
             self._accounts.push(account);
@@ -72,22 +72,24 @@ Account.prototype.init = function(options) {
 };
 
 /**
- * Event that is called when the user agent goes online. This create new instances of the imap-client and pgp-mailer and connects to the mail server.
+ * Event that is called when the user agent goes online.
+ * This create new instances of the imap-client and mailer
+ * and connects to the mail server.
  */
-Account.prototype.onConnect = function(callback) {
+Account.prototype.onOnline = function(callback) {
     if (!this._emailDao || !this._emailDao._account) {
         // prevent connection infinite loop
         return;
     }
 
-    this._emailDao.onConnect().then(callback).catch(callback);
+    this._emailDao.connectImap().then(callback).catch(callback);
 };
 
 /**
  * Event handler that is called when the user agent goes offline.
  */
-Account.prototype.onDisconnect = function() {
-    return this._emailDao.onDisconnect();
+Account.prototype.onOffline = function() {
+    return this._emailDao.disconnectImap();
 };
 
 /**
@@ -101,8 +103,8 @@ Account.prototype.logout = function() {
         return self._accountStore.clear();
 
     }).then(function() {
-        // delete instance of imap-client and pgp-mailer
-        return self._emailDao.onDisconnect();
+        // delete instance of imap-client and mailer
+        return self._emailDao.disconnectImap();
 
     }).then(function() {
         if (typeof window.chrome !== 'undefined' && chrome.runtime && chrome.runtime.reload) {

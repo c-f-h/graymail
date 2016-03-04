@@ -452,7 +452,7 @@ Email.prototype.sendPlaintext = function(options, mailer) {
 /**
  * This funtion wraps error handling for sending via PlainMailer and uploading to imap.
  * @param {Object} options.email The message to be sent
- * @param {Object} mailer an instance of the PlainMailer to be used for testing purposes only
+ * @param {Object} mailer an instance of the PlainMailer; for testing purposes only
  */
 Email.prototype._sendGeneric = function(options, mailer) {
     var self = this;
@@ -541,13 +541,13 @@ Email.prototype.refreshOutbox = function() {
 
 
 /**
- * This handler should be invoked when navigator.onLine === true. It will try to connect a
- * given instance of the imap client. If the connection attempt was successful, it will
- * update the locally available folders with the newly received IMAP folder listing.
+ * This method will try to connect a given instance of the imap client.
+ * If the connection attempt was successful, it will update the locally
+ * available folders with the newly received IMAP folder listing.
  *
- * @param {Object} imap an instance of the imap-client to be used for testing purposes only
+ * @param {Object} imap an instance of the imap-client; for testing purposes only
  */
-Email.prototype.onConnect = function(imap) {
+Email.prototype.connectImap = function(imap) {
     var self = this;
 
     if (!self.isOnline()) {
@@ -568,7 +568,7 @@ Email.prototype.onConnect = function(imap) {
         self._imapClient = (imap || new ImapClient(credentials.imap));
 
         self._imapClient.onError = onConnectionError; // connection error handling
-        self._imapClient.onCert = self._auth.handleCertificateUpdate.bind(self._auth, 'imap', self.onConnect.bind(self), self._dialog.error); // certificate update handling
+        self._imapClient.onCert = self._auth.handleCertificateUpdate.bind(self._auth, 'imap', self.connectImap.bind(self), self._dialog.error); // certificate update handling
         self._imapClient.onSyncUpdate = self._onSyncUpdate.bind(self); // attach sync update handler
 
     }).then(function() {
@@ -640,16 +640,15 @@ Email.prototype.onConnect = function(imap) {
         setTimeout(function() {
             axe.debug('Reconnecting the IMAP stack');
             // re-init client modules on error
-            self.onConnect().catch(self._dialog.error);
+            self.connectImap().catch(self._dialog.error);
         }, config.reconnectInterval);
     }
 };
 
 /**
- * This handler should be invoked when navigator.onLine === false.
- * It will discard the imap client and PlainMailer
+ * Discard the imap client and PlainMailer
  */
-Email.prototype.onDisconnect = function() {
+Email.prototype.disconnectImap = function() {
     // logout of imap-client
     // ignore error, because it's not problem if logout fails
     if (this._imapClient) {

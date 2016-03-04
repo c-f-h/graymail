@@ -116,26 +116,26 @@ describe('Account Service unit test', function() {
         });
     });
 
-    describe('onConnect', function() {
+    describe('onOnline', function() {
         beforeEach(function() {
             emailStub._account = {};
         });
 
         it('should work', function(done) {
-            emailStub.onConnect.returns(resolves());
+            emailStub.connectImap.returns(resolves());
 
-            account.onConnect(function(err) {
+            account.onOnline(function(err) {
                 expect(err).to.not.exist;
-                expect(emailStub.onConnect.calledOnce).to.be.true;
+                expect(emailStub.connectImap.calledOnce).to.be.true;
                 done();
             });
         });
     });
 
-    describe('onDisconnect', function() {
-        it('should work', function(done) {
-            emailStub.onDisconnect.returns(resolves());
-            account.onDisconnect().then(done);
+    describe('onOffline', function() {
+        it('should work', function() {
+            emailStub.disconnectImap.returns(resolves());
+            return account.onOffline();
         });
     });
 
@@ -164,15 +164,15 @@ describe('Account Service unit test', function() {
             });
         });
 
-        it('should fail due to _emailDao.onDisconnect', function(done) {
+        it('should fail due to _emailDao.disconnectImap', function(done) {
             authStub.logout.returns(resolves());
             devicestorageStub.clear.returns(resolves());
-            emailStub.onDisconnect.returns(rejects(new Error('asdf')));
+            emailStub.disconnectImap.returns(rejects(new Error('asdf')));
 
             account.logout().catch(function(err) {
                 expect(err.message).to.match(/asdf/);
    
-                expect(emailStub.onDisconnect.calledOnce).to.be.true;
+                expect(emailStub.disconnectImap.calledOnce).to.be.true;
                 expect(authStub.logout.calledOnce).to.be.true;
                 expect(devicestorageStub.clear.calledOnce).to.be.true;
    
