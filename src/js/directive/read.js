@@ -66,7 +66,7 @@ ngModule.directive('frameLoad', function($window) {
         $window.addEventListener('orientationchange', resetWidth);
 
         // use iframe-resizer to dynamically adapt iframe size to its content
-        elm.iFrameResize({
+        iFrameResize({
             enablePublicMethods: true,
             sizeWidth: true,
             resizedCallback: scaleToFit,
@@ -79,7 +79,7 @@ ngModule.directive('frameLoad', function($window) {
                     });
                 }
             }
-        });
+        }, iframe);
 
         iframe.onload = function() {
             // set listeners
@@ -135,8 +135,8 @@ ngModule.directive('frameLoad', function($window) {
         // transform scale iframe to fit container width
         // necessary if iframe is wider than container
         function scaleToFit() {
-            var parentWidth = elm.parent().width();
-            var w = elm.width();
+            var parentWidth = iframe.parentNode.clientWidth;
+            var w = iframe.clientWidth;
             var scale = 'none';
 
             // only scale html mails
