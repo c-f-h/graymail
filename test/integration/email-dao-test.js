@@ -7,14 +7,14 @@ var ImapClient = require('../../src/js/email/imap-client'),
     LawnchairDAO = require('../../src/js/service/lawnchair'),
     DeviceStorageDAO = require('../../src/js/service/devicestorage'),
     mailreader = require('mailreader'),
-    PgpMailer = require('../../src/js/email/plainmailer'),
+    PlainMailer = require('../../src/js/email/plainmailer'),
     config = require('../../src/js/app-config').config,
     str = require('../../src/js/app-config').string;
 
 describe('Email DAO integration tests', function() {
     this.timeout(10000);
 
-    var accountService, emailDao, imapClient, pgpMailer, imapMessages, imapFolders, imapServer, smtpServer, smtpClient, userStorage, auth,
+    var accountService, emailDao, imapClient, plainMailer, imapMessages, imapFolders, imapServer, smtpServer, smtpClient, userStorage, auth,
         mockKeyPair, inbox, spam;
 
     var testAccount = {
@@ -265,8 +265,7 @@ describe('Email DAO integration tests', function() {
                     accountService.init({
                         emailAddress: testAccount.user
                     }).then(function() {
-                        // retrieve the pgpbuilder from the emaildao and initialize the pgpmailer with the existing pgpbuilder
-                        pgpMailer = new PgpMailer({}, emailDao._pgpbuilder);
+                        plainMailer = new PlainMailer({});
 
                         emailDao.unlock({
                             passphrase: testAccount.pass,
@@ -595,7 +594,7 @@ describe('Email DAO integration tests', function() {
                     subject: 'plaintext test',
                     body: 'hello world!'
                 }
-            }, pgpMailer).then(function() {
+            }, plainMailer).then(function() {
                 expect(smtpServer.onmail.callCount).to.equal(1);
                 done();
             });
@@ -620,7 +619,7 @@ describe('Email DAO integration tests', function() {
                     body: 'hello world!',
                     publicKeysArmored: [mockKeyPair.publicKey.publicKey]
                 }
-            }, pgpMailer).then(function() {
+            }, plainMailer).then(function() {
                 expect(smtpServer.onmail.callCount).to.equal(1);
                 done();
             });
@@ -660,7 +659,7 @@ describe('Email DAO integration tests', function() {
                     subject: 'plaintext test',
                     body: expectedBody
                 }
-            }, pgpMailer).then(function() {});
+            }, plainMailer).then(function() {});
         });
 
         it('should send & receive a signed encrypted message', function(done) {
@@ -689,7 +688,7 @@ describe('Email DAO integration tests', function() {
                     body: expectedBody,
                     publicKeysArmored: [mockKeyPair.publicKey.publicKey]
                 }
-            }, pgpMailer).then(function() {});
+            }, plainMailer).then(function() {});
         });
     });
 });

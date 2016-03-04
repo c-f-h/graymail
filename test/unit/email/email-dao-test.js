@@ -3,7 +3,6 @@
 var mailreader = require('mailreader'),
     ImapClient = require('../../../src/js/email/imap-client'),
     PlainMailer = require('../../../src/js/email/plainmailer'),
-    PlainBuilder = require('../../../src/js/email/plainbuilder'),
     cfg = require('../../../src/js/app-config').config,
     EmailDAO = require('../../../src/js/email/email'),
     DeviceStorageDAO = require('../../../src/js/service/devicestorage'),
@@ -19,7 +18,7 @@ describe('Email DAO unit tests', function() {
     var dao;
 
     // mocks
-    var imapClientStub, plainMailerStub, plainBuilderStub, devicestorageStub, parseStub, dialogStub, authStub;
+    var imapClientStub, plainMailerStub, devicestorageStub, parseStub, dialogStub, authStub;
 
     // config
     var emailAddress, passphrase, asymKeySize, account;
@@ -125,7 +124,6 @@ describe('Email DAO unit tests', function() {
         //
         imapClientStub = sinon.createStubInstance(ImapClient);
         plainMailerStub = sinon.createStubInstance(PlainMailer);
-        plainBuilderStub = sinon.createStubInstance(PlainBuilder);
         parseStub = sinon.stub(mailreader, 'parse');
         devicestorageStub = sinon.createStubInstance(DeviceStorageDAO);
         dialogStub = sinon.createStubInstance(Dialog);
