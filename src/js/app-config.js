@@ -31,7 +31,7 @@ appCfg.config = {
 // parse manifest to get configurations for current runtime
 if (typeof chrome !== 'undefined' && chrome.runtime && chrome.runtime.getManifest) {
     setConfigParams(chrome.runtime.getManifest());
-}*/ else if (typeof $ !== 'undefined' && $.get) {
+}/* else if (typeof $ !== 'undefined' && $.get) {
     $.get('/manifest.json', setConfigParams, 'json');
 }*/
 
