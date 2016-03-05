@@ -23,7 +23,7 @@ describe('Email DAO integration tests', function() {
         xoauth2: 'testtoken'
     };
 
-    beforeEach(function(done) {
+    beforeEach(function() {
 
         //
         // Test data
@@ -208,92 +208,80 @@ describe('Email DAO integration tests', function() {
         angular.mock.module('email-integration-test');
         angular.mock.inject(function($injector) {
             accountService = $injector.get('account');
-            initAccountService();
         });
 
-        function initAccountService() {
+        // create imap/smtp clients with stubbed tcp sockets
+        imapClient = new ImapClient({
+            auth: {
+                user: testAccount.user,
+                xoauth2: testAccount.xoauth2
+            },
+            secure: true,
+            ca: ['random string']
+        });
 
-            // create imap/smtp clients with stubbed tcp sockets
-            imapClient = new ImapClient({
-                auth: {
-                    user: testAccount.user,
-                    xoauth2: testAccount.xoauth2
-                },
-                secure: true,
-                ca: ['random string']
+        imapClient._client.client._TCPSocket = imapServer.createTCPSocket();
+        imapClient._listeningClient.client._TCPSocket = imapServer.createTCPSocket();
+        imapClient.onError = function(err) {
+            console.error('IMAP error.', err);
+            throw err;
+        };
+
+        smtpClient = new SmtpClient('localhost', 25, {
+            auth: {
+                user: testAccount.user,
+                xoauth2: testAccount.xoauth2
+            },
+            secure: true
+        });
+        smtpClient._TCPSocket = smtpServer.createTCPSocket();
+
+        // clear the local database before each test
+        var cleanup = new DeviceStorageDAO(new LawnchairDAO());
+
+        return cleanup.init(testAccount.user)
+        .then(function() {
+            return cleanup.clear();
+        }).then(function() {
+            console.log('onCleaned');
+            userStorage = accountService._accountStore;
+            auth = accountService._auth;
+            emailDao = accountService._emailDao;
+
+            auth.setCredentials({
+                emailAddress: testAccount.user,
+                password: 'asd',
+                smtp: {}, // host and port don't matter here since we're using
+                imap: {} // a preconfigured smtpclient with mocked tcp sockets
             });
 
-            imapClient._client.client._TCPSocket = imapServer.createTCPSocket();
-            imapClient._listeningClient.client._TCPSocket = imapServer.createTCPSocket();
-            imapClient.onError = function(err) {
-                console.error('IMAP error.', err);
-                throw err;
-            };
-
-            smtpClient = new SmtpClient('localhost', 25, {
-                auth: {
-                    user: testAccount.user,
-                    xoauth2: testAccount.xoauth2
-                },
-                secure: true
+            return auth.init();
+        }).then(function() {
+            console.log('auth inited');
+            return accountService.init({
+                emailAddress: testAccount.user
             });
-            smtpClient._TCPSocket = smtpServer.createTCPSocket();
+        }).then(function() {
+            console.log('account inited');
+            plainMailer = new PlainMailer({});
 
-            // clear the local database before each test
-            var cleanup = new DeviceStorageDAO(new LawnchairDAO());
-            cleanup.init(testAccount.user).then(function() {
-                cleanup.clear().then(onCleaned);
-            });
+            sinon.stub(accountService._emailDao, 'isOnline').returns(true);
+            return accountService._emailDao.connectImap(imapClient);
+        }).then(function() {
+            inbox = emailDao._account.folders.filter(function(folder) {
+                return folder.path === 'INBOX';
+            }).pop();
+            spam = emailDao._account.folders.filter(function(folder) {
+                return folder.path === '[Gmail]/Spam';
+            }).pop();
+            expect(inbox).to.exist;
+            expect(spam).to.exist;
 
-            function onCleaned() {
-                userStorage = accountService._accountStore;
-                auth = accountService._auth;
-                emailDao = accountService._emailDao;
-
-                auth.setCredentials({
-                    emailAddress: testAccount.user,
-                    password: 'asd',
-                    smtp: {}, // host and port don't matter here since we're using
-                    imap: {} // a preconfigured smtpclient with mocked tcp sockets
-                });
-
-                // stub rest request to key server
-                sinon.stub(emailDao._keychain._publicKeyDao, 'get').returns(resolves(mockKeyPair.publicKey));
-                sinon.stub(emailDao._keychain._publicKeyDao, 'getByUserId').returns(resolves(mockKeyPair.publicKey));
-
-                auth.init().then(function() {
-                    accountService.init({
-                        emailAddress: testAccount.user
-                    }).then(function() {
-                        plainMailer = new PlainMailer({});
-
-                        emailDao.unlock({
-                            passphrase: testAccount.pass,
-                            keypair: mockKeyPair
-                        }).then(function() {
-                            sinon.stub(accountService._emailDao, 'isOnline').returns(true);
-                            return accountService._emailDao.onConnect(imapClient);
-                        }).then(function() {
-                            inbox = emailDao._account.folders.filter(function(folder) {
-                                return folder.path === 'INBOX';
-                            }).pop();
-                            spam = emailDao._account.folders.filter(function(folder) {
-                                return folder.path === '[Gmail]/Spam';
-                            }).pop();
-                            expect(inbox).to.exist;
-                            expect(spam).to.exist;
-
-                            // phantomjs is really slow, so setting the tcp socket timeouts to 200s will effectively disarm the timeout
-                            imapClient._client.client.TIMEOUT_SOCKET_LOWER_BOUND = 999999999;
-                            imapClient._listeningClient.client.TIMEOUT_SOCKET_LOWER_BOUND = 999999999;
-                            smtpClient.TIMEOUT_SOCKET_LOWER_BOUND = 999999999;
-
-                            done();
-                        });
-                    });
-                });
-            }
-        }
+            // phantomjs is really slow, so setting the tcp socket timeouts to 200s will effectively disarm the timeout
+            imapClient._client.client.TIMEOUT_SOCKET_LOWER_BOUND = 999999999;
+            imapClient._listeningClient.client.TIMEOUT_SOCKET_LOWER_BOUND = 999999999;
+            smtpClient.TIMEOUT_SOCKET_LOWER_BOUND = 999999999;
+        });
     });
 
     afterEach(function(done) {
@@ -318,7 +306,7 @@ describe('Email DAO integration tests', function() {
                     messages: inbox.messages
                 }).then(function(messages) {
                     expect(messages.length).to.equal(imapMessages.length);
-                }).then(done);
+                }).then(done, done);
             }, 200);
         });
 
