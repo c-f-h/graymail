@@ -135,8 +135,8 @@ ngModule.directive('frameLoad', function($window) {
         // transform scale iframe to fit container width
         // necessary if iframe is wider than container
         function scaleToFit() {
-            var parentWidth = iframe.parentNode.clientWidth;
-            var w = iframe.clientWidth;
+            var parentWidth = elm.parent().width();
+            var w = elm.width();
             var scale = 'none';
 
             // only scale html mails
