@@ -557,6 +557,7 @@ Email.prototype.connectImap = function(imap) {
     }
 
     self._account.loggingIn = true;
+    self._rootScope.$apply();
 
     // init imap/smtp clients
     return self._auth.getCredentials().then(function(credentials) {
@@ -634,6 +635,13 @@ Email.prototype.connectImap = function(imap) {
     function onConnectionError(error) {
         axe.debug('IMAP connection error, disconnected. Reason: ' + error.message + (error.stack ? ('\n' + error.stack) : ''));
 
+        // clean up the _imapClient object
+        self.disconnectImap();
+
+        // propagate the online status to the status controller
+        self._rootScope.$apply();
+
+        // only try to reconnect if navigator isn't offline
         if (!self.isOnline()) {
             return;
         }
@@ -655,13 +663,18 @@ Email.prototype.disconnectImap = function() {
     // logout of imap-client
     // ignore error, because it's not problem if logout fails
     if (this._imapClient) {
+        this._imapClient.onError = null;
+        this._imapClient.onCert = null;
+        this._imapClient.onSyncUpdate = null;
+
         this._imapClient.stopListeningForChanges(function() {});
         this._imapClient.logout(function() {});
+
+        this._imapClient = null;
     }
 
     // discard clients
     this._account.online = false;
-    this._imapClient = undefined;
 
     return Promise.resolve();
 };

@@ -29,6 +29,24 @@ var ImapClient = function(options, browserbox) {
     self._loggedIn = false;
     self._listenerLoggedIn = false;
 
+    // event callbacks, to be overridden
+    self.onError = null;
+    self.onCert = null;
+    self.onSyncUpdate = null;
+    /**
+    * Synchronization handler onSyncUpdate(options):
+    *
+    * type 'new' returns an array of UID values that are new messages
+    * type 'deleted' returns an array of UID values that are deleted
+    * type 'messages' returns an array of message objects that are somehow updated
+    *
+    * @param {Object} options Notification options
+    * @param {String} options.type Type of the update
+    * @param {Array} options.list List of uids/messages
+    * @param {String} options.path Selected mailbox
+    */
+
+
     /*
      * Instance of our imap library
      * (only relevant in unit test environment)
@@ -54,7 +72,7 @@ var ImapClient = function(options, browserbox) {
      * Calls the upper layer if the TLS certificate has to be updated
      */
     self._client.oncert = self._listeningClient.oncert = function(certificate) {
-        self.onCert(certificate);
+        self.onCert && self.onCert(certificate);
     };
 
     /**
@@ -108,7 +126,7 @@ ImapClient.prototype._onError = function(client, err) {
         this._client = null;
         this._loggedIn = false;
         axe.error(DEBUG_TAG, new Error(msg));
-        this.onError(new Error(msg)); // report the error
+        this.onError && this.onError(new Error(msg)); // report the error
     } else if (client === this._listeningClient) {
         this._listeningClient = null;
         this._listenerLoggedIn = false;
@@ -381,20 +399,6 @@ ImapClient.prototype._checkModseq = function(options) {
         axe.error(DEBUG_TAG, 'error handling exists notice: ' + error + '\n' + error.stack);
     });
 };
-
-/**
- * Synchronization handler
- *
- * type 'new' returns an array of UID values that are new messages
- * type 'deleted' returns an array of UID values that are deleted
- * type 'messages' returns an array of message objects that are somehow updated
- *
- * @param {Object} options Notification options
- * @param {String} options.type Type of the update
- * @param {Array} options.list List of uids/messages
- * @param {String} options.path Selected mailbox
- */
-ImapClient.prototype.onSyncUpdate = false;
 
 /**
  * Log in to an IMAP Session. No-op if already logged in.
