@@ -115,9 +115,6 @@ module.exports = function(grunt) {
             }
         },
         csso: {
-            options: {
-                banner: '/*! Copyright © 2013, Whiteout Networks GmbH. All rights reserved.*/\n'
-            },
             dist: {
                 files: {
                     'dist/css/read-sandbox.min.css': 'src/css/read-sandbox.css',
@@ -349,9 +346,6 @@ module.exports = function(grunt) {
                     sourceMap: true,
                     sourceMapName: 'dist/js/browserbox-compression-worker.min.js.map'
                 }
-            },
-            options: {
-                banner: '/*! Copyright © <%= grunt.template.today("yyyy") %>, Whiteout Networks GmbH.*/\n'
             }
         },
 
