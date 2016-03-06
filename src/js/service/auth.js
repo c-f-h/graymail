@@ -213,7 +213,7 @@ Auth.prototype.getEmailAddress = function() {
  * @return {Boolean}            If oauth should be used
  */
 Auth.prototype.useOAuth = function(hostname) {
-    if (!this._oauth.isSupported()) {
+    /*if (!this._oauth.isSupported()) {
         return false;
     }
 
@@ -222,7 +222,7 @@ Auth.prototype.useOAuth = function(hostname) {
         if (regex[i].test(hostname)) {
             return true;
         }
-    }
+    }*/
 
     return false;
 };
