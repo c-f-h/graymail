@@ -467,14 +467,14 @@ Email.prototype._sendGeneric = function(options, mailer) {
         self.ignoreUploadOnSent = self.checkIgnoreUploadOnSent(credentials.smtp.host);
 
         // create a new PlainMailer
-        self._plainMailer = (mailer || new PlainMailer(credentials.smtp));
+        var _mailer = (mailer || new PlainMailer(credentials.smtp));
 
         // certificate update retriggers sending after cert update is persisted
-        self._plainMailer.onCert = self._auth.handleCertificateUpdate.bind(self._auth, 'smtp', self._sendGeneric.bind(self, options), self._dialog.error);
-    }).then(function() {
+        _mailer.onCert = self._auth.handleCertificateUpdate.bind(self._auth, 'smtp', self._sendGeneric.bind(self, options), self._dialog.error);
 
         // send the email
-        return self._plainMailer.send(options);
+        return _mailer.send(options);
+
     }).then(function(rfcText) {
         // try to upload to sent, but we don't actually care if the upload failed or not
         // this should not negatively impact the process of sending
@@ -662,7 +662,6 @@ Email.prototype.disconnectImap = function() {
     // discard clients
     this._account.online = false;
     this._imapClient = undefined;
-    this._plainMailer = undefined;
 
     return Promise.resolve();
 };

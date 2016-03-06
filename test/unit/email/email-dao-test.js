@@ -136,7 +136,6 @@ describe('Email DAO unit tests', function() {
         //
         dao = new EmailDAO(devicestorageStub, mailreader, dialogStub, authStub, $rootScope);
         dao._account = account;
-        dao._plainMailer = plainMailerStub;
         dao._imapClient = imapClientStub;
 
         //
@@ -1081,7 +1080,6 @@ describe('Email DAO unit tests', function() {
                     expect(imapClientStub.logout.calledOnce).to.be.true;
                     expect(dao._account.online).to.be.false;
                     expect(dao._imapClient).to.not.exist;
-                    expect(dao._plainMailer).to.not.exist;
                 });
 
             });
