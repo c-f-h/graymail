@@ -48,11 +48,12 @@ var MSG_PART_TYPE_HTML = 'html';
  * @param {Object} devicestorage Handles persistence to the local indexed db
  * @param {Object} mailreader Parses MIME messages received from IMAP
  */
-function Email(accountStore, mailreader, dialog, auth) {
+function Email(accountStore, mailreader, dialog, auth, $rootScope) {
     this._devicestorage = accountStore;
     this._mailreader = mailreader;
     this._dialog = dialog;
     this._auth = auth;
+    this._rootScope = $rootScope;
 }
 
 
@@ -577,6 +578,7 @@ Email.prototype.connectImap = function(imap) {
 
     }).then(function() {
         self._account.loggingIn = false;
+        self._rootScope.$apply();
         // init folders
         return self._updateFolders();
 
@@ -605,6 +607,7 @@ Email.prototype.connectImap = function(imap) {
 
         // set status to online after setting cache to prevent race condition
         self._account.online = true;
+        self._rootScope.$apply();
 
     }).then(function() {
         // by default, select the inbox (if there is one) after connecting the imap client.

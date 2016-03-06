@@ -26,7 +26,9 @@ describe('Email DAO unit tests', function() {
     // test data
     var folders, inboxFolder, sentFolder, draftsFolder, outboxFolder, trashFolder, flaggedFolder, otherFolder, mockKeyPair;
 
-    beforeEach(function() {
+    var $rootScope;
+    beforeEach(inject(function(_$rootScope_) {
+        $rootScope = _$rootScope_;
         //
         // test data
         //
@@ -132,7 +134,7 @@ describe('Email DAO unit tests', function() {
         //
         // setup the SUT
         //
-        dao = new EmailDAO(devicestorageStub, mailreader, dialogStub, authStub);
+        dao = new EmailDAO(devicestorageStub, mailreader, dialogStub, authStub, $rootScope);
         dao._account = account;
         dao._plainMailer = plainMailerStub;
         dao._imapClient = imapClientStub;
@@ -142,7 +144,7 @@ describe('Email DAO unit tests', function() {
         //
         expect(dao._devicestorage).to.equal(devicestorageStub);
         expect(dao._mailreader).to.equal(mailreader);
-    });
+    }));
 
     afterEach(function() {
         mailreader.parse.restore();
