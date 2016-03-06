@@ -88,6 +88,13 @@ ImapClient.prototype._registerEventHandlers = function(client) {
     client.onerror = this._onError.bind(this, client);
 };
 
+ImapClient.prototype._unregisterEventHandlers = function(client) {
+    client.onselectmailbox = null;
+    client.onupdate = null;
+    client.onerror = null;
+    client.oncert = null;
+};
+
 /**
  * Informs the upper layer if the main IMAP connection errors and cleans up.
  * If the listening IMAP connection fails, it only logs the error.
@@ -95,11 +102,15 @@ ImapClient.prototype._registerEventHandlers = function(client) {
 ImapClient.prototype._onError = function(client, err) {
     var msg = 'IMAP connection encountered an error! ' + err;
 
+    this._unregisterEventHandlers(client);
+
     if (client === this._client) {
+        this._client = null;
         this._loggedIn = false;
         axe.error(DEBUG_TAG, new Error(msg));
         this.onError(new Error(msg)); // report the error
     } else if (client === this._listeningClient) {
+        this._listeningClient = null;
         this._listenerLoggedIn = false;
         axe.warn(DEBUG_TAG, new Error('Listening ' + msg));
     }
