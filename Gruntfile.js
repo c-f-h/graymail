@@ -282,7 +282,7 @@ module.exports = function(grunt) {
                     'src/lib/angular/angular-route.js',
                     'src/lib/angular/angular-mocks.js',
                     'src/lib/lawnchair/lawnchair-git.js',
-                    'src/lib/lawnchair/lawnchair-adapter-indexed-db-git.js',
+                    'src/lib/lawnchair/lawnchair-adapter-memory.js',
                     'test/unit/index.browserified.js'
                 ],
                 dest: 'test/unit/index.js',
