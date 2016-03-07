@@ -437,7 +437,7 @@ Email.prototype.getAttachment = function(options) {
 };
 
 /**
- * Sends a signed message in the plain
+ * Sends a message in the plain
  *
  * @param {Object} options.email The message to be sent
  * @param {Object} mailer an instance of the PlainMailer to be used for testing purposes only
@@ -1269,19 +1269,12 @@ Email.prototype._extractBody = function(message) {
         // extract the content
         var root = message.bodyParts;
 
-        var body = _.pluck(filterBodyParts(root, MSG_PART_TYPE_TEXT), MSG_PART_ATTR_CONTENT).join('\n');
+        message.body = _.pluck(filterBodyParts(root, MSG_PART_TYPE_TEXT), MSG_PART_ATTR_CONTENT).join('\n');
+        message.attachments = filterBodyParts(root, MSG_PART_TYPE_ATTACHMENT);
+        message.html = _.pluck(filterBodyParts(root, MSG_PART_TYPE_HTML), MSG_PART_ATTR_CONTENT).join('\n');
 
-        return setBody(body, root);
+        inlineExternalImages(message);
     });
-
-    function setBody(body, root) {
-        message.body = body;
-        if (!message.clearSignedMessage) {
-            message.attachments = filterBodyParts(root, MSG_PART_TYPE_ATTACHMENT);
-            message.html = _.pluck(filterBodyParts(root, MSG_PART_TYPE_HTML), MSG_PART_ATTR_CONTENT).join('\n');
-            inlineExternalImages(message);
-        }
-    }
 };
 
 /**

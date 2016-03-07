@@ -5,7 +5,7 @@ module.exports = buildMimeTree;
 var Mailbuild = require('emailjs-mime-builder');
 
 /**
- * Builds the signed cleartext RFC message to be sent via SMTP
+ * Builds the cleartext RFC message to be sent via SMTP
  * @param {Object} options.mail.from Array containing one object with the ASCII string representing the sender address, e.g. 'foo@bar.io'
  * @param {Array} options.mail.to (optional) Array of ASCII strings representing the recipient (e.g. ['the.dude@lebowski.com', 'donny@kerabatsos.com'])
  * @param {Array} options.mail.cc (optional) Array of ASCII strings representing the recipient, see mail.to
