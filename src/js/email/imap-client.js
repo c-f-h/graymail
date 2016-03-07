@@ -481,9 +481,9 @@ ImapClient.prototype.stopListeningForChanges = function() {
     }
 };
 
-ImapClient.prototype.selectMailbox = function(options) {
-    axe.debug(DEBUG_TAG, 'selecting mailbox ' + options.path);
-    return this._client.selectMailbox(options.path);
+ImapClient.prototype.selectMailbox = function(path) {
+    axe.debug(DEBUG_TAG, 'selecting mailbox ' + path);
+    return this._client.selectMailbox(path);
 };
 
 /**
@@ -573,14 +573,13 @@ ImapClient.prototype.listWellKnownFolders = function() {
 /**
  * Creates a folder with the provided path under the personal namespace
  *
- * @param {String or Array} options.path
+ * @param {String or Array} path
  *                   The folder's path. If path is a hierarchy as an array (e.g. ['foo', 'bar', 'baz'] to create foo/bar/bar),
  *                   will create a hierarchy with all intermediate folders if needed.
  * @returns {Promise<String>} Fully qualified path of the folder just created
  */
-ImapClient.prototype.createFolder = function(options) {
+ImapClient.prototype.createFolder = function(path) {
     var self = this,
-        path = options.path,
         fullPath;
 
     if (!Array.isArray(path)) {
@@ -634,7 +633,7 @@ ImapClient.prototype.createFolder = function(options) {
         return fullPath;
 
     }).catch(function(error) {
-        axe.error(DEBUG_TAG, 'error creating folder ' + options.path + ': ' + error + '\n' + error.stack);
+        axe.error(DEBUG_TAG, 'error creating folder ' + path + ': ' + error + '\n' + error.stack);
         throw error;
     });
 

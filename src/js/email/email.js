@@ -100,9 +100,7 @@ Email.prototype.openFolder = function(folder) {
     var self = this;
     return self.checkOnline().then(function() {
         if (folder.path !== config.outboxMailboxPath) {
-            return self._imapClient.selectMailbox({
-                path: folder.path
-            });
+            return self._imapClient.selectMailbox(folder.path);
         }
     });
 };

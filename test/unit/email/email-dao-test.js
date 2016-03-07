@@ -170,9 +170,7 @@ describe('Email DAO unit tests', function() {
 
     describe('#openFolder', function() {
         it('should open an imap mailbox', function() {
-            imapClientStub.selectMailbox.withArgs({
-                path: inboxFolder.path
-            }).returns(resolves());
+            imapClientStub.selectMailbox.withArgs(inboxFolder.path).returns(resolves());
 
             return dao.openFolder(inboxFolder).then(function() {
                 expect(imapClientStub.selectMailbox.calledOnce).to.be.true;
