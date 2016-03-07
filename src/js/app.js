@@ -70,24 +70,3 @@ app.controller('AboutCtrl', require('./controller/app/about'));
 app.controller('DialogCtrl', require('./controller/app/dialog'));
 app.controller('ActionBarCtrl', require('./controller/app/action-bar'));
 app.controller('StatusDisplayCtrl', require('./controller/app/status-display'));
-
-//
-// Manual angular bootstraping
-//
-
-// are we running in a cordova app or in a browser environment?
-if (window.cordova) {
-    // wait for 'deviceready' event to make sure plugins are loaded
-    axe.debug('Assuming Cordova environment...');
-    document.addEventListener('deviceready', bootstrap, false);
-} else {
-    // No need to wait on events... just start the app
-    axe.debug('Assuming Browser environment...');
-    bootstrap();
-}
-
-function bootstrap() {
-    angular.element(document).ready(function() {
-        angular.bootstrap(document, ['mail']);
-    });
-}
