@@ -269,9 +269,8 @@ var MailListCtrl = function($scope, $timeout, $location, $filter, $q, status, no
             resolve();
 
         }).then(function() {
-            return email.openFolder({
-                folder: currentFolder()
-            }).catch(function(err) {
+            return email.openFolder(currentFolder())
+            .catch(function(err) {
                 // don't display err for offline case
                 if (err.code !== 42) {
                     throw err;
