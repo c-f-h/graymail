@@ -94,14 +94,14 @@ Email.prototype.init = function(options) {
  * Please note that this is a no-op if you try to open the outbox, since it is not an IMAP folder
  * but a virtual folder that only exists on disk.
  *
- * @param {Object} options.folder The folder to be opened
+ * @param {Object} folder The folder to be opened
  */
-Email.prototype.openFolder = function(options) {
+Email.prototype.openFolder = function(folder) {
     var self = this;
     return self.checkOnline().then(function() {
-        if (options.folder.path !== config.outboxMailboxPath) {
+        if (folder.path !== config.outboxMailboxPath) {
             return self._imapClient.selectMailbox({
-                path: options.folder.path
+                path: folder.path
             });
         }
     });
@@ -624,9 +624,7 @@ Email.prototype.connectImap = function(imap) {
             return;
         }
 
-        return self.openFolder({
-            folder: inbox
-        }).then(function() {
+        return self.openFolder(inbox).then(function() {
             // set up the imap client to listen for changes in the inbox
             self._imapClient.listenForChanges({
                 path: inbox.path

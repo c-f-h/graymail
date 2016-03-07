@@ -174,17 +174,13 @@ describe('Email DAO unit tests', function() {
                 path: inboxFolder.path
             }).returns(resolves());
 
-            return dao.openFolder({
-                folder: inboxFolder
-            }).then(function() {
+            return dao.openFolder(inboxFolder).then(function() {
                 expect(imapClientStub.selectMailbox.calledOnce).to.be.true;
             });
         });
 
         it('should not open the virtual outbox folder in imap', function() {
-            return dao.openFolder({
-                folder: outboxFolder
-            }).then(function() {
+            return dao.openFolder(outboxFolder).then(function() {
                 expect(imapClientStub.selectMailbox.called).to.be.false;
             });
         });
@@ -192,9 +188,7 @@ describe('Email DAO unit tests', function() {
         it('should not do anything in offline mode', function(done) {
             account.online = false;
 
-            dao.openFolder({
-                folder: inboxFolder
-            }).catch(function(err) {
+            dao.openFolder(inboxFolder).catch(function(err) {
                 expect(err).to.exist;
                 expect(imapClientStub.selectMailbox.called).to.be.false;
                 done();
