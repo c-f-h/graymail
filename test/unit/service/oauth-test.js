@@ -97,7 +97,7 @@ describe('OAuth unit tests', function() {
     });
 
     describe('getOAuthToken', function() {
-        it('should work for empty emailAddress', function(done) {
+        it('should work for empty emailAddress', function() {
             getPlatformInfoStub.yields({
                 os: 'android'
             });
@@ -105,13 +105,12 @@ describe('OAuth unit tests', function() {
                 interactive: true
             }).yields('token');
 
-            oauth.getOAuthToken(undefined).then(function(token) {
+            return oauth.getOAuthToken(undefined).then(function(token) {
                 expect(token).to.equal('token');
-                done();
             });
         });
 
-        it('should work on android app', function(done) {
+        it('should work on android app', function() {
             getPlatformInfoStub.yields({
                 os: 'android'
             });
@@ -120,13 +119,12 @@ describe('OAuth unit tests', function() {
                 accountHint: testEmail
             }).yields('token');
 
-            oauth.getOAuthToken(testEmail).then(function(token) {
+            return oauth.getOAuthToken(testEmail).then(function(token) {
                 expect(token).to.equal('token');
-                done();
             });
         });
 
-        it('should work on desktop chrome', function(done) {
+        it('should work on desktop chrome', function() {
             getPlatformInfoStub.yields({
                 os: 'mac'
             });
@@ -134,9 +132,8 @@ describe('OAuth unit tests', function() {
                 interactive: true
             }).yields('token');
 
-            oauth.getOAuthToken(testEmail).then(function(token) {
+            return oauth.getOAuthToken(testEmail).then(function(token) {
                 expect(token).to.equal('token');
-                done();
             });
         });
 
@@ -154,16 +151,15 @@ describe('OAuth unit tests', function() {
     });
 
     describe('queryEmailAddress', function() {
-        it('should work', function(done) {
+        it('should work', function() {
             googleApiStub.get.withArgs({
                 uri: '/oauth2/v3/userinfo?access_token=token'
             }).returns(resolves({
                 email: 'asdf@example.com'
             }));
 
-            oauth.queryEmailAddress('token').then(function(emailAddress) {
+            return oauth.queryEmailAddress('token').then(function(emailAddress) {
                 expect(emailAddress).to.equal('asdf@example.com');
-                done();
             });
         });
 

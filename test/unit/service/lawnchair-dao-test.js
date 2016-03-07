@@ -20,16 +20,15 @@ var data2 = {
 describe('Lawnchair DAO unit tests', function() {
     var lawnchairDao;
 
-    beforeEach(function(done) {
+    beforeEach(function() {
         lawnchairDao = new LawnchairDAO();
-        lawnchairDao.init(dbName).then(function() {
+        return lawnchairDao.init(dbName).then(function() {
             expect(lawnchairDao._db).to.exist;
-            done();
         });
     });
 
-    afterEach(function(done) {
-        lawnchairDao.clear().then(done);
+    afterEach(function() {
+        return lawnchairDao.clear();
     });
 
     describe('read', function() {
@@ -73,8 +72,8 @@ describe('Lawnchair DAO unit tests', function() {
             });
         });
 
-        it('should work', function(done) {
-            lawnchairDao.persist(key, data).then(function() {
+        it('should work', function() {
+            return lawnchairDao.persist(key, data).then(function() {
                 return lawnchairDao.read(key);
             }).then(function(fetched) {
                 expect(fetched).to.deep.equal(data);
@@ -83,20 +82,19 @@ describe('Lawnchair DAO unit tests', function() {
                 return lawnchairDao.read(key);
             }).then(function(fetched) {
                 expect(fetched).to.not.exist;
-                done();
             });
         });
     });
 
     describe('batch/list/removeList', function() {
-        it('should fails', function(done) {
+        it('should fail', function(done) {
             lawnchairDao.batch({}).catch(function(err) {
                 expect(err).to.exist;
                 done();
             });
         });
 
-        it('should work', function(done) {
+        it('should work', function() {
             var list = [{
                 key: key,
                 object: data
@@ -105,7 +103,7 @@ describe('Lawnchair DAO unit tests', function() {
                 object: data2
             }];
 
-            lawnchairDao.batch(list).then(function() {
+            return lawnchairDao.batch(list).then(function() {
                 return lawnchairDao.list('type');
             }).then(function(fetched) {
                 expect(fetched.length).to.equal(2);
@@ -116,7 +114,6 @@ describe('Lawnchair DAO unit tests', function() {
             }).then(function(fetched) {
                 expect(fetched).to.exist;
                 expect(fetched.length).to.equal(0);
-                done();
             });
         });
     });
