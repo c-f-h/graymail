@@ -113,16 +113,16 @@
     @include respond-to(lg) {
         padding-left: $nav-padding-h;
         padding-right: $nav-padding-h;
-        padding-top: 27px; // magic number to valign logo with action bar
+        padding-top: 19px; // magic number to valign logo with action bar
         padding-bottom: $footer-height;
         background: $color-bg;
         color: $color-text;
 
         h1 {
-            height: 26px;
-            margin-bottom: 27px;
+            height: 44px;
+            margin-bottom: 18px;
             background-position: center center;
-            background-image: url(../img/whiteout_logo.svg);
+            background-image: url(../img/graymail_logo.svg);
         }
         &__write {
             display: block;
