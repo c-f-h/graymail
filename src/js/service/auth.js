@@ -212,7 +212,7 @@ Auth.prototype.getEmailAddress = function() {
  * @param  {String} hostname    The hostname of the mail server e.g. imap.gmail.com
  * @return {Boolean}            If oauth should be used
  */
-Auth.prototype.useOAuth = function(hostname) {
+Auth.prototype.useOAuth = function(/* hostname */) {
     /*if (!this._oauth.isSupported()) {
         return false;
     }

@@ -557,7 +557,9 @@ Email.prototype.connectImap = function(imap) {
     }
 
     self._account.loggingIn = true;
-    if (!self._rootScope.$$phase) self._rootScope.$apply();
+    if (!self._rootScope.$$phase) {
+        self._rootScope.$apply();
+    }
 
     // init imap/smtp clients
     return self._auth.getCredentials().then(function(credentials) {
