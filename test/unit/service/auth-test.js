@@ -2,10 +2,12 @@
 
 var Auth = require('../../../src/js/service/auth'),
     OAuth = require('../../../src/js/service/oauth'),
-    DeviceStorageDAO = require('../../../src/js/service/devicestorage');
+    DeviceStorageDAO = require('../../../src/js/service/devicestorage'),
+    cfg = require('../../../src/js/app-config.js').config;
 
 describe('Auth unit tests', function() {
     // Constancts
+    var DB_VERSION_KEY = 'dbVersion';
     var EMAIL_ADDR_DB_KEY = 'emailaddress';
     var USERNAME_DB_KEY = 'username';
     var REALNAME_DB_KEY = 'realname';
@@ -47,14 +49,23 @@ describe('Auth unit tests', function() {
     });
 
     describe('#init', function() {
-        it('should initialize a user db', function(done) {
+        it('should initialize a user db with the proper version', function() {
             storageStub.init.withArgs(APP_CONFIG_DB_NAME).returns(resolves());
-            auth.init().then(function() {
+            return auth.init().then(function() {
                 expect(auth._initialized).to.be.true;
-                done();
+                expect(storageStub.storeList.calledWith([cfg.dbVersion], DB_VERSION_KEY)).to.be.true;
             });
         });
-        it('should initialize a user db', function(done) {
+        it('should not overwrite a previous DB version', function() {
+            storageStub.init.withArgs(APP_CONFIG_DB_NAME).returns(resolves());
+            storageStub.listItems.withArgs(DB_VERSION_KEY).returns(resolves([cfg.dbVersion-1]));
+            return auth.init().then(function() {
+                expect(auth._initialized).to.be.true;
+                expect(storageStub.listItems.calledWith(DB_VERSION_KEY)).to.be.true;
+                expect(storageStub.storeList.called).to.be.false;
+            });
+        });
+        it('should fail on storage failure', function(done) {
             storageStub.init.withArgs(APP_CONFIG_DB_NAME).returns(rejects(new Error()));
             auth.init().catch(function(err) {
                 expect(err).to.exist;
@@ -150,12 +161,12 @@ describe('Auth unit tests', function() {
             expect(res).to.be.false;
         });
 
-        it('should recommend oauth for whitelisted host', function() {
+        /*it('should recommend oauth for whitelisted host', function() {
             oauthStub.isSupported.returns(true);
 
             var res = auth.useOAuth('imap.gmail.com');
             expect(res).to.be.true;
-        });
+        });*/
 
         it('should not recommend oauth for other hosts', function() {
             oauthStub.isSupported.returns(true);
