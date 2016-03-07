@@ -9,6 +9,7 @@ var axe = require('axe-logger'),
     str = require('../app-config').string;
 
 var APP_CONFIG_DB_NAME = 'app-config';
+var DB_VERSION_KEY = 'dbVersion';
 var EMAIL_ADDR_DB_KEY = 'emailaddress';
 var USERNAME_DB_KEY = 'username';
 var REALNAME_DB_KEY = 'realname';
@@ -40,6 +41,18 @@ Auth.prototype.init = function() {
     var self = this;
     return self._appConfigStore.init(APP_CONFIG_DB_NAME).then(function() {
         self._initialized = true;
+
+    }).then(function() {
+        // check if DB already has a DB version
+        return self._appConfigStore.listItems(DB_VERSION_KEY);
+
+    }).then(function(result) {
+        var version = result && result[0];
+
+        // if not, it's a new DB and we initialize it to the current version
+        if (!Number.isInteger(version)) {
+            return self._appConfigStore.storeList([cfg.dbVersion], DB_VERSION_KEY);
+        }
     });
 };
 
