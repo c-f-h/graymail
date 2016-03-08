@@ -31,10 +31,10 @@ module.exports = PlainMailer;
  *
  * * @return {Promise<String>} Resolves with the mail source when the mail has been sent
  */
-PlainMailer.prototype.send = function(options) {
+PlainMailer.prototype.send = function(mail, options) {
     var self = this;
 
-    return Promise.resolve(buildMimeTree(options))
+    return Promise.resolve(buildMimeTree(mail))
     .then(function(obj) {
         return new Promise(function(resolve, reject) {
             var smtp = options.smtpclient || new SmtpClient(self._options.host, self._options.port, {

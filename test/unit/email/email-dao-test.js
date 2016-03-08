@@ -780,9 +780,8 @@ describe('Email DAO unit tests', function() {
         });
 
         it('should send in the plain and upload to sent', function() {
-            plainMailerStub.send.withArgs({
-                smtpclient: undefined,
-                mail: dummyMail
+            plainMailerStub.send.withArgs(dummyMail, {
+                smtpclient: undefined
             }).returns(resolves(msg));
             authStub.getCredentials.returns(resolves(credentials));
 
@@ -791,9 +790,9 @@ describe('Email DAO unit tests', function() {
                 message: msg
             }).returns(resolves());
 
-            return dao.sendPlaintext({
-                email: dummyMail
-            }, plainMailerStub).then(function() {
+            return dao.sendPlaintext(dummyMail, {
+                mailer: plainMailerStub
+            }).then(function() {
                 expect(authStub.getCredentials.calledOnce).to.be.true;
                 expect(plainMailerStub.send.calledOnce).to.be.true;
                 expect(imapClientStub.uploadMessage.calledOnce).to.be.true;
@@ -804,29 +803,28 @@ describe('Email DAO unit tests', function() {
             dao.ignoreUploadOnSent = true;
             credentials.smtp.host = 'smtp.gmail.com';
 
-            plainMailerStub.send.withArgs({
-                smtpclient: undefined,
-                mail: dummyMail
+            plainMailerStub.send.withArgs(dummyMail, {
+                smtpclient: undefined
             }).returns(resolves(msg));
             authStub.getCredentials.returns(resolves(credentials));
 
-            return dao.sendPlaintext({
-                email: dummyMail
-            }, plainMailerStub).then(function() {
+            return dao.sendPlaintext(dummyMail, {
+                mailer: plainMailerStub
+            }).then(function() {
                 expect(authStub.getCredentials.calledOnce).to.be.true;
                 expect(plainMailerStub.send.calledOnce).to.be.true;
                 expect(imapClientStub.uploadMessage.called).to.be.false;
             });
         });
 
-        it('should send  and ignore error on upload', function() {
+        it('should send and ignore error on upload', function() {
             imapClientStub.uploadMessage.returns(rejects(new Error()));
             plainMailerStub.send.returns(resolves(msg));
             authStub.getCredentials.returns(resolves(credentials));
 
-            return dao.sendPlaintext({
-                email: dummyMail
-            }, plainMailerStub).then(function() {
+            return dao.sendPlaintext(dummyMail, {
+                mailer: plainMailerStub
+            }).then(function() {
                 expect(authStub.getCredentials.calledOnce).to.be.true;
                 expect(plainMailerStub.send.calledOnce).to.be.true;
                 expect(imapClientStub.uploadMessage.calledOnce).to.be.true;
@@ -837,9 +835,9 @@ describe('Email DAO unit tests', function() {
             plainMailerStub.send.returns(rejects({}));
             authStub.getCredentials.returns(resolves(credentials));
 
-            dao.sendPlaintext({
-                email: dummyMail
-            }, plainMailerStub).catch(function(err) {
+            return dao.sendPlaintext(dummyMail, {
+                mailer: plainMailerStub
+            }).catch(function(err) {
                 expect(err).to.exist;
                 expect(authStub.getCredentials.calledOnce).to.be.true;
                 expect(plainMailerStub.send.calledOnce).to.be.true;
@@ -851,9 +849,9 @@ describe('Email DAO unit tests', function() {
         it('should not send in offline mode', function(done) {
             account.online = false;
 
-            dao.sendPlaintext({
-                email: dummyMail
-            }, plainMailerStub).catch(function(err) {
+            return dao.sendPlaintext(dummyMail, {
+                mailer: plainMailerStub
+            }).catch(function(err) {
                 expect(err.code).to.equal(42);
                 expect(authStub.getCredentials.called).to.be.false;
                 expect(plainMailerStub.send.called).to.be.false;
@@ -1460,9 +1458,7 @@ describe('Email DAO unit tests', function() {
                     message: msg
                 }).returns(resolves());
 
-                return dao._uploadToSent({
-                    message: msg
-                }).then(function() {
+                return dao._uploadToSent(msg).then(function() {
                     expect(imapClientStub.uploadMessage.calledOnce).to.be.true;
                 });
             });

@@ -437,24 +437,24 @@ Email.prototype.getAttachment = function(options) {
 /**
  * Sends a message in the plain
  *
- * @param {Object} options.email The message to be sent
- * @param {Object} mailer an instance of the PlainMailer to be used for testing purposes only
+ * @param {Object} mail The message to be sent
+ * @param {Object} options.mailer an instance of the PlainMailer (for tests)
+ * @param {Object} options.smtpclient an instance of SmtpClient (for tests)
  */
-Email.prototype.sendPlaintext = function(options, mailer) {
+Email.prototype.sendPlaintext = function(mail, options) {
     // mime encode and send email via smtp
-    return this._sendGeneric({
-        smtpclient: options.smtpclient, // filled solely in the integration test, undefined in normal usage
-        mail: options.email
-    }, mailer);
+    return this._sendGeneric(mail, options);
 };
 
 /**
  * This funtion wraps error handling for sending via PlainMailer and uploading to imap.
- * @param {Object} options.email The message to be sent
- * @param {Object} mailer an instance of the PlainMailer; for testing purposes only
+ * @param {Object} mail The message to be sent
+ * @param {Object} options.mailer an instance of the PlainMailer (for tests)
+ * @param {Object} options.smtpclient an instance of SmtpClient (for tests)
  */
-Email.prototype._sendGeneric = function(options, mailer) {
+Email.prototype._sendGeneric = function(mail, options) {
     var self = this;
+    options = options || {};
     self.busy();
     return self.checkOnline().then(function() {
         // get the smtp credentials
@@ -465,20 +465,18 @@ Email.prototype._sendGeneric = function(options, mailer) {
         self.ignoreUploadOnSent = self.checkIgnoreUploadOnSent(credentials.smtp.host);
 
         // create a new PlainMailer
-        var _mailer = (mailer || new PlainMailer(credentials.smtp));
+        var _mailer = (options.mailer || new PlainMailer(credentials.smtp));
 
         // certificate update retriggers sending after cert update is persisted
-        _mailer.onCert = self._auth.handleCertificateUpdate.bind(self._auth, 'smtp', self._sendGeneric.bind(self, options), self._dialog.error);
+        _mailer.onCert = self._auth.handleCertificateUpdate.bind(self._auth, 'smtp', self._sendGeneric.bind(self, mail, options), self._dialog.error);
 
         // send the email
-        return _mailer.send(options);
+        return _mailer.send(mail, options);
 
     }).then(function(rfcText) {
         // try to upload to sent, but we don't actually care if the upload failed or not
         // this should not negatively impact the process of sending
-        return self._uploadToSent({
-            message: rfcText
-        }).catch(function() {});
+        return self._uploadToSent(rfcText).catch(function() {});
 
     }).then(done).catch(done);
 
@@ -1295,9 +1293,9 @@ Email.prototype._parse = function(options) {
  * Uploads a message to the sent folder, if necessary.
  * Calls back immediately if ignoreUploadOnSent == true or not sent folder was found.
  *
- * @param {String} options.message The rfc2822 compatible raw ASCII e-mail source
+ * @param {String} message The rfc2822 compatible raw ASCII e-mail source
  */
-Email.prototype._uploadToSent = function(options) {
+Email.prototype._uploadToSent = function(message) {
     var self = this;
     self.busy();
     return Promise.resolve().then(function() {
@@ -1307,14 +1305,14 @@ Email.prototype._uploadToSent = function(options) {
         });
 
         // return for wrong usage
-        if (self.ignoreUploadOnSent || !sentFolder || !options.message) {
+        if (self.ignoreUploadOnSent || !sentFolder || !message) {
             return;
         }
 
         // upload
         return self._imapUploadMessage({
             folder: sentFolder,
-            message: options.message
+            message: message
         });
 
     }).then(function() {

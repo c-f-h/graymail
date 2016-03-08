@@ -116,9 +116,8 @@ Outbox.prototype._processOutbox = function(callback) {
     // send the message
     function send(mail) {
           // send email as plaintext
-        return self._emailDao.sendPlaintext({
-            email: mail
-        }).then(onSend).catch(sendFailed);
+        return self._emailDao.sendPlaintext(mail)
+            .then(onSend).catch(sendFailed);
 
         function onSend() {
             // fire sent notification

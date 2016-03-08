@@ -16,11 +16,11 @@ var Mailbuild = require('emailjs-mime-builder');
  *
  * @return {Promise<rfcMessage, smtpInfo>} Invoked when the mail has been built and the smtp information has been created.
  */
-function buildMimeTree(options) {
-    var rootNode = options.rootNode || new Mailbuild();
+function buildMimeTree(mail, rootnode) {
+    var rootNode = rootnode || new Mailbuild();
 
-    _createMimeTree(options.mail, rootNode);
-    _setEnvelope(options.mail, rootNode); // configure the envelope data
+    _createMimeTree(mail, rootNode);
+    _setEnvelope(mail, rootNode); // configure the envelope data
 
     return {
         rfcMessage: rootNode.build(),
