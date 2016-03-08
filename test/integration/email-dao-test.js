@@ -243,7 +243,6 @@ describe('Email DAO integration tests', function() {
         .then(function() {
             return cleanup.clear();
         }).then(function() {
-            console.log('onCleaned');
             userStorage = accountService._accountStore;
             auth = accountService._auth;
             emailDao = accountService._emailDao;
@@ -257,12 +256,10 @@ describe('Email DAO integration tests', function() {
 
             return auth.init();
         }).then(function() {
-            console.log('auth inited');
             return accountService.init({
                 emailAddress: testAccount.user
             });
         }).then(function() {
-            console.log('account inited');
             plainMailer = new PlainMailer({});
 
             sinon.stub(accountService._emailDao, 'isOnline').returns(true);
