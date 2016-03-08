@@ -50,7 +50,6 @@
     "grunt-svgstore": "^1.0.0",
     "handlebars-helper-compose": "~0.2.12",
     "iframe-resizer": "^2.8.3",
-    "insert-module-globals": "6.5.0",
     "jquery": "^2.2.1",
     "jsdom": "^7.2.2",
     "mailreader": "^1.0.0",
