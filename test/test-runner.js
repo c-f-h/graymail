@@ -74,6 +74,8 @@ jsdom.env('<html><head><script></script></head><body></body></html>',
 
         var files = glob.sync('**/*js', {cwd: testsPath});
 
+        mocha.useColors(true);
+
         for (var i in files) {
             mocha.addFile(path.join(testsPath, files[i]));
         }
