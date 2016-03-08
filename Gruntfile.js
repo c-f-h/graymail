@@ -24,9 +24,6 @@ module.exports = function(grunt) {
             options: {
                 stderr: false
             },
-            mailreader: {
-                command: 'dir=$(pwd) && cd node_modules/mailreader/ && npm install --production && cd $dir'
-            },
             test: {
                 command: 'npm test',
             }
@@ -429,7 +426,7 @@ module.exports = function(grunt) {
     grunt.registerTask('dist-assets', ['svgmin', 'svgstore', 'string-replace']);
     grunt.registerTask('dist-styleguide', ['sass:styleguide', 'autoprefixer:styleguide', 'csso:styleguide', 'assemble:styleguide']);
     // generate styleguide after manifest to forward version number to styleguide
-    grunt.registerTask('dist', ['clean:dist', 'shell:mailreader', 'dist-css', 'dist-js', 'dist-assets', 'dist-copy']);
+    grunt.registerTask('dist', ['clean:dist', 'dist-css', 'dist-js', 'dist-assets', 'dist-copy']);
     grunt.registerTask('dist-all', ['dist', 'dist-styleguide']);
 
     // Test/Dev tasks
