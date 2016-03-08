@@ -337,12 +337,6 @@ module.exports = function(grunt) {
                     base: '.',
                     keepalive: true
                 }
-            },
-            test: {
-                options: {
-                    port: 8581,
-                    base: '.'
-                }
             }
         },
 
@@ -429,10 +423,11 @@ module.exports = function(grunt) {
     grunt.registerTask('dist', ['clean:dist', 'dist-css', 'dist-js', 'dist-assets', 'dist-copy']);
     grunt.registerTask('dist-all', ['dist', 'dist-styleguide']);
 
+    // run JSHint and unit/integration tests
+    grunt.registerTask('test', ['jshint', 'shell:test']);
+
     // Test/Dev tasks
     grunt.registerTask('dev', ['connect:dev']);
-    grunt.registerTask('test', ['jshint', 'connect:test', 'shell:test']);
-    grunt.registerTask('prod', ['connect:prod']);
 
     //
     // Release tasks for Chrome App Release Channels
