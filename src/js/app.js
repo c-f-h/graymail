@@ -8,8 +8,6 @@ window.forge = {};
 // Angular app config
 //
 
-var axe = require('axe-logger');
-
 // include angular modules
 require('./app-config');
 require('./directive');
