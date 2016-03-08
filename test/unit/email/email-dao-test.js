@@ -3,7 +3,6 @@
 var mailreader = require('mailreader'),
     ImapClient = require('../../../src/js/email/imap-client'),
     PlainMailer = require('../../../src/js/email/plainmailer'),
-    cfg = require('../../../src/js/app-config').config,
     EmailDAO = require('../../../src/js/email/email'),
     DeviceStorageDAO = require('../../../src/js/service/devicestorage'),
     Auth = require('../../../src/js/service/auth'),

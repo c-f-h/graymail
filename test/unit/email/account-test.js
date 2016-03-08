@@ -78,11 +78,6 @@ describe('Account Service unit test', function() {
         });
 
         it('should fail for _emailDao.init', function() {
-            var storedKeys = {
-                publicKey: 'publicKey',
-                privateKey: 'privateKey'
-            };
-
             devicestorageStub.init.returns(resolves());
             updateHandlerStub.update.returns(resolves());
             emailStub.init.returns(rejects(new Error('asdf')));
@@ -108,7 +103,7 @@ describe('Account Service unit test', function() {
             account.init({
                 emailAddress: dummyUser,
                 realname: realname
-            }, function onInit(keys) {
+            }).then(function(keys) {
                 expect(keys).to.equal(storedKeys);
                 expect(emailStub.init.calledOnce).to.be.true;
                 expect(account._accounts.length).to.equal(1);

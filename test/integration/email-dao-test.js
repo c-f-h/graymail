@@ -197,8 +197,8 @@ describe('Email DAO integration tests', function() {
         // Test client setup
         //
 
-        // don't multithread, Function.prototype.bind() is broken in phantomjs in web workers
-        window.Worker = undefined;
+        // // don't multithread, Function.prototype.bind() is broken in phantomjs in web workers
+        // window.Worker = undefined;
         navigator.online = true;
 
         sinon.stub(mailreader, 'startWorker', function() {});

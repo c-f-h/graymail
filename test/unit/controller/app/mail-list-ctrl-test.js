@@ -77,7 +77,7 @@ describe('Mail List controller unit test', function() {
     });
 
     describe('displaySearchResults', function() {
-        var clock;
+        var clock, oldSetTimeout;
 
         beforeEach(function() {
             scope.state.nav = {
@@ -87,10 +87,13 @@ describe('Mail List controller unit test', function() {
             };
             scope.watchMessages();
             scope.watchOnline();
+            oldSetTimeout = global.setTimeout;
+            delete global.setTimeout;
             clock = sinon.useFakeTimers();
         });
         afterEach(function() {
             clock.restore();
+            global.setTimeout = oldSetTimeout;
         });
 
         it('should show initial message on empty', function() {

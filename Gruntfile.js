@@ -24,8 +24,11 @@ module.exports = function(grunt) {
             options: {
                 stderr: false
             },
-            target: {
+            mailreader: {
                 command: 'dir=$(pwd) && cd node_modules/mailreader/ && npm install --production && cd $dir'
+            },
+            test: {
+                command: 'npm test',
             }
         },
 
@@ -35,20 +38,6 @@ module.exports = function(grunt) {
         },
 
         copy: {
-            libTest: {
-                expand: true,
-                flatten: true,
-                cwd: './',
-                src: [
-                    'node_modules/mocha/mocha.css',
-                    'node_modules/mocha/mocha.js',
-                    'node_modules/chai/chai.js',
-                    'node_modules/sinon/pkg/sinon.js',
-                    'node_modules/browsercrow/src/*.js',
-                    'node_modules/browsersmtp/src/*.js'
-                ],
-                dest: 'test/lib/'
-            },
             lib: {
                 expand: true,
                 flatten: true,
@@ -131,7 +120,7 @@ module.exports = function(grunt) {
         // JavaScript
 
         jshint: {
-            all: ['Gruntfile.js', 'src/*.js', 'src/js/**/*.js', 'test/unit/*-test.js', 'test/integration/*-test.js'],
+            all: ['Gruntfile.js', 'src/*.js', 'src/js/**/*.js', 'test/unit/**/*-test.js', 'test/integration/**/*-test.js'],
             options: {
                 jshintrc: '.jshintrc'
             }
@@ -155,46 +144,6 @@ module.exports = function(grunt) {
                     'dist/js/browserbox-compression-worker.browserified.js': ['node_modules/emailjs-imap-client/src/browserbox-compression-worker.js']
                 },
                 options: browserifyOpt
-            },
-            unitTest: {
-                files: {
-                    'test/unit/index.browserified.js': [
-                        'test/main.js',
-                        'test/unit/util/dialog-test.js',
-                        'test/unit/util/connection-doctor-test.js',
-                        'test/unit/util/update-handler-test.js',
-                        'test/unit/util/status-display-test.js',
-                        'test/unit/service/rest-dao-test.js',
-                        'test/unit/service/auth-test.js',
-                        'test/unit/service/oauth-test.js',
-                        'test/unit/service/lawnchair-dao-test.js',
-                        'test/unit/service/devicestorage-dao-test.js',
-                        'test/unit/email/outbox-bo-test.js',
-                        'test/unit/email/email-dao-test.js',
-                        'test/unit/email/account-test.js',
-                        'test/unit/email/search-test.js',
-                        'test/unit/controller/login/login-set-credentials-ctrl-test.js',
-                        'test/unit/controller/login/login-ctrl-test.js',
-                        'test/unit/controller/app/dialog-ctrl-test.js',
-                        'test/unit/controller/app/account-ctrl-test.js',
-                        'test/unit/controller/app/contacts-ctrl-test.js',
-                        'test/unit/controller/app/read-ctrl-test.js',
-                        'test/unit/controller/app/navigation-ctrl-test.js',
-                        'test/unit/controller/app/mail-list-ctrl-test.js',
-                        'test/unit/controller/app/write-ctrl-test.js',
-                        'test/unit/controller/app/action-bar-ctrl-test.js',
-                    ]
-                },
-                options: browserifyOpt
-            },
-            integrationTest: {
-                files: {
-                    'test/integration/index.browserified.js': [
-                        'test/main.js',
-                        'test/integration/email-dao-test.js',
-                    ]
-                },
-                options: browserifyOpt
             }
         },
 
@@ -204,16 +153,6 @@ module.exports = function(grunt) {
                     'dist/js/app.browserified.js.map': ['dist/js/app.browserified.js'],
                 }
             },
-            unitTest: {
-                files: {
-                    'test/unit/index.browserified.js.map': ['test/unit/index.browserified.js'],
-                }
-            },
-            integrationTest: {
-                files: {
-                    'test/integration/index.browserified.js.map': ['test/integration/index.browserified.js'],
-                }
-            }
         },
 
         ngtemplates: {
@@ -274,37 +213,6 @@ module.exports = function(grunt) {
                 src: ['dist/js/browserbox-compression-worker.browserified.js'],
                 dest: 'dist/js/browserbox-compression-worker.min.js'
             },
-            unitTest: {
-                src: [
-                    'src/lib/underscore/underscore.js',
-                    'node_modules/jquery/dist/jquery.min.js',
-                    'src/lib/angular/angular.js',
-                    'src/lib/angular/angular-route.js',
-                    'src/lib/angular/angular-mocks.js',
-                    'src/lib/lawnchair/lawnchair-git.js',
-                    'src/lib/lawnchair/lawnchair-adapter-memory.js',
-                    'test/unit/index.browserified.js'
-                ],
-                dest: 'test/unit/index.js',
-                options: {
-                    sourceMapName: 'test/unit/index.js.map'
-                }
-            },
-            integrationTest: {
-                src: [
-                    'src/lib/underscore/underscore.js',
-                    'node_modules/jquery/dist/jquery.min.js',
-                    'src/lib/angular/angular.js',
-                    'src/lib/angular/angular-mocks.js',
-                    'src/lib/lawnchair/lawnchair-git.js',
-                    'src/lib/lawnchair/lawnchair-adapter-indexed-db-git.js',
-                    'test/integration/index.browserified.js'
-                ],
-                dest: 'test/integration/index.js',
-                options: {
-                    sourceMapName: 'test/integration/index.js.map'
-                }
-            }
         },
 
         uglify: {
@@ -345,17 +253,6 @@ module.exports = function(grunt) {
                 options: {
                     sourceMap: true,
                     sourceMapName: 'dist/js/browserbox-compression-worker.min.js.map'
-                }
-            }
-        },
-
-        mocha_phantomjs: {
-            all: {
-                options: {
-                    urls: [
-                        'http://localhost:<%= connect.test.options.port %>/test/unit/index.html',
-                        'http://localhost:<%= connect.test.options.port %>/test/integration/index.html'
-                    ]
                 }
             }
         },
@@ -467,14 +364,6 @@ module.exports = function(grunt) {
                 files: ['src/js/**/*.js', 'src/*.html', 'src/tpl/**/*.html'],
                 tasks: ['dist-js-app']
             },
-            jsUnitTest: {
-                files: ['test/unit/**/*-test.js', 'test/*.js'],
-                tasks: ['dist-js-unitTest']
-            },
-            jsIntegrationTest: {
-                files: ['test/integration/*-test.js', 'test/*.js'],
-                tasks: ['dist-js-integrationTest']
-            },
             icons: {
                 files: ['src/index.html', 'src/img/icons/*.svg', '!src/img/icons/all.svg'],
                 tasks: ['svgmin', 'svgstore', 'string-replace', 'dist-styleguide']
@@ -518,7 +407,6 @@ module.exports = function(grunt) {
     grunt.loadNpmTasks('grunt-contrib-watch');
     grunt.loadNpmTasks('grunt-contrib-copy');
     grunt.loadNpmTasks('grunt-contrib-compress');
-    grunt.loadNpmTasks('grunt-mocha-phantomjs');
     grunt.loadNpmTasks('grunt-exorcise');
     grunt.loadNpmTasks('grunt-string-replace');
     grunt.loadNpmTasks('grunt-svgmin');
@@ -537,26 +425,16 @@ module.exports = function(grunt) {
         'concat:app',
         'concat:readSandbox'
     ]);
-    grunt.registerTask('dist-js-unitTest', [
-        'browserify:unitTest',
-        'exorcise:unitTest',
-        'concat:unitTest'
-    ]);
-    grunt.registerTask('dist-js-integrationTest', [
-        'browserify:integrationTest',
-        'exorcise:integrationTest',
-        'concat:integrationTest'
-    ]);
     grunt.registerTask('dist-copy', ['copy']);
     grunt.registerTask('dist-assets', ['svgmin', 'svgstore', 'string-replace']);
     grunt.registerTask('dist-styleguide', ['sass:styleguide', 'autoprefixer:styleguide', 'csso:styleguide', 'assemble:styleguide']);
     // generate styleguide after manifest to forward version number to styleguide
-    grunt.registerTask('dist', ['clean:dist', 'shell', 'dist-css', 'dist-js', 'dist-assets', 'dist-copy']);
+    grunt.registerTask('dist', ['clean:dist', 'shell:mailreader', 'dist-css', 'dist-js', 'dist-assets', 'dist-copy']);
     grunt.registerTask('dist-all', ['dist', 'dist-styleguide']);
 
     // Test/Dev tasks
     grunt.registerTask('dev', ['connect:dev']);
-    grunt.registerTask('test', ['jshint', 'connect:test', 'mocha_phantomjs']);
+    grunt.registerTask('test', ['jshint', 'connect:test', 'shell:test']);
     grunt.registerTask('prod', ['connect:prod']);
 
     //

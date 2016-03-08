@@ -25,7 +25,6 @@ describe('Auth unit tests', function() {
     // test data
     var emailAddress = 'bla@blubb.com';
     var password = 'passwordpasswordpassword';
-    var encryptedPassword = 'pgppasswordpgppassword';
     var oauthToken = 'tokentokentokentoken';
     var realname = 'Bla Blubb';
     var username = 'bla';
