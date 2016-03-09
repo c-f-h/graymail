@@ -21,6 +21,7 @@
   },
   "devDependencies": {
     "assemble": "~0.4.42",
+    "async": "^1.5.2",
     "axe-logger": "~0.0.2",
     "browsercrow": "https://github.com/whiteout-io/browsercrow/tarball/master",
     "browserify": "^13.0.0",
