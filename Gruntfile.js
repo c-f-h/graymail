@@ -23,12 +23,6 @@ function doBrowserify(target, src, done) {
     b.bundle().pipe(fs.createWriteStream(target)).on('finish', done);
 }
 
-function runTests() {
-    var result1 = !exec('node test/test-runner.js test/unit');
-    var result2 = !exec('node test/test-runner.js test/integration');
-    return result1 && result2;
-}
-
 module.exports = function(grunt) {
 
     require('time-grunt')(grunt);
@@ -50,7 +44,7 @@ module.exports = function(grunt) {
         // General
 
         clean: {
-            dist: ['dist', 'compile', 'test/lib', 'test/integration/src'],
+            dist: ['dist', 'compile'],
             release: ['dist/**/*.browserified.js', 'dist/**/*.js.map', 'dist/js/app.templates.js']
         },
 
@@ -385,7 +379,11 @@ module.exports = function(grunt) {
     grunt.registerTask('dist-all', ['dist', 'dist-styleguide']);
 
     // run JSHint and unit/integration tests
-    grunt.registerTask('run-tests', runTests);
+    grunt.registerTask('run-tests', function() {
+        var result1 = !exec('node test/test-runner.js test/unit');
+        var result2 = !exec('node test/test-runner.js test/integration');
+        return result1 && result2;
+    });
     grunt.registerTask('test', ['jshint', 'run-tests']);
 
     //
