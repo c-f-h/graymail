@@ -10,7 +10,8 @@
     "test": "npm run unit-test ; npm run integration-test",
     "unit-test": "node test/test-runner.js test/unit ; node test/test-runner.js test/integration",
     "integration-test": "node test/test-runner.js test/unit ; node test/test-runner.js test/integration",
-    "start": "node server.js"
+    "start": "node server.js",
+    "discify": "grunt browserify:app && `npm bin`/discify dist/js/app.browserified.js > disc.html"
   },
   "dependencies": {
     "config": "^1.0.2",
