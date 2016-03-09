@@ -10,6 +10,9 @@ module.exports = function(grunt) {
     var browserifyOpt = {
         exclude: ['openpgp', 'node-forge', 'net', 'tls', 'crypto'], // node apis not required at build time
         ignore: ['buffer'], // node apis to be stubbed for runtime
+        alias: {
+            'emailjs-stringencoding': './src/js/stringencoding.js'
+        },
         browserifyOptions: {
             debug: true
         }
