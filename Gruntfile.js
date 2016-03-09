@@ -38,15 +38,15 @@ module.exports = function(grunt) {
         cp(['src/*.js', 'src/*.json', 'src/manifest.*'], 'dist/');
     });
 
+    grunt.registerTask('clean', function() {
+        rm('-rf', ['dist', 'compile']);
+    });
+    grunt.registerTask('clean-release', function() {
+        rm(['dist/js/*.browserified.js', 'dist/js/*.js.map', 'dist/js/app.templates.js']);
+    });
+
     // Project configuration.
     grunt.initConfig({
-
-        // General
-
-        clean: {
-            dist: ['dist', 'compile'],
-            release: ['dist/**/*.browserified.js', 'dist/**/*.js.map', 'dist/js/app.templates.js']
-        },
 
         // Stylesheets
 
@@ -331,7 +331,6 @@ module.exports = function(grunt) {
     grunt.loadNpmTasks('grunt-contrib-concat');
     grunt.loadNpmTasks('grunt-contrib-uglify');
     grunt.loadNpmTasks('grunt-contrib-jshint');
-    grunt.loadNpmTasks('grunt-contrib-clean');
     grunt.loadNpmTasks('grunt-csso');
     grunt.loadNpmTasks('grunt-contrib-sass');
     grunt.loadNpmTasks('grunt-autoprefixer');
@@ -375,7 +374,7 @@ module.exports = function(grunt) {
     grunt.registerTask('dist-assets', ['svgmin', 'svgstore', 'string-replace']);
     grunt.registerTask('dist-styleguide', ['sass:styleguide', 'autoprefixer:styleguide', 'csso:styleguide', 'assemble:styleguide']);
     // generate styleguide after manifest to forward version number to styleguide
-    grunt.registerTask('dist', ['clean:dist', 'dist-css', 'dist-js', 'dist-assets', 'copy']);
+    grunt.registerTask('dist', ['clean', 'dist-css', 'dist-js', 'dist-assets', 'copy']);
     grunt.registerTask('dist-all', ['dist', 'dist-styleguide']);
 
     // run JSHint and unit/integration tests
@@ -441,8 +440,8 @@ module.exports = function(grunt) {
     }
 
     grunt.registerTask('release-dev', ['dist', 'manifest-dev', 'compress']);
-    grunt.registerTask('release-test', ['dist', 'manifest-test', 'clean:release', 'compress']);
-    grunt.registerTask('release-prod', ['dist', 'manifest-prod', 'clean:release', 'compress']);
+    grunt.registerTask('release-test', ['dist', 'manifest-test', 'clean-release', 'compress']);
+    grunt.registerTask('release-prod', ['dist', 'manifest-prod', 'clean-release', 'compress']);
     grunt.registerTask('default', ['release-dev']);
 
 };
