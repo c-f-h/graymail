@@ -50,7 +50,7 @@
         "PhoneNumber",
         "DOMPurify",
         "iFrameResize",
-        "mkdir", "ls", "cp", "rm"
+        "mkdir", "ls", "cp", "rm", "exec"
     ],
 
     "globals": {}

@@ -23,6 +23,12 @@ function doBrowserify(target, src, done) {
     b.bundle().pipe(fs.createWriteStream(target)).on('finish', done);
 }
 
+function runTests() {
+    var result1 = !exec('node test/test-runner.js test/unit');
+    var result2 = !exec('node test/test-runner.js test/integration');
+    return result1 && result2;
+}
+
 module.exports = function(grunt) {
 
     require('time-grunt')(grunt);
@@ -34,15 +40,6 @@ module.exports = function(grunt) {
     grunt.initConfig({
 
         // General
-
-        shell: {
-            options: {
-                stderr: false
-            },
-            test: {
-                command: 'npm test',
-            }
-        },
 
         clean: {
             dist: ['dist', 'compile', 'test/lib', 'test/integration/src'],
@@ -387,7 +384,6 @@ module.exports = function(grunt) {
     grunt.loadNpmTasks('grunt-string-replace');
     grunt.loadNpmTasks('grunt-svgmin');
     grunt.loadNpmTasks('grunt-svgstore');
-    grunt.loadNpmTasks('grunt-shell');
     grunt.loadNpmTasks('grunt-angular-templates');
     grunt.loadNpmTasks('assemble');
 
@@ -427,7 +423,8 @@ module.exports = function(grunt) {
     grunt.registerTask('dist-all', ['dist', 'dist-styleguide']);
 
     // run JSHint and unit/integration tests
-    grunt.registerTask('test', ['jshint', 'shell:test']);
+    grunt.registerTask('run-tests', runTests);
+    grunt.registerTask('test', ['jshint', 'run-tests']);
 
     // Test/Dev tasks
     grunt.registerTask('dev', ['connect:dev']);

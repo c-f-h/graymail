@@ -46,7 +46,6 @@
     "grunt-contrib-watch": "~0.5.3",
     "grunt-csso": "^0.8.2",
     "grunt-exorcise": "^2.1.1",
-    "grunt-shell": "~1.1.1",
     "grunt-string-replace": "^1.2.1",
     "grunt-svgmin": "^3.1.2",
     "grunt-svgstore": "^1.0.0",
