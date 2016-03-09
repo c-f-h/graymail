@@ -311,18 +311,6 @@ module.exports = function(grunt) {
             }
         },
 
-        // Development
-
-        connect: {
-            dev: {
-                options: {
-                    port: 8580,
-                    base: '.',
-                    keepalive: true
-                }
-            }
-        },
-
         // Utilities
 
         watch: {
@@ -371,7 +359,6 @@ module.exports = function(grunt) {
     // Load the plugin(s)
     grunt.loadNpmTasks('grunt-contrib-concat');
     grunt.loadNpmTasks('grunt-contrib-uglify');
-    grunt.loadNpmTasks('grunt-contrib-connect');
     grunt.loadNpmTasks('grunt-contrib-jshint');
     grunt.loadNpmTasks('grunt-contrib-clean');
     grunt.loadNpmTasks('grunt-csso');
@@ -425,9 +412,6 @@ module.exports = function(grunt) {
     // run JSHint and unit/integration tests
     grunt.registerTask('run-tests', runTests);
     grunt.registerTask('test', ['jshint', 'run-tests']);
-
-    // Test/Dev tasks
-    grunt.registerTask('dev', ['connect:dev']);
 
     //
     // Release tasks for Chrome App Release Channels
