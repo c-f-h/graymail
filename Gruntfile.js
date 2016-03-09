@@ -27,8 +27,7 @@ module.exports = function(grunt) {
 
     require('time-grunt')(grunt);
 
-    var version = grunt.option('release'),
-        zipName = (version) ? version : 'DEV';
+    var version = require('./src/manifest.json').version;
 
     grunt.registerTask('copy', function() {
         mkdir('-p', ['dist/img', 'dist/tpl']);
@@ -317,7 +316,7 @@ module.exports = function(grunt) {
             main: {
                 options: {
                     mode: 'zip',
-                    archive: 'release/whiteout-mail_' + zipName + '.zip'
+                    archive: 'release/graymail_' + version + '.zip'
                 },
                 expand: true,
                 cwd: 'dist/',
@@ -391,29 +390,18 @@ module.exports = function(grunt) {
 
     grunt.registerTask('manifest-dev', function() {
         patchManifest({
-            suffix: ' (DEV)',
-            version: '9999.9999.9999'
+            suffix: ' (DEV)'
         });
     });
     grunt.registerTask('manifest-test', function() {
-        if (!version) {
-            throw new Error('You must specify the version: "--release=1.0.0"');
-        }
-
         patchManifest({
             suffix: ' (TEST)',
             client_id: '440907777130-bfpgo5fbo4f7hetrg3hn57qolrtubs0u.apps.googleusercontent.com',
-            version: version,
             deleteKey: true
         });
     });
     grunt.registerTask('manifest-prod', function() {
-        if (!version) {
-            throw new Error('You must specify the version: "--release=1.0.0"');
-        }
-
         patchManifest({
-            version: version,
             deleteKey: true
         });
     });
@@ -423,9 +411,6 @@ module.exports = function(grunt) {
             path = './dist/manifest.json',
             manifest = require(path);
 
-        if (options.version) {
-            manifest.version = options.version;
-        }
         if (options.suffix) {
             manifest.name += options.suffix;
         }
