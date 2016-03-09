@@ -36,6 +36,14 @@ module.exports = function(grunt) {
     var version = grunt.option('release'),
         zipName = (version) ? version : 'DEV';
 
+    grunt.registerTask('copy', function() {
+        mkdir('-p', ['dist/img', 'dist/tpl']);
+        cp('-r', 'src/font/', 'dist/font/');
+        cp('src/img/*', 'dist/img');
+        cp('src/tpl/read-sandbox.html', 'dist/tpl/');
+        cp(['src/*.js', 'src/*.json', 'src/manifest.*'], 'dist/');
+    });
+
     // Project configuration.
     grunt.initConfig({
 
@@ -44,33 +52,6 @@ module.exports = function(grunt) {
         clean: {
             dist: ['dist', 'compile', 'test/lib', 'test/integration/src'],
             release: ['dist/**/*.browserified.js', 'dist/**/*.js.map', 'dist/js/app.templates.js']
-        },
-
-        copy: {
-            font: {
-                expand: true,
-                cwd: 'src/font/',
-                src: ['*'],
-                dest: 'dist/font/'
-            },
-            img: {
-                expand: true,
-                cwd: 'src/img/',
-                src: ['*'],
-                dest: 'dist/img/'
-            },
-            tpl: {
-                expand: true,
-                cwd: 'src/tpl/',
-                src: ['read-sandbox.html'],
-                dest: 'dist/tpl/'
-            },
-            app: {
-                expand: true,
-                cwd: 'src/',
-                src: ['*.js', '*.json', 'manifest.*'],
-                dest: 'dist/'
-            }
         },
 
         // Stylesheets
@@ -330,13 +311,9 @@ module.exports = function(grunt) {
                 files: ['src/index.html', 'src/img/icons/*.svg', '!src/img/icons/all.svg'],
                 tasks: ['svgmin', 'svgstore', 'string-replace', 'dist-styleguide']
             },
-            lib: {
-                files: ['src/lib/**/*.js'],
-                tasks: ['copy:lib']
-            },
             app: {
                 files: ['src/*.js', 'src/*.html', 'src/tpl/**/*.html', 'src/**/*.json', 'src/manifest.*', 'src/img/**/*', 'src/font/**/*'],
-                tasks: ['copy:app', 'copy:tpl', 'copy:img', 'copy:font', 'manifest-dev']
+                tasks: ['copy', 'manifest-dev']
             }
         },
 
@@ -365,7 +342,6 @@ module.exports = function(grunt) {
     grunt.loadNpmTasks('grunt-contrib-sass');
     grunt.loadNpmTasks('grunt-autoprefixer');
     grunt.loadNpmTasks('grunt-contrib-watch');
-    grunt.loadNpmTasks('grunt-contrib-copy');
     grunt.loadNpmTasks('grunt-contrib-compress');
     grunt.loadNpmTasks('grunt-exorcise');
     grunt.loadNpmTasks('grunt-string-replace');
@@ -402,11 +378,10 @@ module.exports = function(grunt) {
         'concat:app',
         'concat:readSandbox'
     ]);
-    grunt.registerTask('dist-copy', ['copy']);
     grunt.registerTask('dist-assets', ['svgmin', 'svgstore', 'string-replace']);
     grunt.registerTask('dist-styleguide', ['sass:styleguide', 'autoprefixer:styleguide', 'csso:styleguide', 'assemble:styleguide']);
     // generate styleguide after manifest to forward version number to styleguide
-    grunt.registerTask('dist', ['clean:dist', 'dist-css', 'dist-js', 'dist-assets', 'dist-copy']);
+    grunt.registerTask('dist', ['clean:dist', 'dist-css', 'dist-js', 'dist-assets', 'copy']);
     grunt.registerTask('dist-all', ['dist', 'dist-styleguide']);
 
     // run JSHint and unit/integration tests
