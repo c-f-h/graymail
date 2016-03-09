@@ -17,6 +17,8 @@
     "undef": true,
     "unused": true,
 
+    "esversion": 6,
+
     "predef": [
         "inject",
         "Promise",
@@ -47,7 +49,8 @@
         "openpgp",
         "PhoneNumber",
         "DOMPurify",
-        "iFrameResize"
+        "iFrameResize",
+        "mkdir", "ls", "cp", "rm"
     ],
 
     "globals": {}
