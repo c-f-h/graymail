@@ -11,7 +11,7 @@
     "unit-test": "node test/test-runner.js test/unit ; node test/test-runner.js test/integration",
     "integration-test": "node test/test-runner.js test/unit ; node test/test-runner.js test/integration",
     "start": "node server.js",
-    "discify": "grunt browserify:app && `npm bin`/discify dist/js/app.browserified.js > disc.html"
+    "discify": "grunt browserify_app && `npm bin`/discify dist/js/app.browserified.js > disc.html"
   },
   "dependencies": {
     "config": "^1.0.2",
@@ -23,6 +23,7 @@
     "assemble": "~0.4.42",
     "axe-logger": "~0.0.2",
     "browsercrow": "https://github.com/whiteout-io/browsercrow/tarball/master",
+    "browserify": "^13.0.0",
     "browsersmtp": "https://github.com/whiteout-io/browsersmtp/tarball/master",
     "chai": "~1.9.2",
     "dompurify": "~0.7.3",
@@ -33,7 +34,6 @@
     "grunt": "~0.4.1",
     "grunt-angular-templates": "~0.5.7",
     "grunt-autoprefixer": "^3.0.4",
-    "grunt-browserify": "^4.0.1",
     "grunt-contrib-clean": "~0.5.0",
     "grunt-contrib-compress": "^1.0.0",
     "grunt-contrib-concat": "^1.0.0",
@@ -57,6 +57,7 @@
     "mocha": "^2.4.5",
     "ng-infinite-scroll": "~1.1.2",
     "node-uuid": "^1.4.7",
+    "shelljs": "^0.6.0",
     "sinon": "~1.7.3",
     "time-grunt": "^1.0.0"
   }

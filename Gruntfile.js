@@ -1,22 +1,34 @@
 'use strict';
 
+require('shelljs/global');
+
+var fs = require('fs');
+var browserify = require('browserify');
+var async = require('async');
+
+function doBrowserify(target, src, done) {
+    var b = browserify(src, {
+        debug: true,
+        //fullPaths: true       // only needed for discify
+    });
+
+    ['openpgp', 'node-forge', 'net', 'tls', 'crypto'].
+        forEach(f => b.exclude(f));
+
+    b.ignore('buffer');
+
+    // shim out the stringencoding module for the browser
+    b.require('./src/js/stringencoding.js', {expose: 'emailjs-stringencoding'});
+
+    b.bundle().pipe(fs.createWriteStream(target)).on('finish', done);
+}
+
 module.exports = function(grunt) {
 
     require('time-grunt')(grunt);
 
     var version = grunt.option('release'),
         zipName = (version) ? version : 'DEV';
-
-    var browserifyOpt = {
-        exclude: ['openpgp', 'node-forge', 'net', 'tls', 'crypto'], // node apis not required at build time
-        ignore: ['buffer'], // node apis to be stubbed for runtime
-        alias: {
-            'emailjs-stringencoding': './src/js/stringencoding.js'
-        },
-        browserifyOptions: {
-            debug: true
-        }
-    };
 
     // Project configuration.
     grunt.initConfig({
@@ -38,14 +50,6 @@ module.exports = function(grunt) {
         },
 
         copy: {
-            lib: {
-                expand: true,
-                flatten: true,
-                cwd: './',
-                src: [
-                ],
-                dest: 'dist/js/'
-            },
             font: {
                 expand: true,
                 cwd: 'src/font/',
@@ -123,27 +127,6 @@ module.exports = function(grunt) {
             all: ['Gruntfile.js', 'src/*.js', 'src/js/**/*.js', 'test/unit/**/*-test.js', 'test/integration/**/*-test.js'],
             options: {
                 jshintrc: '.jshintrc'
-            }
-        },
-
-        browserify: {
-            app: {
-                files: {
-                    'dist/js/app.browserified.js': ['src/js/app.js']
-                },
-                options: browserifyOpt
-            },
-            mailreaderWorker: {
-                files: {
-                    'dist/js/mailreader-parser-worker.browserified.js': ['node_modules/mailreader/src/mailreader-parser-worker-browserify.js']
-                },
-                options: browserifyOpt
-            },
-            compressionWorker: {
-                files: {
-                    'dist/js/browserbox-compression-worker.browserified.js': ['node_modules/emailjs-imap-client/src/browserbox-compression-worker.js']
-                },
-                options: browserifyOpt
             }
         },
 
@@ -389,7 +372,6 @@ module.exports = function(grunt) {
     });
 
     // Load the plugin(s)
-    grunt.loadNpmTasks('grunt-browserify');
     grunt.loadNpmTasks('grunt-contrib-concat');
     grunt.loadNpmTasks('grunt-contrib-uglify');
     grunt.loadNpmTasks('grunt-contrib-connect');
@@ -409,11 +391,29 @@ module.exports = function(grunt) {
     grunt.loadNpmTasks('grunt-angular-templates');
     grunt.loadNpmTasks('assemble');
 
+    grunt.registerTask('browserify_app', function() {
+        var done = this.async();
+        doBrowserify('dist/js/app.browserified.js', 'src/js/app.js', done);
+    });
+
+    grunt.registerTask('browserify', function() {
+        mkdir('-p', 'dist/js');
+        var done = this.async();
+        async.parallel([
+        doBrowserify.bind(null, 'dist/js/app.browserified.js',
+                                './src/js/app.js'),
+        doBrowserify.bind(null, 'dist/js/mailreader-parser-worker.browserified.js',
+                                './node_modules/mailreader/src/mailreader-parser-worker-browserify.js'),
+        doBrowserify.bind(null, 'dist/js/browserbox-compression-worker.browserified.js',
+                                './node_modules/emailjs-imap-client/src/emailjs-imap-client-compression-worker.js')
+        ], done);
+    });
+
     // Build tasks
     grunt.registerTask('dist-css', ['sass:dist', 'autoprefixer:dist', 'csso:dist']);
     grunt.registerTask('dist-js', ['browserify', 'exorcise', 'ngtemplates', 'concat' /*, 'uglify'*/]);
     grunt.registerTask('dist-js-app', [
-        'browserify:app',
+        'browserify_app',
         'exorcise:app',
         'ngtemplates',
         'concat:app',
