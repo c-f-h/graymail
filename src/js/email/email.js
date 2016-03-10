@@ -387,7 +387,7 @@ Email.prototype.getBody = function(options) {
 
         if (options.notifyNew && messages.length) {
             // notify for incoming mail
-            self.onIncomingMessage(messages);
+            self.onIncomingMessage && self.onIncomingMessage(messages);
         }
 
         return messages;
@@ -593,7 +593,6 @@ Email.prototype.connectImap = function(imap) {
                 return a - b;
             });
             var lastUid = uids[uids.length - 1];
-
 
             mailboxCache[folder.path] = {
                 exists: lastUid,
