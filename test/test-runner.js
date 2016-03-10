@@ -3,7 +3,6 @@ var Mocha = require('mocha');
 var glob = require('glob');
 var path = require('path');
 
-
 if (process.argv.length != 3) {
     console.error('Please pass a path to the tests to be run.');
     process.exit(1);
@@ -11,6 +10,12 @@ if (process.argv.length != 3) {
 
 var testsPath = path.resolve(process.argv[2]);
 
+// Hack: on first require(), the TCPSocket module tries to detect
+// the runtime environment. If we require it in jsdom, it will see
+// the navigator object and think it's running in the browser.
+// So instead we first require it here so that it correctly uses
+// the Node.js shim.
+require('emailjs-tcp-socket');
 
 var vc = jsdom.createVirtualConsole().sendTo(console);
 
@@ -48,7 +53,6 @@ jsdom.env('<html><head><script></script></head><body></body></html>',
         Object.setPrototypeOf(global, window);
 
         window.forge = {};
-
         window.chrome = {};
         window.expect = window.chai.expect;
 
