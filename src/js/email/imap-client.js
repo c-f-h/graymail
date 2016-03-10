@@ -241,9 +241,8 @@ ImapClient.prototype._onSelectMailbox = function(client, path, mailbox) {
     }
 };
 
-ImapClient.prototype._onUpdate = function(client, type, value) {
+ImapClient.prototype._onUpdate = function(client, path, type, value) {
     var self = this,
-        path = client.selectedMailbox,
         cached = self.mailboxCache[path];
 
     if (!self.onSyncUpdate) {
