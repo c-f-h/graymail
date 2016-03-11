@@ -146,7 +146,7 @@ ImapClient.prototype._onSelectMailbox = function(client, path, info) {
         cached;
 
     // If both clients are currently listening the same mailbox, ignore data from listeningClient
-    if (client === self._listeningClient && self._listeningClient.selectedMailbox === self._client.selectedMailbox) {
+    if (client === self._listeningClient && self._listeningClient._selectedMailbox === self._client._selectedMailbox) {
         return;
     }
 
@@ -252,7 +252,7 @@ ImapClient.prototype._onUpdate = function(client, path, type, value) {
     }
 
     // If both clients are currently listening the same mailbox, ignore data from listeningClient
-    if (client === self._listeningClient && self._listeningClient.selectedMailbox === self._client.selectedMailbox) {
+    if (client === self._listeningClient && self._listeningClient._selectedMailbox === self._client._selectedMailbox) {
         return;
     }
 
@@ -1023,7 +1023,7 @@ ImapClient.prototype._ensurePath = function(path, client) {
     client = client || self._client;
 
     return function(ctx, next) {
-        if (client.selectedMailbox === path) {
+        if (client._selectedMailbox === path) {
             return next();
         }
 
