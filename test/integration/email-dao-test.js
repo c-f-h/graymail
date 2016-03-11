@@ -292,7 +292,7 @@ describe('Email DAO integration tests', function() {
         }).then(done);
     });
 
-    describe('IMAP Integration Tests', function(done) {
+    describe('IMAP Integration Tests', function() {
         beforeEach(function() {
             inbox.messages.sort(function(a, b) {
                 return a.uid - b.uid;
