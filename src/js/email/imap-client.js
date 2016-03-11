@@ -222,6 +222,7 @@ ImapClient.prototype._onSelectMailbox = function(client, path, info) {
 
             if (!firstUpdate) {
                 self._checkModseq({
+                    path: path,
                     highestModseq: info.highestModseq,
                     client: client
                 }).catch(function(error) {
@@ -233,6 +234,7 @@ ImapClient.prototype._onSelectMailbox = function(client, path, info) {
         // check for changed flags
         axe.debug(DEBUG_TAG, 'no changes in message count in ' + path + '. exists: ' + info.exists + ', uidNext: ' + info.uidNext);
         return self._checkModseq({
+            path: path,
             highestModseq: info.highestModseq,
             client: client
         }).catch(function(error) {
@@ -344,7 +346,7 @@ ImapClient.prototype._checkModseq = function(options) {
     var self = this,
         highestModseq = options.highestModseq,
         client = options.client || self._client,
-        path = client.selectedMailbox;
+        path = options.path;
 
     // do nothing if we do not have highestModseq value. it should be at least 1. if it is
     // undefined then the server does not support CONDSTORE extension.
@@ -363,9 +365,7 @@ ImapClient.prototype._checkModseq = function(options) {
 
     // only do this when we actually do have a last know change number
     if (!(cached && cached.highestModseq && cached.highestModseq !== highestModseq)) {
-        return new Promise(function(resolve) {
-            resolve([]);
-        });
+        return Promise.resolve([]);
     }
 
     var msgs = cached.uidlist.slice(-100);
@@ -373,7 +373,7 @@ ImapClient.prototype._checkModseq = function(options) {
     var lastUid = (msgs.pop() || '*');
 
     axe.debug(DEBUG_TAG, 'listing changes since MODSEQ ' + highestModseq + ' for ' + path);
-    return client.listMessages(options.path, firstUid + ':' + lastUid, ['uid', 'flags', 'modseq'], {
+    return client.listMessages(path, firstUid + ':' + lastUid, ['uid', 'flags', 'modseq'], {
         byUid: true,
         changedSince: cached.highestModseq
     }).then(function(messages) {
