@@ -25,7 +25,7 @@ describe('Device Storage DAO unit tests', function() {
             });
         });
 
-        it('should fail', function() {
+        it('should fail', function(done) {
             lawnchairDaoStub.init.returns(rejects(new Error()));
 
             storageDao.init(testUser).catch(function(err) {
@@ -45,7 +45,7 @@ describe('Device Storage DAO unit tests', function() {
             return storageDao.store(obj, key).then(function() {
                 expect(lawnchairDaoStub.persist.calledWith(key, obj)).to.be.true;
             });
-        })
+        });
     });
 
     describe('#storeList', function() {
@@ -78,34 +78,31 @@ describe('Device Storage DAO unit tests', function() {
     });
 
     describe('remove list', function() {
-        it('should work', function(done) {
+        it('should work', function() {
             lawnchairDaoStub.removeList.returns(resolves());
 
-            storageDao.removeList('email').then(function() {
+            return storageDao.removeList('email').then(function() {
                 expect(lawnchairDaoStub.removeList.calledOnce).to.be.true;
-                done();
             });
         });
     });
 
     describe('list items', function() {
-        it('should work', function(done) {
+        it('should work', function() {
             lawnchairDaoStub.list.returns(resolves());
 
-            storageDao.listItems('email').then(function() {
+            return storageDao.listItems('email').then(function() {
                 expect(lawnchairDaoStub.list.calledOnce).to.be.true;
-                done();
             });
         });
     });
 
     describe('clear', function() {
-        it('should work', function(done) {
+        it('should work', function() {
             lawnchairDaoStub.clear.returns(resolves());
 
-            storageDao.clear().then(function() {
+            return storageDao.clear().then(function() {
                 expect(lawnchairDaoStub.clear.calledOnce).to.be.true;
-                done();
             });
         });
     });

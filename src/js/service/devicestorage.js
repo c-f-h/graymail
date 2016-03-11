@@ -42,7 +42,7 @@ DeviceStorage.prototype.init = function(dbName) {
  */
 DeviceStorage.prototype.store = function(item, key) {
     return this._lawnchairDAO.persist(key, item);
-}
+};
 
 /**
  * Stores a list of items in the object store
