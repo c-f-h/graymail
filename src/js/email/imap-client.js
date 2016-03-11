@@ -445,7 +445,6 @@ ImapClient.prototype.logout = function() {
  * @return {Promise}
  */
 ImapClient.prototype.listenForChanges = function(options) {
-    return;
     var self = this;
 
     if (self._listenerLoggedIn) {
