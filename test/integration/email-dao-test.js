@@ -334,25 +334,32 @@ describe('Email DAO integration tests', function() {
                 }).then(function(folder) {
                     expect(folder.exists).to.equal(1);
                     return new Promise(function (resolve) {
-                        setTimeout(resolve, 10);    // give time for the onselectmailbox handler to run
+                        setTimeout(resolve, 100);    // give time for the onselectmailbox handler to run
                     });
                 }).then(function() {
                     expect(inbox.messages).to.have.lengthOf(19);
                 });
             });
 
-            it.skip('should move a message', function(done) {
-                emailDao.moveMessage({
+            it('should move a message', function() {
+                var msg = inbox.messages[0];
+                return emailDao.moveMessage({
                     folder: inbox,
                     destination: spam,
-                    message: inbox.messages[0]
+                    message: msg
                 }).then(function() {
-                    emailDao.openFolder({
+                    return emailDao.openFolder({
                         path: '[Gmail]/Spam'
-                    }).then(function(folder) {
-                        expect(folder.exists).to.equal(1);
-                        done();
                     });
+                }).then(function(folder) {
+                    expect(folder.exists).to.equal(1);
+                    return new Promise(function (resolve) {
+                        setTimeout(resolve, 100);    // give time for the onselectmailbox handler to run
+                    });
+                }).then(function() {
+                    expect(inbox.messages).to.have.lengthOf(19);
+                    expect(spam.messages).to.have.lengthOf(1);
+                    //expect(spam.messages[0].uid).to.equal(msg.uid); // uid changes during copy/move
                 });
             });
 
