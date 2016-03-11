@@ -328,13 +328,11 @@ describe('Email DAO integration tests', function() {
                     folder: inbox,
                     message: inbox.messages[0]
                 }).then(function() {
-                    emailDao.openFolder({
-                        folder: {
-                            path: '[Gmail]/Trash'
-                        }
-                    }).then(function(folder) {
-                        expect(folder.exists).to.equal(1);
+                    return emailDao.openFolder({
+                        path: '[Gmail]/Trash'
                     });
+                }).then(function(folder) {
+                    expect(folder.exists).to.equal(1);
                 });
             });
 
@@ -345,9 +343,7 @@ describe('Email DAO integration tests', function() {
                     message: inbox.messages[0]
                 }).then(function() {
                     emailDao.openFolder({
-                        folder: {
-                            path: '[Gmail]/Spam'
-                        }
+                        path: '[Gmail]/Spam'
                     }).then(function(folder) {
                         expect(folder.exists).to.equal(1);
                         done();
