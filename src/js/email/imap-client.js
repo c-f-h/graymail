@@ -428,8 +428,10 @@ ImapClient.prototype.logout = function() {
         return Promise.resolve();
     } else {
         self._loggedIn = false;
+        self._unregisterEventHandlers(self._client);
         return self._client.close().then(function() {
             axe.debug(DEBUG_TAG, 'logout completed, kthxbye!');
+            self._client = null;
         });
     }
 };
@@ -443,6 +445,7 @@ ImapClient.prototype.logout = function() {
  * @return {Promise}
  */
 ImapClient.prototype.listenForChanges = function(options) {
+    return;
     var self = this;
 
     if (self._listenerLoggedIn) {
@@ -471,8 +474,10 @@ ImapClient.prototype.stopListeningForChanges = function() {
         return Promise.resolve();
     } else {
         self._listenerLoggedIn = false;
+        self._unregisterEventHandlers(self._listeningClient);
         return self._listeningClient.close().then(function() {
             axe.debug(DEBUG_TAG, 'logout completed, kthxbye!');
+            self._listeningClient = null;
         });
     }
 };
