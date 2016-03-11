@@ -35,6 +35,16 @@ DeviceStorage.prototype.init = function(dbName) {
 };
 
 /**
+ * Stores an item in the object store
+ * @param item         The item to be persisted
+ * @param key [String] The key under which to persist
+ * @return {Promise}
+ */
+DeviceStorage.prototype.store = function(item, key) {
+    return this._lawnchairDAO.persist(key, item);
+}
+
+/**
  * Stores a list of items in the object store
  * @param list [Array] The list of items to be persisted
  * @param type [String] The type of item to be persisted e.g. 'email'

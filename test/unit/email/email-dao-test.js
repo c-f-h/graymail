@@ -1024,34 +1024,34 @@ describe('Email DAO unit tests', function() {
                     Flagged: [flaggedFolder],
                     Other: [otherFolder]
                 }));
-                devicestorageStub.storeList.withArgs(sinon.match(function(arg) {
-                    expect(arg[0][0].name).to.deep.equal(inboxFolder.name);
-                    expect(arg[0][0].path).to.deep.equal(inboxFolder.path);
-                    expect(arg[0][0].type).to.deep.equal(inboxFolder.type);
-                    expect(arg[0][1].name).to.deep.equal(sentFolder.name);
-                    expect(arg[0][1].path).to.deep.equal(sentFolder.path);
-                    expect(arg[0][1].type).to.deep.equal(sentFolder.type);
-                    expect(arg[0][2].name).to.deep.equal(outboxFolder.name);
-                    expect(arg[0][2].path).to.deep.equal(outboxFolder.path);
-                    expect(arg[0][2].type).to.deep.equal(outboxFolder.type);
-                    expect(arg[0][3].name).to.deep.equal(draftsFolder.name);
-                    expect(arg[0][3].path).to.deep.equal(draftsFolder.path);
-                    expect(arg[0][3].type).to.deep.equal(draftsFolder.type);
-                    expect(arg[0][4].name).to.deep.equal(trashFolder.name);
-                    expect(arg[0][4].path).to.deep.equal(trashFolder.path);
-                    expect(arg[0][4].type).to.deep.equal(trashFolder.type);
-                    expect(arg[0][5].name).to.deep.equal(flaggedFolder.name);
-                    expect(arg[0][5].path).to.deep.equal(flaggedFolder.path);
-                    expect(arg[0][5].type).to.deep.equal(flaggedFolder.type);
-                    expect(arg[0][6].name).to.deep.equal(otherFolder.name);
-                    expect(arg[0][6].path).to.deep.equal(otherFolder.path);
-                    expect(arg[0][6].type).to.deep.equal(otherFolder.type);
+                devicestorageStub.store.withArgs(sinon.match(function(arg) {
+                    expect(arg[0].name).to.deep.equal(inboxFolder.name);
+                    expect(arg[0].path).to.deep.equal(inboxFolder.path);
+                    expect(arg[0].type).to.deep.equal(inboxFolder.type);
+                    expect(arg[1].name).to.deep.equal(sentFolder.name);
+                    expect(arg[1].path).to.deep.equal(sentFolder.path);
+                    expect(arg[1].type).to.deep.equal(sentFolder.type);
+                    expect(arg[2].name).to.deep.equal(outboxFolder.name);
+                    expect(arg[2].path).to.deep.equal(outboxFolder.path);
+                    expect(arg[2].type).to.deep.equal(outboxFolder.type);
+                    expect(arg[3].name).to.deep.equal(draftsFolder.name);
+                    expect(arg[3].path).to.deep.equal(draftsFolder.path);
+                    expect(arg[3].type).to.deep.equal(draftsFolder.type);
+                    expect(arg[4].name).to.deep.equal(trashFolder.name);
+                    expect(arg[4].path).to.deep.equal(trashFolder.path);
+                    expect(arg[4].type).to.deep.equal(trashFolder.type);
+                    expect(arg[5].name).to.deep.equal(flaggedFolder.name);
+                    expect(arg[5].path).to.deep.equal(flaggedFolder.path);
+                    expect(arg[5].type).to.deep.equal(flaggedFolder.type);
+                    expect(arg[6].name).to.deep.equal(otherFolder.name);
+                    expect(arg[6].path).to.deep.equal(otherFolder.path);
+                    expect(arg[6].type).to.deep.equal(otherFolder.type);
                     return true;
                 }), 'folders').returns(resolves());
 
                 return dao._updateFolders().then(function() {
                     expect(imapClientStub.listWellKnownFolders.calledOnce).to.be.true;
-                    expect(devicestorageStub.storeList.calledOnce).to.be.true;
+                    expect(devicestorageStub.store.calledOnce).to.be.true;
                 });
             });
 
@@ -1070,34 +1070,34 @@ describe('Email DAO unit tests', function() {
                     Flagged: [flaggedFolder],
                     Other: [otherFolder]
                 }));
-                devicestorageStub.storeList.withArgs(sinon.match(function(arg) {
-                    expect(arg[0][0].name).to.deep.equal(inboxFolder.name);
-                    expect(arg[0][0].path).to.deep.equal(inboxFolder.path);
-                    expect(arg[0][0].type).to.deep.equal(inboxFolder.type);
-                    expect(arg[0][1].name).to.deep.equal(sentFolder.name);
-                    expect(arg[0][1].path).to.deep.equal(sentFolder.path);
-                    expect(arg[0][1].type).to.deep.equal(sentFolder.type);
-                    expect(arg[0][2].name).to.deep.equal(outboxFolder.name);
-                    expect(arg[0][2].path).to.deep.equal(outboxFolder.path);
-                    expect(arg[0][2].type).to.deep.equal(outboxFolder.type);
-                    expect(arg[0][3].name).to.deep.equal(draftsFolder.name);
-                    expect(arg[0][3].path).to.deep.equal(draftsFolder.path);
-                    expect(arg[0][3].type).to.deep.equal(draftsFolder.type);
-                    expect(arg[0][4].name).to.deep.equal(trashFolder.name);
-                    expect(arg[0][4].path).to.deep.equal(trashFolder.path);
-                    expect(arg[0][4].type).to.deep.equal(trashFolder.type);
-                    expect(arg[0][5].name).to.deep.equal(flaggedFolder.name);
-                    expect(arg[0][5].path).to.deep.equal(flaggedFolder.path);
-                    expect(arg[0][5].type).to.deep.equal(flaggedFolder.type);
-                    expect(arg[0][6].name).to.deep.equal(otherFolder.name);
-                    expect(arg[0][6].path).to.deep.equal(otherFolder.path);
-                    expect(arg[0][6].type).to.deep.equal(otherFolder.type);
+                devicestorageStub.store.withArgs(sinon.match(function(arg) {
+                    expect(arg[0].name).to.deep.equal(inboxFolder.name);
+                    expect(arg[0].path).to.deep.equal(inboxFolder.path);
+                    expect(arg[0].type).to.deep.equal(inboxFolder.type);
+                    expect(arg[1].name).to.deep.equal(sentFolder.name);
+                    expect(arg[1].path).to.deep.equal(sentFolder.path);
+                    expect(arg[1].type).to.deep.equal(sentFolder.type);
+                    expect(arg[2].name).to.deep.equal(outboxFolder.name);
+                    expect(arg[2].path).to.deep.equal(outboxFolder.path);
+                    expect(arg[2].type).to.deep.equal(outboxFolder.type);
+                    expect(arg[3].name).to.deep.equal(draftsFolder.name);
+                    expect(arg[3].path).to.deep.equal(draftsFolder.path);
+                    expect(arg[3].type).to.deep.equal(draftsFolder.type);
+                    expect(arg[4].name).to.deep.equal(trashFolder.name);
+                    expect(arg[4].path).to.deep.equal(trashFolder.path);
+                    expect(arg[4].type).to.deep.equal(trashFolder.type);
+                    expect(arg[5].name).to.deep.equal(flaggedFolder.name);
+                    expect(arg[5].path).to.deep.equal(flaggedFolder.path);
+                    expect(arg[5].type).to.deep.equal(flaggedFolder.type);
+                    expect(arg[6].name).to.deep.equal(otherFolder.name);
+                    expect(arg[6].path).to.deep.equal(otherFolder.path);
+                    expect(arg[6].type).to.deep.equal(otherFolder.type);
                     return true;
                 }), 'folders').returns(resolves());
 
                 return dao._updateFolders().then(function() {
                     expect(imapClientStub.listWellKnownFolders.calledOnce).to.be.true;
-                    expect(devicestorageStub.storeList.calledOnce).to.be.true;
+                    expect(devicestorageStub.store.calledOnce).to.be.true;
                 });
             });
         });

@@ -1192,7 +1192,7 @@ Email.prototype._localStoreFolders = function() {
         };
     });
 
-    return this._devicestorage.storeList([folders], FOLDER_DB_TYPE);
+    return this._devicestorage.store(folders, FOLDER_DB_TYPE);
 };
 
 /**

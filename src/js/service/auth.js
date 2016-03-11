@@ -51,7 +51,7 @@ Auth.prototype.init = function() {
 
         // if not, it's a new DB and we initialize it to the current version
         if (!Number.isInteger(version)) {
-            return self._appConfigStore.storeList([cfg.dbVersion], DB_VERSION_KEY);
+            return self._appConfigStore.store(cfg.dbVersion, DB_VERSION_KEY);
         }
     });
 };
@@ -165,25 +165,25 @@ Auth.prototype.storeCredentials = function() {
     }
 
     // persist the config
-    var storeSmtp = self._appConfigStore.storeList([self.smtp], SMTP_DB_KEY);
-    var storeImap = self._appConfigStore.storeList([self.imap], IMAP_DB_KEY);
-    var storeEmailAddress = self._appConfigStore.storeList([self.emailAddress], EMAIL_ADDR_DB_KEY);
-    var storeUsername = self._appConfigStore.storeList([self.username], USERNAME_DB_KEY);
-    var storeRealname = self._appConfigStore.storeList([self.realname], REALNAME_DB_KEY);
+    var storeSmtp = self._appConfigStore.store(self.smtp, SMTP_DB_KEY);
+    var storeImap = self._appConfigStore.store(self.imap, IMAP_DB_KEY);
+    var storeEmailAddress = self._appConfigStore.store(self.emailAddress, EMAIL_ADDR_DB_KEY);
+    var storeUsername = self._appConfigStore.store(self.username, USERNAME_DB_KEY);
+    var storeRealname = self._appConfigStore.store(self.realname, REALNAME_DB_KEY);
     var storePassword = new Promise(function(resolve) {
         if (!self.password) {
             resolve();
             return;
         }
 
-        return self._appConfigStore.storeList([self.password], PASSWD_DB_KEY).then(resolve);
+        return self._appConfigStore.store(self.password, PASSWD_DB_KEY).then(resolve);
 
         /*if (self.passwordNeedsDecryption) {
             // password is not decrypted yet, so no need to re-encrypt it before storing...
-            return self._appConfigStore.storeList([self.password], PASSWD_DB_KEY).then(resolve);
+            return self._appConfigStore.store(self.password, PASSWD_DB_KEY).then(resolve);
         }
         return self._pgp.encrypt(self.password, undefined).then(function(ciphertext) {
-            return self._appConfigStore.storeList([ciphertext], PASSWD_DB_KEY).then(resolve);
+            return self._appConfigStore.store(ciphertext, PASSWD_DB_KEY).then(resolve);
         });*/
     });
 

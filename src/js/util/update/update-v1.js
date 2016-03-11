@@ -15,7 +15,7 @@ function updateV1(options) {
     // remove the emails
     return options.userStorage.removeList(emailDbType).then(function() {
         // update the database version to postUpdateDbVersion
-        return options.appConfigStorage.storeList([postUpdateDbVersion], versionDbType);
+        return options.appConfigStorage.store(postUpdateDbVersion, versionDbType);
     });
 }
 

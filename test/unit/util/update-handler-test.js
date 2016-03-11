@@ -124,11 +124,11 @@ describe('UpdateHandler', function() {
 
             it('should work', function(done) {
                 userStorageStub.removeList.withArgs(emailDbType).returns(resolves());
-                appConfigStorageStub.storeList.withArgs([1], versionDbType).returns(resolves());
+                appConfigStorageStub.store.withArgs(1, versionDbType).returns(resolves());
 
                 updateHandler.update().then(function() {
                     expect(userStorageStub.removeList.calledOnce).to.be.true;
-                    expect(appConfigStorageStub.storeList.calledOnce).to.be.true;
+                    expect(appConfigStorageStub.store.calledOnce).to.be.true;
 
                     done();
                 });
@@ -136,12 +136,12 @@ describe('UpdateHandler', function() {
 
             it('should fail when persisting database version fails', function(done) {
                 userStorageStub.removeList.returns(resolves());
-                appConfigStorageStub.storeList.returns(rejects(new Error()));
+                appConfigStorageStub.store.returns(rejects(new Error()));
 
                 updateHandler.update().catch(function(error) {
                     expect(error).to.exist;
                     expect(userStorageStub.removeList.calledOnce).to.be.true;
-                    expect(appConfigStorageStub.storeList.calledOnce).to.be.true;
+                    expect(appConfigStorageStub.store.calledOnce).to.be.true;
 
                     done();
                 });
@@ -153,7 +153,7 @@ describe('UpdateHandler', function() {
                 updateHandler.update().catch(function(error) {
                     expect(error).to.exist;
                     expect(userStorageStub.removeList.calledOnce).to.be.true;
-                    expect(appConfigStorageStub.storeList.called).to.be.false;
+                    expect(appConfigStorageStub.store.called).to.be.false;
 
                     done();
                 });
@@ -176,11 +176,11 @@ describe('UpdateHandler', function() {
 
             it('should work', function(done) {
                 userStorageStub.removeList.withArgs(emailDbType).returns(resolves());
-                appConfigStorageStub.storeList.withArgs([2], versionDbType).returns(resolves());
+                appConfigStorageStub.store.withArgs(2, versionDbType).returns(resolves());
 
                 updateHandler.update().then(function() {
                     expect(userStorageStub.removeList.calledOnce).to.be.true;
-                    expect(appConfigStorageStub.storeList.calledOnce).to.be.true;
+                    expect(appConfigStorageStub.store.calledOnce).to.be.true;
 
                     done();
                 });
@@ -188,12 +188,12 @@ describe('UpdateHandler', function() {
 
             it('should fail when persisting database version fails', function(done) {
                 userStorageStub.removeList.returns(resolves());
-                appConfigStorageStub.storeList.returns(rejects(new Error()));
+                appConfigStorageStub.store.returns(rejects(new Error()));
 
                 updateHandler.update().catch(function(error) {
                     expect(error).to.exist;
                     expect(userStorageStub.removeList.calledOnce).to.be.true;
-                    expect(appConfigStorageStub.storeList.calledOnce).to.be.true;
+                    expect(appConfigStorageStub.store.calledOnce).to.be.true;
 
                     done();
                 });
@@ -205,7 +205,7 @@ describe('UpdateHandler', function() {
                 updateHandler.update().catch(function(error) {
                     expect(error).to.exist;
                     expect(userStorageStub.removeList.calledOnce).to.be.true;
-                    expect(appConfigStorageStub.storeList.called).to.be.false;
+                    expect(appConfigStorageStub.store.called).to.be.false;
 
                     done();
                 });
@@ -228,11 +228,11 @@ describe('UpdateHandler', function() {
 
             it('should work', function(done) {
                 userStorageStub.removeList.withArgs(emailDbType).returns(resolves());
-                appConfigStorageStub.storeList.withArgs([3], versionDbType).returns(resolves());
+                appConfigStorageStub.store.withArgs(3, versionDbType).returns(resolves());
 
                 updateHandler.update().then(function() {
                     expect(userStorageStub.removeList.calledOnce).to.be.true;
-                    expect(appConfigStorageStub.storeList.calledOnce).to.be.true;
+                    expect(appConfigStorageStub.store.calledOnce).to.be.true;
 
                     done();
                 });
@@ -240,12 +240,12 @@ describe('UpdateHandler', function() {
 
             it('should fail when persisting database version fails', function(done) {
                 userStorageStub.removeList.returns(resolves());
-                appConfigStorageStub.storeList.returns(rejects(new Error()));
+                appConfigStorageStub.store.returns(rejects(new Error()));
 
                 updateHandler.update().catch(function(error) {
                     expect(error).to.exist;
                     expect(userStorageStub.removeList.calledOnce).to.be.true;
-                    expect(appConfigStorageStub.storeList.calledOnce).to.be.true;
+                    expect(appConfigStorageStub.store.calledOnce).to.be.true;
 
                     done();
                 });
@@ -257,7 +257,7 @@ describe('UpdateHandler', function() {
                 updateHandler.update().catch(function(error) {
                     expect(error).to.exist;
                     expect(userStorageStub.removeList.calledOnce).to.be.true;
-                    expect(appConfigStorageStub.storeList.called).to.be.false;
+                    expect(appConfigStorageStub.store.called).to.be.false;
 
                     done();
                 });
@@ -291,16 +291,16 @@ describe('UpdateHandler', function() {
             it('should add gmail as mail service provider with email address and no provider present in db', function(done) {
                 appConfigStorageStub.listItems.withArgs(EMAIL_ADDR_DB_KEY).returns(resolves([emailaddress]));
                 appConfigStorageStub.listItems.withArgs(PROVIDER_DB_KEY).returns(resolves([]));
-                appConfigStorageStub.storeList.withArgs([4], versionDbType).returns(resolves());
-                appConfigStorageStub.storeList.withArgs(['gmail'], PROVIDER_DB_KEY).returns(resolves());
-                appConfigStorageStub.storeList.withArgs([emailaddress], USERNAME_DB_KEY).returns(resolves());
-                appConfigStorageStub.storeList.withArgs([imap], IMAP_DB_KEY).returns(resolves());
-                appConfigStorageStub.storeList.withArgs([smtp], SMTP_DB_KEY).returns(resolves());
-                appConfigStorageStub.storeList.withArgs([''], REALNAME_DB_KEY).returns(resolves());
+                appConfigStorageStub.store.withArgs(4, versionDbType).returns(resolves());
+                appConfigStorageStub.store.withArgs('gmail', PROVIDER_DB_KEY).returns(resolves());
+                appConfigStorageStub.store.withArgs(emailaddress, USERNAME_DB_KEY).returns(resolves());
+                appConfigStorageStub.store.withArgs(imap, IMAP_DB_KEY).returns(resolves());
+                appConfigStorageStub.store.withArgs(smtp, SMTP_DB_KEY).returns(resolves());
+                appConfigStorageStub.store.withArgs('', REALNAME_DB_KEY).returns(resolves());
                 authStub._loadCredentials.returns(resolves());
 
                 updateHandler.update().then(function() {
-                    expect(appConfigStorageStub.storeList.callCount).to.equal(6);
+                    expect(appConfigStorageStub.store.callCount).to.equal(6);
                     expect(appConfigStorageStub.listItems.calledThrice).to.be.true;
                     expect(authStub._loadCredentials.calledOnce).to.be.true;
 
@@ -311,10 +311,10 @@ describe('UpdateHandler', function() {
             it('should not add a provider when no email adress is in db', function(done) {
                 appConfigStorageStub.listItems.withArgs(EMAIL_ADDR_DB_KEY).returns(resolves([]));
                 appConfigStorageStub.listItems.withArgs(PROVIDER_DB_KEY).returns(resolves([]));
-                appConfigStorageStub.storeList.withArgs([4], versionDbType).returns(resolves());
+                appConfigStorageStub.store.withArgs(4, versionDbType).returns(resolves());
 
                 updateHandler.update().then(function() {
-                    expect(appConfigStorageStub.storeList.calledOnce).to.be.true;
+                    expect(appConfigStorageStub.store.calledOnce).to.be.true;
                     expect(appConfigStorageStub.listItems.calledThrice).to.be.true;
 
                     done();
@@ -323,12 +323,12 @@ describe('UpdateHandler', function() {
 
             it('should fail when appConfigStore write fails', function(done) {
                 appConfigStorageStub.listItems.returns(resolves([]));
-                appConfigStorageStub.storeList.returns(rejects(new Error()));
+                appConfigStorageStub.store.returns(rejects(new Error()));
 
                 updateHandler.update().catch(function(error) {
                     expect(error).to.exist;
                     expect(appConfigStorageStub.listItems.calledThrice).to.be.true;
-                    expect(appConfigStorageStub.storeList.calledOnce).to.be.true;
+                    expect(appConfigStorageStub.store.calledOnce).to.be.true;
 
                     done();
                 });
@@ -336,12 +336,12 @@ describe('UpdateHandler', function() {
 
             it('should fail when appConfigStore read fails', function(done) {
                 appConfigStorageStub.listItems.withArgs(EMAIL_ADDR_DB_KEY).returns(rejects(new Error()));
-                appConfigStorageStub.storeList.returns(rejects(new Error()));
+                appConfigStorageStub.store.returns(rejects(new Error()));
 
                 updateHandler.update().catch(function(error) {
                     expect(error).to.exist;
                     expect(appConfigStorageStub.listItems.calledTwice).to.be.true;
-                    expect(appConfigStorageStub.storeList.called).to.be.false;
+                    expect(appConfigStorageStub.store.called).to.be.false;
 
                     done();
                 });
@@ -399,8 +399,8 @@ describe('UpdateHandler', function() {
                     }]
                 ]));
 
-                userStorageStub.storeList.withArgs([
-                    [{
+                userStorageStub.store.withArgs([
+                    {
                         name: 'inbox1',
                         type: FOLDER_TYPE_INBOX
                     }, {
@@ -412,15 +412,15 @@ describe('UpdateHandler', function() {
                     }, {
                         name: 'trash1',
                         type: FOLDER_TYPE_TRASH
-                    }]
+                    }
                 ], FOLDER_DB_TYPE).returns(resolves());
 
-                appConfigStorageStub.storeList.withArgs([POST_UPDATE_DB_VERSION], VERSION_DB_TYPE).returns(resolves());
+                appConfigStorageStub.store.withArgs(POST_UPDATE_DB_VERSION, VERSION_DB_TYPE).returns(resolves());
 
                 updateHandler.update().then(function() {
                     expect(userStorageStub.listItems.calledOnce).to.be.true;
-                    expect(userStorageStub.storeList.calledOnce).to.be.true;
-                    expect(appConfigStorageStub.storeList.calledOnce).to.be.true;
+                    expect(userStorageStub.store.calledOnce).to.be.true;
+                    expect(appConfigStorageStub.store.calledOnce).to.be.true;
 
                     done();
                 });
@@ -428,14 +428,14 @@ describe('UpdateHandler', function() {
 
             it('should fail when persisting database version fails', function(done) {
                 userStorageStub.listItems.returns(resolves([]));
-                userStorageStub.storeList.returns(resolves());
-                appConfigStorageStub.storeList.returns(rejects(new Error()));
+                userStorageStub.store.returns(resolves());
+                appConfigStorageStub.store.returns(rejects(new Error()));
 
                 updateHandler.update().catch(function(error) {
                     expect(error).to.exist;
                     expect(userStorageStub.listItems.calledOnce).to.be.true;
-                    expect(userStorageStub.storeList.calledOnce).to.be.true;
-                    expect(appConfigStorageStub.storeList.calledOnce).to.be.true;
+                    expect(userStorageStub.store.calledOnce).to.be.true;
+                    expect(appConfigStorageStub.store.calledOnce).to.be.true;
 
                     done();
                 });
@@ -443,13 +443,13 @@ describe('UpdateHandler', function() {
 
             it('should fail when persisting folders fails', function(done) {
                 userStorageStub.listItems.returns(resolves([]));
-                userStorageStub.storeList.returns(rejects(new Error()));
+                userStorageStub.store.returns(rejects(new Error()));
 
                 updateHandler.update().catch(function(error) {
                     expect(error).to.exist;
                     expect(userStorageStub.listItems.calledOnce).to.be.true;
-                    expect(userStorageStub.storeList.calledOnce).to.be.true;
-                    expect(appConfigStorageStub.storeList.called).to.be.false;
+                    expect(userStorageStub.store.calledOnce).to.be.true;
+                    expect(appConfigStorageStub.store.called).to.be.false;
 
                     done();
                 });
@@ -461,8 +461,8 @@ describe('UpdateHandler', function() {
                 updateHandler.update().catch(function(error) {
                     expect(error).to.exist;
                     expect(userStorageStub.listItems.calledOnce).to.be.true;
-                    expect(userStorageStub.storeList.called).to.be.false;
-                    expect(appConfigStorageStub.storeList.called).to.be.false;
+                    expect(userStorageStub.store.called).to.be.false;
+                    expect(appConfigStorageStub.store.called).to.be.false;
 
                     done();
                 });
@@ -485,11 +485,11 @@ describe('UpdateHandler', function() {
 
             it('should work', function(done) {
                 userStorageStub.removeList.withArgs(emailDbType).returns(resolves());
-                appConfigStorageStub.storeList.withArgs([6], versionDbType).returns(resolves());
+                appConfigStorageStub.store.withArgs(6, versionDbType).returns(resolves());
 
                 updateHandler.update().then(function() {
                     expect(userStorageStub.removeList.calledOnce).to.be.true;
-                    expect(appConfigStorageStub.storeList.calledOnce).to.be.true;
+                    expect(appConfigStorageStub.store.calledOnce).to.be.true;
 
                     done();
                 });
@@ -497,12 +497,12 @@ describe('UpdateHandler', function() {
 
             it('should fail when persisting database version fails', function(done) {
                 userStorageStub.removeList.returns(resolves());
-                appConfigStorageStub.storeList.returns(rejects(new Error()));
+                appConfigStorageStub.store.returns(rejects(new Error()));
 
                 updateHandler.update().catch(function(error) {
                     expect(error).to.exist;
                     expect(userStorageStub.removeList.calledOnce).to.be.true;
-                    expect(appConfigStorageStub.storeList.calledOnce).to.be.true;
+                    expect(appConfigStorageStub.store.calledOnce).to.be.true;
 
                     done();
                 });
@@ -514,7 +514,7 @@ describe('UpdateHandler', function() {
                 updateHandler.update().catch(function(error) {
                     expect(error).to.exist;
                     expect(userStorageStub.removeList.calledOnce).to.be.true;
-                    expect(appConfigStorageStub.storeList.called).to.be.false;
+                    expect(appConfigStorageStub.store.called).to.be.false;
 
                     done();
                 });

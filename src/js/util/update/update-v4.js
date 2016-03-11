@@ -40,19 +40,19 @@ function update(options) {
         // for any other situation, we're good.
         if (!(emailAddress && !provider)) {
             // update the database version to POST_UPDATE_DB_VERSION
-            return options.appConfigStorage.storeList([POST_UPDATE_DB_VERSION], VERSION_DB_TYPE);
+            return options.appConfigStorage.store(POST_UPDATE_DB_VERSION, VERSION_DB_TYPE);
         }
 
         // add the missing provider key
-        var storeProvider = options.appConfigStorage.storeList(['gmail'], PROVIDER_DB_KEY);
+        var storeProvider = options.appConfigStorage.store('gmail', PROVIDER_DB_KEY);
         // add the missing user name key
-        var storeAdress = options.appConfigStorage.storeList([emailAddress], USERNAME_DB_KEY);
+        var storeAdress = options.appConfigStorage.store(emailAddress, USERNAME_DB_KEY);
         // add the missing imap host info key
-        var storeImap = options.appConfigStorage.storeList([imap], IMAP_DB_KEY);
+        var storeImap = options.appConfigStorage.store(imap, IMAP_DB_KEY);
         // add the missing empty real name
-        var storeEmptyName = options.appConfigStorage.storeList([''], REALNAME_DB_KEY);
+        var storeEmptyName = options.appConfigStorage.store('', REALNAME_DB_KEY);
         // add the missing smtp host info key
-        var storeSmtp = options.appConfigStorage.storeList([smtp], SMTP_DB_KEY);
+        var storeSmtp = options.appConfigStorage.store(smtp, SMTP_DB_KEY);
 
         return Promise.all([storeProvider, storeAdress, storeImap, storeEmptyName, storeSmtp]).then(function() {
             // reload the credentials
@@ -61,7 +61,7 @@ function update(options) {
 
         }).then(function() {
             // update the database version to POST_UPDATE_DB_VERSION
-            return options.appConfigStorage.storeList([POST_UPDATE_DB_VERSION], VERSION_DB_TYPE);
+            return options.appConfigStorage.store(POST_UPDATE_DB_VERSION, VERSION_DB_TYPE);
         });
     });
 

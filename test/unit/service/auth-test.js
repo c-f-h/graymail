@@ -52,7 +52,7 @@ describe('Auth unit tests', function() {
             storageStub.init.withArgs(APP_CONFIG_DB_NAME).returns(resolves());
             return auth.init().then(function() {
                 expect(auth._initialized).to.be.true;
-                expect(storageStub.storeList.calledWith([cfg.dbVersion], DB_VERSION_KEY)).to.be.true;
+                expect(storageStub.store.calledWith(cfg.dbVersion, DB_VERSION_KEY)).to.be.true;
             });
         });
         it('should not overwrite a previous DB version', function() {
@@ -61,6 +61,7 @@ describe('Auth unit tests', function() {
             return auth.init().then(function() {
                 expect(auth._initialized).to.be.true;
                 expect(storageStub.listItems.calledWith(DB_VERSION_KEY)).to.be.true;
+                expect(storageStub.store.called).to.be.false;
                 expect(storageStub.storeList.called).to.be.false;
             });
         });
@@ -137,15 +138,15 @@ describe('Auth unit tests', function() {
             auth.smtp = smtp;
             auth.imap = imap;
 
-            storageStub.storeList.withArgs([password], PASSWD_DB_KEY).returns(resolves());
-            storageStub.storeList.withArgs([emailAddress], EMAIL_ADDR_DB_KEY).returns(resolves());
-            storageStub.storeList.withArgs([username], USERNAME_DB_KEY).returns(resolves());
-            storageStub.storeList.withArgs([realname], REALNAME_DB_KEY).returns(resolves());
-            storageStub.storeList.withArgs([imap], IMAP_DB_KEY).returns(resolves());
-            storageStub.storeList.withArgs([smtp], SMTP_DB_KEY).returns(resolves());
+            storageStub.store.withArgs(password, PASSWD_DB_KEY).returns(resolves());
+            storageStub.store.withArgs(emailAddress, EMAIL_ADDR_DB_KEY).returns(resolves());
+            storageStub.store.withArgs(username, USERNAME_DB_KEY).returns(resolves());
+            storageStub.store.withArgs(realname, REALNAME_DB_KEY).returns(resolves());
+            storageStub.store.withArgs(imap, IMAP_DB_KEY).returns(resolves());
+            storageStub.store.withArgs(smtp, SMTP_DB_KEY).returns(resolves());
 
             auth.storeCredentials().then(function() {
-                expect(storageStub.storeList.callCount).to.equal(6);
+                expect(storageStub.store.callCount).to.equal(6);
 
                 done();
             });

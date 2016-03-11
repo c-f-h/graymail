@@ -81,10 +81,10 @@ describe('Outbox unit test', function() {
                 bcc: []
             };
 
-            devicestorageStub.storeList.withArgs([mail]).returns(resolves());
+            devicestorageStub.store.withArgs(mail).returns(resolves());
 
             return outbox.put(mail).then(function() {
-                expect(devicestorageStub.storeList.calledOnce).to.be.true;
+                expect(devicestorageStub.store.calledOnce).to.be.true;
             });
         });
     });

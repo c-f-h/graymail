@@ -17,16 +17,15 @@ describe('Device Storage DAO unit tests', function() {
     afterEach(function() {});
 
     describe('init', function() {
-        it('should work', function(done) {
+        it('should work', function() {
             lawnchairDaoStub.init.returns(resolves());
 
-            storageDao.init(testUser).then(function() {
+            return storageDao.init(testUser).then(function() {
                 expect(lawnchairDaoStub.init.calledOnce).to.be.true;
-                done();
             });
         });
 
-        it('should fail', function(done) {
+        it('should fail', function() {
             lawnchairDaoStub.init.returns(rejects(new Error()));
 
             storageDao.init(testUser).catch(function(err) {
@@ -37,7 +36,19 @@ describe('Device Storage DAO unit tests', function() {
         });
     });
 
-    describe('store list', function() {
+    describe('#store', function() {
+        it('should work', function() {
+            lawnchairDaoStub.persist.returns(resolves(42));
+
+            var obj = {foo: 42, bar: 'xyzzy'};
+            var key = 'myKey';
+            return storageDao.store(obj, key).then(function() {
+                expect(lawnchairDaoStub.persist.calledWith(key, obj)).to.be.true;
+            });
+        })
+    });
+
+    describe('#storeList', function() {
         it('should fail', function(done) {
             var list = [{}];
 
@@ -47,22 +58,21 @@ describe('Device Storage DAO unit tests', function() {
             });
         });
 
-        it('should work with empty list', function(done) {
+        it('should work with empty list', function() {
             var list = [];
 
-            storageDao.storeList(list, 'email').then(done);
+            return storageDao.storeList(list, 'email');
         });
 
-        it('should work', function(done) {
+        it('should work', function() {
             lawnchairDaoStub.batch.returns(resolves());
 
             var list = [{
                 foo: 'bar'
             }];
 
-            storageDao.storeList(list, 'email').then(function() {
+            return storageDao.storeList(list, 'email').then(function() {
                 expect(lawnchairDaoStub.batch.calledOnce).to.be.true;
-                done();
             });
         });
     });

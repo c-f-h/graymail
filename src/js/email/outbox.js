@@ -67,7 +67,7 @@ Outbox.prototype.put = function(mail) {
     mail.uid = mail.id = uuid.v4(); // the mail needs a random id & uid for storage in the database
 
     // store in outbox
-    return self._devicestorage.storeList([mail], outboxDb).then(function() {
+    return self._devicestorage.store(mail, outboxDb).then(function() {
         // don't wait for next round
         self._processOutbox(self._onUpdate);
     });

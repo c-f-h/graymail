@@ -34,11 +34,11 @@ function update(options) {
                 folders.splice(folders.indexOf(foldersForType[i]), 1);
             }
         });
-        return options.userStorage.storeList([folders], FOLDER_DB_TYPE);
+        return options.userStorage.store(folders, FOLDER_DB_TYPE);
 
     }).then(function() {
         // update the database version to POST_UPDATE_DB_VERSION
-        return options.appConfigStorage.storeList([POST_UPDATE_DB_VERSION], VERSION_DB_TYPE);
+        return options.appConfigStorage.store(POST_UPDATE_DB_VERSION, VERSION_DB_TYPE);
     });
 }
 

@@ -51,10 +51,9 @@ LawnchairDAO.prototype.persist = function(key, object) {
         }, function(persisted) {
             if (persisted.key !== key) {
                 reject(new Error('Persisting failed!'));
-                return;
+            } else {
+                resolve();
             }
-
-            resolve();
         });
     });
 };
