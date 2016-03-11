@@ -333,6 +333,11 @@ describe('Email DAO integration tests', function() {
                     });
                 }).then(function(folder) {
                     expect(folder.exists).to.equal(1);
+                    return new Promise(function (resolve) {
+                        setTimeout(resolve, 10);    // give time for the onselectmailbox handler to run
+                    });
+                }).then(function() {
+                    expect(inbox.messages).to.have.lengthOf(19);
                 });
             });
 
