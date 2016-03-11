@@ -217,8 +217,10 @@ ImapClient.prototype._onSelectMailbox = function(client, path, info) {
             // update mailbox info
             cached.uidlist = imapUidList;
 
+            axe.debug(DEBUG_TAG, '+' + deltaNew.length + ' -' + deltaDeleted.length +
+                    ' messages in ' + path);
+
             if (!firstUpdate) {
-                axe.debug(DEBUG_TAG, 'no changes in message count in ' + path + '. exists: ' + info.exists + ', uidNext: ' + info.uidNext);
                 self._checkModseq({
                     highestModseq: info.highestModseq,
                     client: client
