@@ -1012,10 +1012,6 @@ describe('Email DAO unit tests', function() {
 
     describe('internal API', function() {
         describe('#_updateFolders', function() {
-            beforeEach(function() {
-                sinon.stub(dao, 'getBody');
-            });
-
             it('should initialize from imap if online', function() {
                 account.folders = [];
                 inboxFolder.uids = [7];
@@ -1053,17 +1049,9 @@ describe('Email DAO unit tests', function() {
                     return true;
                 }), 'folders').returns(resolves());
 
-                dao.getBody.withArgs({
-                    folder: inboxFolder,
-                    messages: [{
-                        uid: 7
-                    }]
-                }).returns(resolves());
-
                 return dao._updateFolders().then(function() {
                     expect(imapClientStub.listWellKnownFolders.calledOnce).to.be.true;
                     expect(devicestorageStub.storeList.calledOnce).to.be.true;
-                    expect(dao.getBody.calledOnce).to.be.true;
                 });
             });
 
@@ -1110,7 +1098,6 @@ describe('Email DAO unit tests', function() {
                 return dao._updateFolders().then(function() {
                     expect(imapClientStub.listWellKnownFolders.calledOnce).to.be.true;
                     expect(devicestorageStub.storeList.calledOnce).to.be.true;
-                    expect(dao.getBody.called).to.be.false;
                 });
             });
         });
