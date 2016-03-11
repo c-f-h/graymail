@@ -85,7 +85,7 @@ Email.prototype.init = function(options) {
     // fetch folders from idb
     return self._devicestorage.listItems(FOLDER_DB_TYPE, true).then(function(stored) {
         self._account.folders = stored[0] || [];
-        return self._initFolders();
+        self._initFolders();
     });
 };
 
@@ -290,8 +290,8 @@ Email.prototype.moveMessage = function(options) {
 
 /**
  * Streams message content
- * @param {Object} options.message The message for which to retrieve the body
- * @param {Object} options.folder The IMAP folder
+ * @param {Object} options.messages The messages for which to retrieve the body
+ * @param {Object} options.folder   The IMAP folder
  * @return {Promise}
  * @resolve {Object}    The message object that was streamed
  */
@@ -619,7 +619,11 @@ Email.prototype.connectImap = function(imap) {
             return;
         }
 
-        return self.openFolder(inbox).then(function() {
+        return self.openFolder(inbox).then(function(info) {
+            // HACK: force onSyncUpdate() before we go on
+            return self._imapClient._onSelectMailbox(self._imapClient._client, inbox.path, info);
+
+        }).then(function() {
             // set up the imap client to listen for changes in the inbox
             self._imapClient.listenForChanges({
                 path: inbox.path
@@ -908,13 +912,24 @@ Email.prototype._updateFolders = function() {
             }
         });
 
+        self._initFolders();
+
         // if folders have not changed, can fill them with messages directly
         if (foldersChanged) {
             return self._localStoreFolders();
         }
 
-    }).then(function() {
-        return self._initFolders();
+    /*}).then(function() {
+
+        var inbox = _.findWhere(self._account.folders, {
+            type: FOLDER_TYPE_INBOX
+        });
+        if (inbox && inbox.messages.length) {
+            return self.getBody({
+                folder: inbox,
+                messages: inbox.messages.slice(-30)
+            }).catch(self._dialog.error);
+        }*/
 
     }).then(function() {
         self.done();
@@ -925,6 +940,9 @@ Email.prototype._updateFolders = function() {
     });
 };
 
+/**
+ * Initialize each folder in this._account.folders to sensible defaults.
+ */
 Email.prototype._initFolders = function() {
     var self = this;
 
@@ -942,16 +960,6 @@ Email.prototype._initFolders = function() {
             };
         });
     });
-
-    var inbox = _.findWhere(self._account.folders, {
-        type: FOLDER_TYPE_INBOX
-    });
-    if (inbox && inbox.messages.length) {
-        return self.getBody({
-            folder: inbox,
-            messages: inbox.messages.slice(-30)
-        }).catch(self._dialog.error);
-    }
 };
 
 Email.prototype.busy = function() {

@@ -138,10 +138,10 @@ ImapClient.prototype._onError = function(client, err) {
  * Executed whenever 'onselectmailbox' event is emitted in emailjs-imap-client
  *
  * @param {Object} client Listening client object
- * @param {String} path Path to currently opened mailbox
- * @param {Object} mailbox Information object for the opened mailbox
+ * @param {String} path   Path to currently opened mailbox
+ * @param {Object} info   Information object for the opened mailbox
  */
-ImapClient.prototype._onSelectMailbox = function(client, path, mailbox) {
+ImapClient.prototype._onSelectMailbox = function(client, path, info) {
     var self = this,
         cached;
 
@@ -170,16 +170,16 @@ ImapClient.prototype._onSelectMailbox = function(client, path, mailbox) {
 
     // if exists count does not match, there might be new messages
     // if exists count matches but uidNext is different, then something has been deleted and something added
-    if (cached.exists !== mailbox.exists || cached.uidNext !== mailbox.uidNext) {
-        axe.debug(DEBUG_TAG, 'possible updates available in ' + path + '. exists: ' + mailbox.exists + ', uidNext: ' + mailbox.uidNext);
+    if (cached.exists !== info.exists || cached.uidNext !== info.uidNext) {
+        axe.debug(DEBUG_TAG, 'possible updates available in ' + path + '. exists: ' + info.exists + ', uidNext: ' + info.uidNext);
 
         var firstUpdate = cached.exists === 0;
 
-        cached.exists = mailbox.exists;
-        cached.uidNext = mailbox.uidNext;
+        cached.exists = info.exists;
+        cached.uidNext = info.uidNext;
 
         // list all uid values in the selected mailbox
-        self.search({
+        return self.search({
             path: path,
             client: client
         }).then(function(imapUidList) {
@@ -187,9 +187,7 @@ ImapClient.prototype._onSelectMailbox = function(client, path, mailbox) {
             cached.uidlist = cached.uidlist || [];
 
             // determine deleted uids
-            var deltaDeleted = cached.uidlist.filter(function(i) {
-                return imapUidList.indexOf(i) < 0;
-            });
+            var deltaDeleted = _.difference(cached.uidlist, imapUidList);
 
             // notify about deleted messages
             if (deltaDeleted.length) {
@@ -220,9 +218,9 @@ ImapClient.prototype._onSelectMailbox = function(client, path, mailbox) {
             cached.uidlist = imapUidList;
 
             if (!firstUpdate) {
-                axe.debug(DEBUG_TAG, 'no changes in message count in ' + path + '. exists: ' + mailbox.exists + ', uidNext: ' + mailbox.uidNext);
+                axe.debug(DEBUG_TAG, 'no changes in message count in ' + path + '. exists: ' + info.exists + ', uidNext: ' + info.uidNext);
                 self._checkModseq({
-                    highestModseq: mailbox.highestModseq,
+                    highestModseq: info.highestModseq,
                     client: client
                 }).catch(function(error) {
                     axe.error(DEBUG_TAG, 'error checking modseq: ' + error + '\n' + error.stack);
@@ -231,9 +229,9 @@ ImapClient.prototype._onSelectMailbox = function(client, path, mailbox) {
         });
     } else {
         // check for changed flags
-        axe.debug(DEBUG_TAG, 'no changes in message count in ' + path + '. exists: ' + mailbox.exists + ', uidNext: ' + mailbox.uidNext);
-        self._checkModseq({
-            highestModseq: mailbox.highestModseq,
+        axe.debug(DEBUG_TAG, 'no changes in message count in ' + path + '. exists: ' + info.exists + ', uidNext: ' + info.uidNext);
+        return self._checkModseq({
+            highestModseq: info.highestModseq,
             client: client
         }).catch(function(error) {
             axe.error(DEBUG_TAG, 'error checking modseq: ' + error + '\n' + error.stack);
@@ -297,7 +295,6 @@ ImapClient.prototype._onUpdate = function(client, path, type, value) {
             }
 
             imapUidList.sort(sortNumericallyDescending);
-            axe.debug(DEBUG_TAG, 'new uids in ' + path + ': ' + imapUidList);
             // update cahced uid list
             cached.uidlist = cached.uidlist.concat(imapUidList);
             // predict the next UID, might not be the actual value set by the server
@@ -357,9 +354,7 @@ ImapClient.prototype._checkModseq = function(options) {
     // the highestModseq value would give us a false positive.
     if (!client.hasCapability('CONDSTORE') || !highestModseq || !path) {
         axe.info(DEBUG_TAG, 'can not check MODSEQ, server does not support CONDSTORE extension');
-        return new Promise(function(resolve) {
-            resolve([]);
-        });
+        return Promise.resolve([]);
     }
 
     var cached = self.mailboxCache[path];

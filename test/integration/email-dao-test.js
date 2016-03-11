@@ -265,6 +265,7 @@ describe('Email DAO integration tests', function() {
             sinon.stub(accountService._emailDao, 'isOnline').returns(true);
             return accountService._emailDao.connectImap(imapClient);
         }).then(function() {
+            console.log('<<<<< CONNECT COMPLETED >>>>>');
             inbox = emailDao._account.folders.filter(function(folder) {
                 return folder.path === 'INBOX';
             }).pop();
