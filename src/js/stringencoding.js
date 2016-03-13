@@ -4,6 +4,6 @@
 // is very large) with the native classes.
 
 module.exports = {
-    TextEncoder: window.TextEncoder,
-    TextDecoder: window.TextDecoder
+    TextEncoder: TextEncoder,
+    TextDecoder: TextDecoder
 };
