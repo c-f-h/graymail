@@ -376,7 +376,7 @@ Email.prototype.getBody = function(options) {
 
         messages.forEach(function(message) {
             var job = self._extractBody(message).catch(function(err) {
-                axe.error('Can extract body for message uid ' + message.uid + ' . Reason: ' + err.message + (err.stack ? ('\n' + err.stack) : ''));
+                axe.error('Cannot extract body for message uid ' + message.uid + ' . Reason: ' + err.message + (err.stack ? ('\n' + err.stack) : ''));
             });
             jobs.push(job);
         });
