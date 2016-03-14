@@ -686,21 +686,17 @@ describe('Email DAO unit tests', function() {
     });
 
     describe('#getAttachment', function() {
-        var imapGetStub, uid;
+        var getBodyPartsStub, uid;
 
         beforeEach(function() {
             uid = 123456;
-            imapGetStub = sinon.stub(dao, '_getBodyParts');
+            getBodyPartsStub = sinon.stub(dao, '_getBodyParts');
         });
 
         it('should fetch an attachment from imap', function() {
             var attmt = {};
 
-            imapGetStub.withArgs({
-                folder: inboxFolder,
-                uid: uid,
-                bodyParts: [attmt]
-            }).returns(resolves([{
+            getBodyPartsStub.withArgs(inboxFolder, uid, [attmt]).returns(resolves([{
                 content: 'CONTENT!!!'
             }]));
 
@@ -711,14 +707,14 @@ describe('Email DAO unit tests', function() {
             }).then(function(fetchedAttmt) {
                 expect(fetchedAttmt).to.equal(attmt);
                 expect(attmt.content).to.not.be.empty;
-                expect(imapGetStub.calledOnce).to.be.true;
+                expect(getBodyPartsStub.calledOnce).to.be.true;
             });
         });
 
         it('should error during fetch', function(done) {
             var attmt = {};
 
-            imapGetStub.returns(resolves());
+            getBodyPartsStub.returns(resolves());
 
             dao.getAttachment({
                 folder: inboxFolder,
@@ -726,7 +722,7 @@ describe('Email DAO unit tests', function() {
                 attachment: attmt
             }).catch(function(err) {
                 expect(err).to.exist;
-                expect(imapGetStub.calledOnce).to.be.true;
+                expect(getBodyPartsStub.calledOnce).to.be.true;
 
                 done();
             });
@@ -1183,11 +1179,11 @@ describe('Email DAO unit tests', function() {
                     emails: [messages[1]]
                 }).returns(resolves());
                 localStoreFoldersStub.returns(resolves());
-                getBodyPartsStub.withArgs({
-                    folder: inboxFolder,
-                    uid: messages[0].uid,
-                    bodyParts: messages[0].bodyParts
-                }).returns(resolves(messages[0].bodyParts));
+                getBodyPartsStub.withArgs(
+                    inboxFolder,
+                    messages[0].uid,
+                    messages[0].bodyParts
+                ).returns(resolves(messages[0].bodyParts));
 
                 return dao._fetchMessages({
                     folder: inboxFolder,
@@ -1250,19 +1246,10 @@ describe('Email DAO unit tests', function() {
                     content: 'bender is great! bender is great!'
                 }];
 
-                imapClientStub.getBodyParts.withArgs({
-                    folder: inboxFolder,
-                    path: inboxFolder.path,
-                    uid: 123,
-                    bodyParts: bp
-                }).returns(resolves(bp));
+                imapClientStub.getBodyParts.withArgs(inboxFolder.path, 123, bp).returns(resolves(bp));
                 parseStub.yieldsAsync(null, []);
 
-                return dao._getBodyParts({
-                    folder: inboxFolder,
-                    uid: 123,
-                    bodyParts: bp
-                }).then(function(parts) {
+                return dao._getBodyParts(inboxFolder, 123, bp).then(function(parts) {
                     expect(parts).to.exist;
 
                     expect(imapClientStub.getBodyParts.calledOnce).to.be.true;
@@ -1275,19 +1262,10 @@ describe('Email DAO unit tests', function() {
                     type: 'text'
                 }];
 
-                imapClientStub.getBodyParts.withArgs({
-                    folder: inboxFolder,
-                    path: inboxFolder.path,
-                    uid: 123,
-                    bodyParts: bp
-                }).returns(resolves());
+                imapClientStub.getBodyParts.withArgs(inboxFolder.path, 123, bp).returns(resolves());
                 parseStub.yieldsAsync(null, []);
 
-                dao._getBodyParts({
-                    folder: inboxFolder,
-                    uid: 123,
-                    bodyParts: bp
-                }).catch(function(err) {
+                dao._getBodyParts(inboxFolder, 123, bp).catch(function(err) {
                     expect(err).to.exist;
 
                     expect(imapClientStub.getBodyParts.calledOnce).to.be.true;
@@ -1300,11 +1278,7 @@ describe('Email DAO unit tests', function() {
             it('should fail when getBody fails', function(done) {
                 imapClientStub.getBodyParts.returns(rejects({}));
 
-                dao._getBodyParts({
-                    folder: inboxFolder,
-                    uid: 123,
-                    bodyParts: []
-                }).catch(function(err) {
+                dao._getBodyParts(inboxFolder, 123, []).catch(function(err) {
                     expect(err).to.exist;
 
                     expect(imapClientStub.getBodyParts.calledOnce).to.be.true;
@@ -1317,11 +1291,7 @@ describe('Email DAO unit tests', function() {
             it('should fail when getBody fails', function(done) {
                 imapClientStub.getBodyParts.returns(rejects({}));
 
-                dao._getBodyParts({
-                    folder: inboxFolder,
-                    uid: 123,
-                    bodyParts: []
-                }).catch(function(err) {
+                dao._getBodyParts(inboxFolder, 123, []).catch(function(err) {
                     expect(err).to.exist;
 
                     expect(imapClientStub.getBodyParts.calledOnce).to.be.true;

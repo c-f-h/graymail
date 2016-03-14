@@ -801,15 +801,16 @@ ImapClient.prototype.listMessages = function(options) {
 
  * @returns {Promise<Array>} Body parts that have been received from the server
  */
-ImapClient.prototype.getBodyParts = function(options) {
+ImapClient.prototype.getBodyParts = function(path, uid, bodyParts) {
     var self = this,
         query = [],
         queryOptions = {
             byUid: true,
-            precheck: self._ensurePath(options.path)
+            precheck: self._ensurePath(path)
         },
-        interval = options.uid + ':' + options.uid,
-        bodyParts = options.bodyParts || [];
+        interval = uid + ':' + uid;
+
+    bodyParts = bodyParts || [];
 
     // formulate a query for each text part. for part 2.1 to be parsed, we need 2.1.MIME and 2.1
     bodyParts.forEach(function(bodyPart) {
@@ -831,11 +832,11 @@ ImapClient.prototype.getBodyParts = function(options) {
         });
     }
 
-    axe.debug(DEBUG_TAG, 'retrieving body parts for uid ' + options.uid + ' in folder ' + options.path + ': ' + query);
+    axe.debug(DEBUG_TAG, 'retrieving body parts for uid ' + uid + ' in folder ' + path + ': ' + query);
     return self._checkOnline().then(function() {
-        return self._client.listMessages(options.path, interval, query, queryOptions);
+        return self._client.listMessages(path, interval, query, queryOptions);
     }).then(function(messages) {
-        axe.debug(DEBUG_TAG, 'successfully retrieved body parts for uid ' + options.uid + ' in folder ' + options.path + ': ' + query);
+        axe.debug(DEBUG_TAG, 'successfully retrieved body parts for uid ' + uid + ' in folder ' + path + ': ' + query);
 
         var message = messages[0];
         if (!message) {
@@ -859,7 +860,7 @@ ImapClient.prototype.getBodyParts = function(options) {
 
         return bodyParts;
     }).catch(function(error) {
-        axe.error(DEBUG_TAG, 'error fetching body parts for uid ' + options.uid + ' in folder ' + options.path + ': ' + error + '\n' + error.stack);
+        axe.error(DEBUG_TAG, 'error fetching body parts for uid ' + uid + ' in folder ' + path + ': ' + error + '\n' + error.stack);
         throw error;
     });
 };

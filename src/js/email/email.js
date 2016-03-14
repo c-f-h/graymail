@@ -416,11 +416,7 @@ Email.prototype.getAttachment = function(options) {
         attachment = options.attachment;
 
     attachment.busy = true;
-    return self._getBodyParts({
-        folder: options.folder,
-        uid: options.uid,
-        bodyParts: [attachment]
-    }).then(function(parsedBodyParts) {
+    return self._getBodyParts(options.folder, options.uid, [attachment]).then(function(parsedBodyParts) {
         attachment.busy = false;
         // add the content to the original object
         attachment.content = parsedBodyParts[0].content;
@@ -1099,11 +1095,7 @@ Email.prototype._fetchMessages = function(options) {
             }
 
             // do the imap roundtrip
-            var job = self._getBodyParts({
-                folder: folder,
-                uid: message.uid,
-                bodyParts: contentParts
-            }).then(function(parsedBodyParts) {
+            var job = self._getBodyParts(folder, message.uid, contentParts).then(function(parsedBodyParts) {
                 // concat parsed bodyparts and the empty attachment parts
                 message.bodyParts = parsedBodyParts.concat(attachmentParts);
 
@@ -1147,13 +1139,12 @@ Email.prototype._fetchMessages = function(options) {
  * @param {String} options.uid the message's uid
  * @param {Object} options.bodyParts The message parts
  */
-Email.prototype._getBodyParts = function(options) {
+Email.prototype._getBodyParts = function(folder, uid, bodyParts) {
     var self = this;
     return self.checkOnline().then(function() {
-        options.path = options.folder.path;
-        return self._imapClient.getBodyParts(options);
+        return self._imapClient.getBodyParts(folder.path, uid, bodyParts);
     }).then(function() {
-        if (options.bodyParts.filter(function(bodyPart) {
+        if (bodyParts.filter(function(bodyPart) {
                 return !(bodyPart.raw || bodyPart.content);
             }).length) {
             var error = new Error('Can not get the contents of this message. It has already been deleted!');
@@ -1161,7 +1152,7 @@ Email.prototype._getBodyParts = function(options) {
             throw error;
         }
 
-        return self._parse(options);
+        return self._parse(bodyParts);
     });
 };
 
@@ -1276,13 +1267,13 @@ Email.prototype._extractBody = function(message) {
 
 /**
  * Parse an email using the mail reader
- * @param  {Object} options The option to be passed to the mailreader
+ * @param  {Array} bodyParts  The body parts to be passed to the mailreader
  * @return {Promise}
  */
-Email.prototype._parse = function(options) {
+Email.prototype._parse = function(bodyParts) {
     var self = this;
     return new Promise(function(resolve, reject) {
-        self._mailreader.parse(options, function(err, root) {
+        self._mailreader.parse({bodyParts: bodyParts}, function(err, root) {
             if (err) {
                 reject(err);
             } else {
