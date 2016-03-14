@@ -523,11 +523,7 @@ describe('Email DAO unit tests', function() {
                 uid: message.uid
             }).returns(resolves());
 
-            return dao.moveMessage({
-                folder: inboxFolder,
-                destination: sentFolder,
-                message: message
-            }).then(function() {
+            return dao.moveMessage(inboxFolder, sentFolder, message).then(function() {
                 expect(imapMoveStub.calledOnce).to.be.true;
                 expect(localDeleteStub.calledOnce).to.be.true;
                 expect(inboxFolder.messages).to.not.contain(message);
@@ -541,11 +537,7 @@ describe('Email DAO unit tests', function() {
                 uid: message.uid
             }).returns(rejects(new Error()));
 
-            dao.moveMessage({
-                folder: inboxFolder,
-                destination: sentFolder,
-                message: message
-            }).catch(function(err) {
+            dao.moveMessage(inboxFolder, sentFolder, message).catch(function(err) {
                 expect(err).to.exist;
                 expect(imapMoveStub.calledOnce).to.be.true;
                 expect(localDeleteStub.called).to.be.false;
@@ -558,11 +550,7 @@ describe('Email DAO unit tests', function() {
         it('should fail at delete from imap in offline', function(done) {
             account.online = false;
 
-            dao.moveMessage({
-                folder: inboxFolder,
-                destination: sentFolder,
-                message: message
-            }).catch(function(err) {
+            dao.moveMessage(inboxFolder, sentFolder, message).catch(function(err) {
                 expect(err).to.exist;
                 expect(imapMoveStub.called).to.be.false;
                 expect(localDeleteStub.called).to.be.false;

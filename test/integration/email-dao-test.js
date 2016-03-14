@@ -338,11 +338,7 @@ describe('Email DAO integration tests', function() {
 
             it('should move a message', function() {
                 var msg = inbox.messages[0];
-                return emailDao.moveMessage({
-                    folder: inbox,
-                    destination: spam,
-                    message: msg
-                }).then(function() {
+                return emailDao.moveMessage(inbox, spam, msg).then(function() {
                     return emailDao.openFolder({
                         path: '[Gmail]/Spam'
                     });

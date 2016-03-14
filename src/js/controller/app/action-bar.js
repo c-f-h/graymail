@@ -57,11 +57,7 @@ var ActionBarCtrl = function($scope, $q, email, dialog, status) {
             resolve();
 
         }).then(function() {
-            return email.moveMessage({
-                folder: currentFolder(),
-                destination: destination,
-                message: message
-            });
+            return email.moveMessage(currentFolder(), destination, message);
 
         }).then(function() {
             status.update('Online');

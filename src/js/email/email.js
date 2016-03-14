@@ -164,8 +164,9 @@ Email.prototype.deleteMessage = function(folder, message, localOnly) {
  * Please note if you set flags on disk only if you delete from the outbox,
  * since it is not an IMAP folder but a virtual folder that only exists on disk.
  *
- * @param {Object} options.folder The origin folder
- * @param {Object} options.message The message that should change flags
+ * @param {Object}  options.folder    Folder which contains the message
+ * @param {Object}  options.message   The message that should change flags
+ * @param {Boolean} options.localOnly If true, change only in local cache
  * @return {Promise}
  */
 Email.prototype.setFlags = function(options) {
@@ -182,24 +183,24 @@ Email.prototype.setFlags = function(options) {
 
     // don't do a roundtrip to IMAP,
     // especially if you want to mark outbox messages
-    if (options.localOnly || options.folder.path === config.outboxMailboxPath) {
-        return markStorage().then(done).catch(done);
+    if (options.localOnly || folder.path === config.outboxMailboxPath) {
+        return markStorage().then(done, done);
     }
 
     return self.checkOnline().then(function() {
         // mark a message unread/answered on IMAP
         return self._imapMark({
             folder: folder,
-            uid: options.message.uid,
-            unread: options.message.unread,
-            answered: options.message.answered,
-            flagged: options.message.flagged
+            uid: message.uid,
+            unread: message.unread,
+            answered: message.answered,
+            flagged: message.flagged
         });
 
     }).then(function() {
         return markStorage();
 
-    }).then(done).catch(done);
+    }).then(done, done);
 
     function markStorage() {
         // angular pollutes that data transfer objects with helper properties (e.g. $$hashKey),
@@ -207,7 +208,7 @@ Email.prototype.setFlags = function(options) {
         // message from disk, change the flags and re-persist it to disk
         return self._localListMessages({
             folder: folder,
-            uid: options.message.uid,
+            uid: message.uid,
         }).then(function(storedMessages) {
             // set the flags
             var storedMessage = storedMessages[0];
@@ -217,10 +218,10 @@ Email.prototype.setFlags = function(options) {
                 return;
             }
 
-            storedMessage.unread = options.message.unread;
-            storedMessage.flagged = options.message.flagged;
-            storedMessage.answered = options.message.answered;
-            storedMessage.modseq = options.message.modseq || storedMessage.modseq;
+            storedMessage.unread = message.unread;
+            storedMessage.flagged = message.flagged;
+            storedMessage.answered = message.answered;
+            storedMessage.modseq = message.modseq || storedMessage.modseq;
 
             // store
             return self._localStoreMessages({
@@ -242,16 +243,13 @@ Email.prototype.setFlags = function(options) {
 /**
  * Moves a message to another folder
  *
- * @param {Object} options.folder The origin folder
- * @param {Object} options.destination The destination folder
- * @param {Object} options.message The message that should be moved
+ * @param {Object} folder      The origin folder
+ * @param {Object} destination The destination folder
+ * @param {Object} message     The message that should be moved
  * @return {Promise}
  */
-Email.prototype.moveMessage = function(options) {
-    var self = this,
-        folder = options.folder,
-        destination = options.destination,
-        message = options.message;
+Email.prototype.moveMessage = function(folder, destination, message) {
+    var self = this;
 
     self.busy();
     return self.checkOnline().then(function() {
@@ -275,7 +273,7 @@ Email.prototype.moveMessage = function(options) {
             uid: message.uid
         });
 
-    }).then(done).catch(done);
+    }).then(done, done);
 
     function done(err) {
         self.done(); // stop the spinner
@@ -478,7 +476,7 @@ Email.prototype._sendGeneric = function(mail, options) {
         // this should not negatively impact the process of sending
         return self._uploadToSent(rfcText).catch(function() {});
 
-    }).then(done).catch(done);
+    }).then(done, done);
 
     function done(err) {
         self.done(); // stop the spinner
