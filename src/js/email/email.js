@@ -130,10 +130,7 @@ Email.prototype.deleteMessage = function(folder, message, localOnly) {
 
     return self.checkOnline().then(function() {
         // delete from IMAP
-        return self._imapDeleteMessage({
-            folder: folder,
-            uid: message.uid
-        });
+        return self._imapDeleteMessage(folder, message.uid);
 
     }).then(function() {
         return deleteLocal();
@@ -141,10 +138,7 @@ Email.prototype.deleteMessage = function(folder, message, localOnly) {
 
     function deleteLocal() {
         // delete from indexed db
-        return self._localDeleteMessage({
-            folder: folder,
-            uid: message.uid
-        });
+        return self._localDeleteMessage(folder, message.uid);
     }
 
     function done(err) {
@@ -268,10 +262,7 @@ Email.prototype.moveMessage = function(folder, destination, message) {
 
     }).then(function() {
         // delete from local indexed db, will be synced when new folder is opened
-        return self._localDeleteMessage({
-            folder: folder,
-            uid: message.uid
-        });
+        return self._localDeleteMessage(folder, message.uid);
 
     }).then(done, done);
 
@@ -989,29 +980,30 @@ Email.prototype._imapMark = function(options) {
  * If we're in the trash folder or no trash folder is available, this deletes a message from IMAP.
  * Otherwise, it moves a message to the trash folder.
  *
- * @param {Object} options.folder The folder where to find the message
- * @param {Number} options.uid The uid of the message
+ * @param {Object} folder The folder where to find the message
+ * @param {Number} uid The uid of the message
  * @return {Promise}
  */
-Email.prototype._imapDeleteMessage = function(options) {
+Email.prototype._imapDeleteMessage = function(folder, uid) {
     var self = this;
+
     return self.checkOnline().then(function() {
         var trash = _.findWhere(self._account.folders, {
             type: FOLDER_TYPE_TRASH
         });
 
         // there's no known trash folder to move the mail to or we're in the trash folder, so we can purge the message
-        if (!trash || options.folder === trash) {
+        if (!trash || folder === trash) {
             return self._imapClient.deleteMessage({
-                path: options.folder.path,
-                uid: options.uid
+                path: folder.path,
+                uid: uid
             });
         }
 
         return self._imapMoveMessage({
-            folder: options.folder,
+            folder: folder,
             destination: trash,
-            uid: options.uid
+            uid: uid
         });
     });
 };
@@ -1207,7 +1199,7 @@ Email.prototype._localListMessages = function(options) {
 };
 
 /**
- * Stores a bunch of messages to the indexed db. The messages are stored under "email_[FOLDER PATH]_[MESSAGE UID]"
+ * Stores a bunch of messages to the indexed DB. The messages are stored under "email_[FOLDER PATH]_[MESSAGE UID]"
  *
  * @param {Object} options.folder The folder for which to list the content
  * @param {Array} options.messages The messages to store
@@ -1218,24 +1210,20 @@ Email.prototype._localStoreMessages = function(options) {
 };
 
 /**
- * Stores a bunch of messages to the indexed db. The messages are stored under "email_[FOLDER PATH]_[MESSAGE UID]"
+ * Deletes a message from the indexed DB.
  *
- * @param {Object} options.folder The folder for which to list the content
- * @param {Array} options.messages The messages to store
+ * @param {Object} folder The folder from which to delete
+ * @param {Number} uid    The message to delete
  */
-Email.prototype._localDeleteMessage = function(options) {
-    var path = options.folder.path,
-        uid = options.uid,
-        id = options.id;
+Email.prototype._localDeleteMessage = function(folder, uid) {
+    var path = folder.path;
 
-    if (!path || !(uid || id)) {
-        return new Promise(function() {
-            throw new Error('Invalid options!');
-        });
+    if (!path || !uid) {
+        return Promise.reject(new Error('Invalid options!'));
     }
 
-    var dbType = 'email_' + path + '_' + (uid || id);
-    return this._devicestorage.removeList(dbType);
+    var dbKey = 'email_' + path + '_' + uid;
+    return this._devicestorage.removeList(dbKey);
 };
 
 

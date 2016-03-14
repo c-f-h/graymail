@@ -258,13 +258,8 @@ describe('Email DAO unit tests', function() {
         });
 
         it('should delete from imap, local, memory', function() {
-            var deleteOpts = {
-                folder: inboxFolder,
-                uid: message.uid
-            };
-
-            imapDeleteStub.withArgs(deleteOpts).returns(resolves());
-            localDeleteStub.withArgs(deleteOpts).returns(resolves());
+            imapDeleteStub.withArgs(inboxFolder, message.uid).returns(resolves());
+            localDeleteStub.withArgs(inboxFolder, message.uid).returns(resolves());
 
             return dao.deleteMessage(inboxFolder, message).then(function() {
                 expect(imapDeleteStub.calledOnce).to.be.true;
@@ -274,12 +269,7 @@ describe('Email DAO unit tests', function() {
         });
 
         it('should delete from local, memory', function() {
-            var deleteOpts = {
-                folder: inboxFolder,
-                uid: message.uid
-            };
-
-            localDeleteStub.withArgs(deleteOpts).returns(resolves());
+            localDeleteStub.withArgs(inboxFolder, message.uid).returns(resolves());
 
             return dao.deleteMessage(inboxFolder, message, true).then(function() {
                 expect(imapDeleteStub.called).to.be.false;
@@ -289,12 +279,7 @@ describe('Email DAO unit tests', function() {
         });
 
         it('should delete from outbox from local, memory', function() {
-            var deleteOpts = {
-                folder: outboxFolder,
-                uid: message.uid
-            };
-
-            localDeleteStub.withArgs(deleteOpts).returns(resolves());
+            localDeleteStub.withArgs(outboxFolder, message.uid).returns(resolves());
 
             return dao.deleteMessage(outboxFolder, message).then(function() {
                 expect(imapDeleteStub.called).to.be.false;
@@ -304,13 +289,8 @@ describe('Email DAO unit tests', function() {
         });
 
         it('should fail at delete from local', function(done) {
-            var deleteOpts = {
-                folder: inboxFolder,
-                uid: message.uid
-            };
-
-            imapDeleteStub.withArgs(deleteOpts).returns(resolves());
-            localDeleteStub.withArgs(deleteOpts).returns(rejects({}));
+            imapDeleteStub.withArgs(inboxFolder, message.uid).returns(resolves());
+            localDeleteStub.withArgs(inboxFolder, message.uid).returns(rejects({}));
 
             dao.deleteMessage(inboxFolder, message).catch(function(err) {
                 expect(err).to.exist;
@@ -323,12 +303,7 @@ describe('Email DAO unit tests', function() {
         });
 
         it('should fail at delete from imap', function(done) {
-            var deleteOpts = {
-                folder: inboxFolder,
-                uid: message.uid
-            };
-
-            imapDeleteStub.withArgs(deleteOpts).returns(rejects({}));
+            imapDeleteStub.withArgs(inboxFolder, message.uid).returns(rejects({}));
 
             dao.deleteMessage(inboxFolder, message).catch(function(err) {
                 expect(err).to.exist;
@@ -1119,10 +1094,7 @@ describe('Email DAO unit tests', function() {
                     destination: trashFolder.path
                 }).returns(resolves());
 
-                return dao._imapDeleteMessage({
-                    folder: inboxFolder,
-                    uid: uid
-                });
+                return dao._imapDeleteMessage(inboxFolder, uid);
             });
 
             it('should purge message', function() {
@@ -1131,10 +1103,7 @@ describe('Email DAO unit tests', function() {
                     uid: uid
                 }).returns(resolves());
 
-                return dao._imapDeleteMessage({
-                    folder: trashFolder,
-                    uid: uid
-                });
+                return dao._imapDeleteMessage(trashFolder, uid);
             });
         });
 
@@ -1354,16 +1323,11 @@ describe('Email DAO unit tests', function() {
             it('should delete message', function() {
                 devicestorageStub.removeList.withArgs('email_' + inboxFolder.path + '_' + uid).returns(resolves());
 
-                return dao._localDeleteMessage({
-                    folder: inboxFolder,
-                    uid: uid
-                });
+                return dao._localDeleteMessage(inboxFolder, uid);
             });
 
             it('should fail when uid is missing', function(done) {
-                dao._localDeleteMessage({
-                    folder: inboxFolder
-                }).catch(function(err) {
+                dao._localDeleteMessage(inboxFolder).catch(function(err) {
                     expect(err).to.exist;
                     done();
                 });
