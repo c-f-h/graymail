@@ -65,7 +65,7 @@ describe('Email DAO unit tests', function() {
         outboxFolder = {
             name: 'Outbox',
             type: 'Outbox',
-            path: 'OUTBOX',
+            path: 'VIRTUALOUTBOX',
             messages: [],
             uids: [],
             modseq: 123

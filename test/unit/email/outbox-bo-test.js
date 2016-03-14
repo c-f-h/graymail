@@ -81,10 +81,10 @@ describe('Outbox unit test', function() {
                 bcc: []
             };
 
-            devicestorageStub.store.withArgs(mail).returns(resolves());
+            devicestorageStub.storeList.returns(resolves());
 
             return outbox.put(mail).then(function() {
-                expect(devicestorageStub.store.calledOnce).to.be.true;
+                expect(devicestorageStub.storeList.calledWith([mail], 'email_VIRTUALOUTBOX')).to.be.true;
             });
         });
     });
