@@ -378,8 +378,9 @@ module.exports = function(grunt) {
 
     // run JSHint and unit/integration tests
     grunt.registerTask('run-tests', function() {
-        var result1 = !exec('node test/test-runner.js test/unit');
-        var result2 = !exec('node test/test-runner.js test/integration');
+        var result1 = exec('node test/test-runner.js test/unit').code === 0;
+        var result2 = exec('node test/test-runner.js test/integration').code === 0;
+        console.log(result1, result2);
         return result1 && result2;
     });
     grunt.registerTask('test', ['jshint', 'run-tests']);
