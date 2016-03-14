@@ -6,7 +6,7 @@ module.exports = Outbox;
 
 var config = require('../app-config').config,
     uuid = require('node-uuid'),
-    outboxDb = 'email_OUTBOX';
+    outboxDb = 'email_VIRTUALOUTBOX';
 
 /**
  * High level business object that orchestrates the local outbox.

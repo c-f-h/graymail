@@ -21,7 +21,7 @@ appCfg.config = {
     iconPath: '/img/icon-128-chrome.png',
     dbVersion: 6,
     appVersion: undefined,
-    outboxMailboxPath: 'OUTBOX',
+    outboxMailboxPath: 'VIRTUALOUTBOX',
     outboxMailboxName: 'Outbox',
     outboxMailboxType: 'Outbox',
     connDocTimeout: 5000,
