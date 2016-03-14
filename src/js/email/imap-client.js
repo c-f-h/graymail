@@ -441,11 +441,11 @@ ImapClient.prototype.logout = function() {
  * Starts dedicated listener for updates on a specific IMAP folder, calls back when a change occurrs,
  * or includes information in case of an error
 
- * @param {String} options.path The path to the folder to subscribe to
+ * @param {String} path The path to the folder to subscribe to
  *
  * @return {Promise}
  */
-ImapClient.prototype.listenForChanges = function(options) {
+ImapClient.prototype.listenForChanges = function(path) {
     var self = this;
 
     if (self._listenerLoggedIn) {
@@ -455,8 +455,8 @@ ImapClient.prototype.listenForChanges = function(options) {
         return self._listeningClient.connect().then(function() {
             axe.debug(DEBUG_TAG, 'listener login completed, ready to roll!');
             self._listenerLoggedIn = true;
-            axe.debug(DEBUG_TAG, 'listening for changes in ' + options.path);
-            return self._listeningClient.selectMailbox(options.path);
+            axe.debug(DEBUG_TAG, 'listening for changes in ' + path);
+            return self._listeningClient.selectMailbox(path);
         });
     }
 };

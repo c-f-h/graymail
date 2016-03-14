@@ -623,9 +623,7 @@ Email.prototype.connectImap = function(imap) {
 
         }).then(function() {
             // set up the imap client to listen for changes in the inbox
-            self._imapClient.listenForChanges({
-                path: inbox.path
-            }, function() {});
+            self._imapClient.listenForChanges(inbox.path);
         });
     });
 
