@@ -111,9 +111,9 @@ Email.prototype.openFolder = function(folder) {
  * Please note that this deletes from disk only if you delete from the outbox,
  * since it is not an IMAP folder but a virtual folder that only exists on disk.
  *
- * @param {Object} options.folder The folder from which to delete the messages
- * @param {Object} options.message The message that should be deleted
- * @param {Boolean} options.localOnly Indicated if the message should not be removed from IMAP
+ * @param {Object} folder The folder from which to delete the messages
+ * @param {Object} message The message that should be deleted
+ * @param {Boolean} localOnly Indicated if the message should not be removed from IMAP
  * @return {Promise}
  */
 Email.prototype.deleteMessage = function(folder, message, localOnly) {
@@ -285,11 +285,12 @@ Email.prototype.moveMessage = function(folder, destination, message) {
 };
 
 /**
- * Loads message content. First tries to load from local storage, then fetches
- * from IMAP server.
+ * Loads message content for one or more messages. First tries to load from
+ * local storage, then fetches from IMAP server.
  *
  * @param {Object} options.messages The messages for which to retrieve the body
  * @param {Object} options.folder   The IMAP folder
+ * @param {Boolean} options.notifyNew  If true, calls onIncomingMessage on a new message
  * @return {Promise}
  * @resolve {Object}    The message object that was streamed
  */
@@ -486,8 +487,6 @@ Email.prototype._sendGeneric = function(mail, options) {
  * Synchronizes the outbox's contents from disk to memory.
  * If a message has disappeared from the disk, this method will remove
  * it from folder.messages, and it adds any messages from disk to memory the are not yet in folder.messages
- *
- * @param {Object} options.folder The folder to synchronize
  */
 Email.prototype.refreshOutbox = function() {
     var outbox = _.findWhere(this._account.folders, {
