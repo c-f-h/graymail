@@ -7,9 +7,7 @@ var ImapClient = require('../../src/js/email/imap-client'),
     LawnchairDAO = require('../../src/js/service/lawnchair'),
     DeviceStorageDAO = require('../../src/js/service/devicestorage'),
     mailreader = require('mailreader'),
-    PlainMailer = require('../../src/js/email/plainmailer'),
-    config = require('../../src/js/app-config').config,
-    str = require('../../src/js/app-config').string;
+    PlainMailer = require('../../src/js/email/plainmailer');
 
 describe('Email DAO integration tests', function() {
     this.timeout(10000);
