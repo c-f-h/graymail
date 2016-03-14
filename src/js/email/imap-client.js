@@ -66,6 +66,7 @@ var ImapClient = function(options, browserbox) {
         };
         self._client = new Imap(options.host, options.port, credentials);
         self._listeningClient = new Imap(options.host, options.port, credentials);
+        self._client.logLevel = self._listeningClient.logLevel = Imap.LOG_LEVEL_ERROR;
     }
 
     /*
@@ -707,11 +708,12 @@ ImapClient.prototype.search = function(options) {
 };
 
 /**
- * List messages in an IMAP folder based on their uid
+ * List messages in an IMAP folder based on their uid.
+ *
  * @param {String} options.path The folder's path
  * @param {Number} options.firstUid (optional) If you want to fetch a range, this is the uid of the first message. if omitted, defaults to 1
  * @param {Number} options.lastUid (optional) The uid of the last message. if omitted, defaults to *
- * @param {Array} options.uids (optional) If used, fetched individual uids
+ * @param {Array}  options.uids (optional) If used, fetched individual uids
  *
  * @returns {Promise<Array>} Array of messages with their respective envelope data.
  */

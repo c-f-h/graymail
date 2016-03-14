@@ -126,8 +126,8 @@ Email.prototype.deleteMessage = function(options) {
     folder.messages.splice(folder.messages.indexOf(message), 1);
 
     // delete only locally
-    if (options.localOnly || options.folder.path === config.outboxMailboxPath) {
-        return deleteLocal().then(done).catch(done);
+    if (options.localOnly || folder.path === config.outboxMailboxPath) {
+        return deleteLocal().then(done, done);
     }
 
     return self.checkOnline().then(function() {
@@ -139,7 +139,7 @@ Email.prototype.deleteMessage = function(options) {
 
     }).then(function() {
         return deleteLocal();
-    }).then(done).catch(done);
+    }).then(done, done);
 
     function deleteLocal() {
         // delete from indexed db
@@ -289,7 +289,9 @@ Email.prototype.moveMessage = function(options) {
 };
 
 /**
- * Streams message content
+ * Loads message content. First tries to load from local storage, then fetches
+ * from IMAP server.
+ *
  * @param {Object} options.messages The messages for which to retrieve the body
  * @param {Object} options.folder   The IMAP folder
  * @return {Promise}
@@ -1063,7 +1065,10 @@ Email.prototype._imapUploadMessage = function(options) {
 };
 
 /**
- * Fetch messages from imap
+ * Fetch messages from IMAP server. Does not check local cache.
+ *
+ * @param options.messages  The messages for which to fetch the bodies (uid required)
+ * @param options.folder    The folder from which to fetch.
  */
 Email.prototype._fetchMessages = function(options) {
     var self = this,

@@ -59,15 +59,13 @@ Outbox.prototype.put = function(mail) {
     var self = this;
     
     if (mail.to.concat(mail.cc.concat(mail.bcc)).length === 0) {
-        return new Promise(function() {
-            throw new Error('Message has no recipients!');
-        });
+        return Promise.reject(new Error('Message has no recipients!'));
     }
 
     mail.uid = mail.id = uuid.v4(); // the mail needs a random id & uid for storage in the database
 
     // store in outbox
-    return self._devicestorage.store(mail, outboxDb).then(function() {
+    return self._devicestorage.storeList([mail], outboxDb).then(function() {
         // don't wait for next round
         self._processOutbox(self._onUpdate);
     });
