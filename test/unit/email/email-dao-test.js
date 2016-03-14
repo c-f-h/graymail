@@ -266,10 +266,7 @@ describe('Email DAO unit tests', function() {
             imapDeleteStub.withArgs(deleteOpts).returns(resolves());
             localDeleteStub.withArgs(deleteOpts).returns(resolves());
 
-            return dao.deleteMessage({
-                folder: inboxFolder,
-                message: message
-            }).then(function() {
+            return dao.deleteMessage(inboxFolder, message).then(function() {
                 expect(imapDeleteStub.calledOnce).to.be.true;
                 expect(localDeleteStub.calledOnce).to.be.true;
                 expect(inboxFolder.messages).to.not.contain(message);
@@ -284,11 +281,7 @@ describe('Email DAO unit tests', function() {
 
             localDeleteStub.withArgs(deleteOpts).returns(resolves());
 
-            return dao.deleteMessage({
-                folder: inboxFolder,
-                message: message,
-                localOnly: true
-            }).then(function() {
+            return dao.deleteMessage(inboxFolder, message, true).then(function() {
                 expect(imapDeleteStub.called).to.be.false;
                 expect(localDeleteStub.calledOnce).to.be.true;
                 expect(inboxFolder.messages).to.not.contain(message);
@@ -303,10 +296,7 @@ describe('Email DAO unit tests', function() {
 
             localDeleteStub.withArgs(deleteOpts).returns(resolves());
 
-            return dao.deleteMessage({
-                folder: outboxFolder,
-                message: message
-            }).then(function() {
+            return dao.deleteMessage(outboxFolder, message).then(function() {
                 expect(imapDeleteStub.called).to.be.false;
                 expect(localDeleteStub.calledOnce).to.be.true;
                 expect(outboxFolder.messages).to.not.contain(message);
@@ -322,10 +312,7 @@ describe('Email DAO unit tests', function() {
             imapDeleteStub.withArgs(deleteOpts).returns(resolves());
             localDeleteStub.withArgs(deleteOpts).returns(rejects({}));
 
-            dao.deleteMessage({
-                folder: inboxFolder,
-                message: message
-            }).catch(function(err) {
+            dao.deleteMessage(inboxFolder, message).catch(function(err) {
                 expect(err).to.exist;
                 expect(imapDeleteStub.calledOnce).to.be.true;
                 expect(localDeleteStub.calledOnce).to.be.true;
@@ -343,10 +330,7 @@ describe('Email DAO unit tests', function() {
 
             imapDeleteStub.withArgs(deleteOpts).returns(rejects({}));
 
-            dao.deleteMessage({
-                folder: inboxFolder,
-                message: message
-            }).catch(function(err) {
+            dao.deleteMessage(inboxFolder, message).catch(function(err) {
                 expect(err).to.exist;
                 expect(imapDeleteStub.calledOnce).to.be.true;
                 expect(localDeleteStub.called).to.be.false;
@@ -358,10 +342,7 @@ describe('Email DAO unit tests', function() {
 
         it('should fail at delete from imap in offline', function(done) {
             account.online = false;
-            dao.deleteMessage({
-                folder: inboxFolder,
-                message: message
-            }).catch(function(err) {
+            dao.deleteMessage(inboxFolder, message).catch(function(err) {
                 expect(err).to.exist;
                 expect(imapDeleteStub.called).to.be.false;
                 expect(localDeleteStub.called).to.be.false;
@@ -970,11 +951,7 @@ describe('Email DAO unit tests', function() {
             });
 
             it('should delete message', function(done) {
-                deleteMessagesStub.withArgs({
-                    folder: inboxFolder,
-                    message: msgs[0],
-                    localOnly: true
-                }).returns(resolves());
+                deleteMessagesStub.withArgs(inboxFolder, msgs[0], true).returns(resolves());
 
                 dao._onSyncUpdate({
                     type: 'deleted',

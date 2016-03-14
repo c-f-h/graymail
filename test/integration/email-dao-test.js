@@ -322,10 +322,7 @@ describe('Email DAO integration tests', function() {
             });
 
             it('should delete a message', function() {
-                return emailDao.deleteMessage({
-                    folder: inbox,
-                    message: inbox.messages[0]
-                }).then(function() {
+                return emailDao.deleteMessage(inbox, inbox.messages[0]).then(function() {
                     return emailDao.openFolder({
                         path: '[Gmail]/Trash'
                     });

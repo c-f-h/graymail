@@ -121,10 +121,7 @@ var ActionBarCtrl = function($scope, $q, email, dialog, status) {
             resolve();
 
         }).then(function() {
-            return email.deleteMessage({
-                folder: currentFolder(),
-                message: message
-            });
+            return email.deleteMessage(currentFolder(), message);
 
         }).then(function() {
             status.update('Online');

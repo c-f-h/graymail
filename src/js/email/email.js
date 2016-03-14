@@ -116,17 +116,15 @@ Email.prototype.openFolder = function(folder) {
  * @param {Boolean} options.localOnly Indicated if the message should not be removed from IMAP
  * @return {Promise}
  */
-Email.prototype.deleteMessage = function(options) {
-    var self = this,
-        folder = options.folder,
-        message = options.message;
+Email.prototype.deleteMessage = function(folder, message, localOnly) {
+    var self = this;
 
     self.busy();
 
     folder.messages.splice(folder.messages.indexOf(message), 1);
 
     // delete only locally
-    if (options.localOnly || folder.path === config.outboxMailboxPath) {
+    if (localOnly || folder.path === config.outboxMailboxPath) {
         return deleteLocal().then(done, done);
     }
 
@@ -747,11 +745,8 @@ Email.prototype._onSyncUpdate = function(options) {
                 return;
             }
 
-            self.deleteMessage({
-                folder: folder,
-                message: message,
-                localOnly: true
-            }).catch(self._dialog.error);
+            // delete from local folder only
+            self.deleteMessage(folder, message, true).catch(self._dialog.error);
         });
     } else if (options.type === SYNC_TYPE_MSGS) {
         // NB! several possible reasons why this could be called.
