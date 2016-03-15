@@ -235,10 +235,9 @@ var WriteCtrl = function($scope, $window, $filter, $q, appConfig, auth, email, o
      */
     $scope.checkSendStatus = function() {
         $scope.okToSend = false;
-        $scope.sendBtnText = undefined;
-        $scope.sendBtnSecure = undefined;
 
-        var numReceivers = 0;
+        var anyReceivers = false;
+        var allOk = true;
 
         // count number of receivers and check security
         $scope.to.forEach(check);
@@ -247,23 +246,17 @@ var WriteCtrl = function($scope, $window, $filter, $q, appConfig, auth, email, o
 
         function check(recipient) {
             if (!validateEmailAddress(recipient.address)) {
-                return dialog.info({
-                    title: 'Warning',
-                    message: 'Invalid recipient address!'
-                });
+                allOk = false;
+            } else {
+                anyReceivers = true;
             }
-            numReceivers++;
         }
 
-        // only allow sending if receviers exist
-        if (numReceivers < 1) {
-            return;
+        // only allow sending if there are receivers and all are valid exist
+        if (anyReceivers && allOk) {
+            // send plaintext
+            $scope.okToSend = true;
         }
-
-        // send plaintext
-        $scope.okToSend = true;
-        $scope.sendBtnText = str.sendBtnClear;
-        $scope.sendBtnSecure = false;
     };
 
     //
@@ -346,9 +339,8 @@ var WriteCtrl = function($scope, $window, $filter, $q, appConfig, auth, email, o
     // Tag input & Autocomplete
     //
 
-    $scope.tagStyle = function(/* recipient */) {
-        var classes = ['label'];
-        return classes;
+    $scope.tagStyle = function(recipient) {
+        return validateEmailAddress(recipient.address) ? ['label'] : ['label', 'label--invalid'];
     };
 
     $scope.lookupAddressBook = function(query) {
