@@ -21,7 +21,6 @@ var SetCredentialsCtrl = function($scope, $location, $routeParams, $q, auth, con
         if (cred.imap.auth.user && cred.imap.auth.user !== $scope.emailAddress) {
             $scope.username = cred.imap.user;
         }
-        console.log(cred.imap);
         $scope.password = cred.imap.auth.pass;
 
         $scope.imapHost = cred.imap.host;

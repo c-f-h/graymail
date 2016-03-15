@@ -32,6 +32,8 @@ function Auth(appConfigStore, oauth) {
     this._oauth = oauth;
 
     this._initialized = false;
+    this.imap = {};
+    this.smtp = {};
 }
 
 /**
@@ -76,9 +78,9 @@ Auth.prototype.getCredentials = function() {
     if (!self.emailAddress) {
         // we're not yet initialized, so let's load our stuff from disk
         return self._loadCredentials().then(chooseLogin);
+    } else {
+        return chooseLogin();
     }
-
-    return chooseLogin();
 
     function chooseLogin() {
         if (self.useOAuth(self.imap.host) && !self.password) {
@@ -283,11 +285,11 @@ Auth.prototype._loadCredentials = function() {
     }
 
     return loadFromDB(SMTP_DB_KEY).then(function(smtp) {
-        self.smtp = smtp;
+        self.smtp = smtp ? smtp : {};
         return loadFromDB(IMAP_DB_KEY);
 
     }).then(function(imap) {
-        self.imap = imap;
+        self.imap = imap ? imap : {};
         return loadFromDB(USERNAME_DB_KEY);
 
     }).then(function(username) {
