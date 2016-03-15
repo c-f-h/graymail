@@ -196,7 +196,7 @@ var WriteCtrl = function($scope, $window, $filter, $q, appConfig, auth, email, o
     //
 
     /**
-     * Verify email address and fetch its public key
+     * Verify email address
      */
     $scope.verify = function(recipient) {
         if (!recipient) {
@@ -211,9 +211,6 @@ var WriteCtrl = function($scope, $window, $filter, $q, appConfig, auth, email, o
             recipient.address = recipient.displayId;
         }
 
-        // set display to insecure while fetching keys
-        recipient.key = undefined;
-        recipient.secure = false;
         $scope.checkSendStatus();
 
         // verify email address

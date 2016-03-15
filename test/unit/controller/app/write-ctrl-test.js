@@ -167,9 +167,6 @@ describe('Write controller unit test', function() {
             };
 
             scope.verify(recipient);
-
-            expect(recipient.key).to.be.undefined;
-            expect(recipient.secure).to.be.undefined;
             expect(scope.checkSendStatus.callCount).to.equal(2);
         });
     });
