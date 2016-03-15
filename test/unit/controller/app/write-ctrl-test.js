@@ -167,7 +167,7 @@ describe('Write controller unit test', function() {
             };
 
             scope.verify(recipient);
-            expect(scope.checkSendStatus.callCount).to.equal(2);
+            expect(scope.checkSendStatus.callCount).to.equal(1);
         });
     });
 
@@ -182,7 +182,6 @@ describe('Write controller unit test', function() {
             scope.checkSendStatus();
 
             expect(scope.okToSend).to.be.false;
-            expect(scope.sendBtnText).to.be.undefined;
         });
 
         it('should be able to send plaintext', function() {
@@ -192,7 +191,6 @@ describe('Write controller unit test', function() {
             scope.checkSendStatus();
 
             expect(scope.okToSend).to.be.true;
-            expect(scope.sendBtnText).to.equal('Send');
         });
 
         it('should send plaintext if one receiver is not secure', function() {
@@ -205,7 +203,6 @@ describe('Write controller unit test', function() {
             scope.checkSendStatus();
 
             expect(scope.okToSend).to.be.true;
-            expect(scope.sendBtnText).to.equal('Send');
         });
 
         it('should be able to send to multiple recipients', function() {
@@ -219,7 +216,6 @@ describe('Write controller unit test', function() {
             scope.checkSendStatus();
 
             expect(scope.okToSend).to.be.true;
-            expect(scope.sendBtnText).to.equal('Send');
         });
     });
 

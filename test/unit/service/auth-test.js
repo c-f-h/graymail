@@ -266,8 +266,8 @@ describe('Auth unit tests', function() {
                 expect(err).to.exist;
                 expect(auth.emailAddress).to.not.exist;
                 expect(auth.password).to.not.exist;
-                expect(auth.imap).to.not.exist;
-                expect(auth.smtp).to.not.exist;
+                expect(auth.imap).to.deep.equal({});
+                expect(auth.smtp).to.deep.equal({});
                 expect(auth.username).to.not.exist;
                 expect(auth.realname).to.not.exist;
 

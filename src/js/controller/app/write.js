@@ -212,22 +212,6 @@ var WriteCtrl = function($scope, $window, $filter, $q, appConfig, auth, email, o
         }
 
         $scope.checkSendStatus();
-
-        // verify email address
-        if (!validateEmailAddress(recipient.address)) {
-            recipient.secure = undefined;
-            $scope.checkSendStatus();
-            return;
-        }
-
-        // TODO: this probably doesn't need to be a promise anymore
-        return $q(function(resolve) {
-            resolve();
-
-        }).then(function() {
-            $scope.checkSendStatus();
-
-        }).catch(dialog.error);
     };
 
     /**
