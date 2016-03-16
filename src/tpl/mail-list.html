@@ -37,11 +37,11 @@
               <span><svg role="presentation"><use xlink:href="#icon-check" /></svg></span>
             </label>
           </li>
-          <li ng-show="email.from" class="mail-list-entry__flags-flagged" wo-touch="flag(email, !email.flagged); $event.stopPropagation()">
-            <svg ng-show="email.flagged"><use xlink:href="#icon-star_filled" /><title>Starred</title></svg>
-            <svg ng-show="!email.flagged"><use xlink:href="#icon-star" /><title>Not Starred</title></svg>
+          <li ng-if="email.from" class="mail-list-entry__flags-flagged" wo-touch="flag(email, !email.flagged); $event.stopPropagation()">
+            <svg ng-if="email.flagged"><use xlink:href="#icon-star_filled" /><title>Starred</title></svg>
+            <svg ng-if="!email.flagged"><use xlink:href="#icon-star" /><title>Not Starred</title></svg>
           </li>
-          <li class="mail-list-entry__flags-answered" ng-show="!email.unread && email.answered">
+          <li class="mail-list-entry__flags-answered" ng-if="!email.unread && email.answered">
             <svg><use xlink:href="#icon-reply" /><title>Answered</title></svg>
           </li>
           <li class="mail-list-entry__flags-attachment">
@@ -49,7 +49,7 @@
           </li>
         </ul>
         <h3 class="mail-list-entry__name">
-          <span ng-show="!email.from" class="spinner"></span>
+          <span ng-if="!email.from" class="spinner"></span>
           {{email.from[0].name || email.from[0].address}}
         </h3>
         <div class="mail-list-entry__subject">
