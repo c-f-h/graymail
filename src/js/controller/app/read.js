@@ -11,14 +11,15 @@ var ReadCtrl = function($scope, $location, $q, email, download, dialog, status) 
     //
 
     $scope.state.read = {
-        open: false,
-        toggle: function(to) {
-            this.open = to;
-        }
+        open: false
     };
 
+    function toggle(to) {
+        $scope.state.read.open = to;
+    }
+
     $scope.$on('read', function(e, state) {
-        $scope.state.read.toggle(state);
+        toggle(state);
     });
 
     //
@@ -29,7 +30,7 @@ var ReadCtrl = function($scope, $location, $q, email, download, dialog, status) 
     $scope.loc = $location;
     $scope.$watch('(loc.search()).uid', function(uid) {
         // synchronize the url to the scope state
-        $scope.state.read.toggle(!!uid);
+        toggle(!!uid);
     });
     $scope.$watch('state.read.open', function(value) {
         // close read mode by navigating to folder view
