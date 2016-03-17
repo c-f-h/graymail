@@ -69,16 +69,14 @@ ngModule.directive('listScroll', function($timeout) {
                 var prefetchLower = displayMessages.slice(Math.max(prefetchLowerBound - PREFETCH_ITEMS, 0), prefetchLowerBound);
                 var prefetchUpper = displayMessages.slice(prefetchUpperBound, prefetchUpperBound + PREFETCH_ITEMS);
 
-                visible.concat(prefetchLower).concat(prefetchUpper).forEach(function(email) {
-                    scope.getBody([email]);
-                });
+                scope.getBody(
+                    visible.concat(prefetchLower).concat(prefetchUpper)
+                );
             }
 
             scope.loadVisibleBodies = function() {
                 // wait for next tick so that scope is digested and synced to DOM
-                $timeout(function() {
-                    loadVisibleBodies();
-                });
+                $timeout(loadVisibleBodies);
             };
 
             // load body when scrolling
