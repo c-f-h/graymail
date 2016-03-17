@@ -801,6 +801,29 @@ describe('Email DAO unit tests', function() {
         });
     });
 
+    describe('onOnline', function() {
+        beforeEach(function() {
+            dao._account = {};
+        });
+
+        it('should work', function() {
+            sinon.stub(dao, 'connectImap');
+            dao.connectImap.returns(resolves());
+
+            dao.onOnline();
+            expect(dao.connectImap.calledOnce).to.be.true;
+        });
+    });
+
+    describe('onOffline', function() {
+        it('should work', function() {
+            sinon.stub(dao, 'disconnectImap');
+            dao.disconnectImap.returns(resolves());
+            dao.onOffline();
+            expect(dao.disconnectImap.calledOnce).to.be.true;
+        });
+    });
+
     describe('event handlers', function() {
 
         describe('#connectImap', function() {

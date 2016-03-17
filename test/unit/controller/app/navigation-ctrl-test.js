@@ -24,6 +24,7 @@ describe('Navigation Controller unit test', function() {
         };
 
         emailDaoMock = sinon.createStubInstance(Email);
+        emailDaoMock.connectImap.returns(resolves());
         outboxFolder = account.folders[1];
         outboxBoMock = sinon.createStubInstance(Outbox);
         outboxBoMock.startChecking.returns();

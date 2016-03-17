@@ -111,29 +111,6 @@ describe('Account Service unit test', function() {
         });
     });
 
-    describe('onOnline', function() {
-        beforeEach(function() {
-            emailStub._account = {};
-        });
-
-        it('should work', function(done) {
-            emailStub.connectImap.returns(resolves());
-
-            account.onOnline(function(err) {
-                expect(err).to.not.exist;
-                expect(emailStub.connectImap.calledOnce).to.be.true;
-                done();
-            });
-        });
-    });
-
-    describe('onOffline', function() {
-        it('should work', function() {
-            emailStub.disconnectImap.returns(resolves());
-            return account.onOffline();
-        });
-    });
-
     describe('logout', function() {
         // cannot test the good case here or the browser will refresh during the test.
 
