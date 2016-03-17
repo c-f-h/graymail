@@ -2,34 +2,34 @@
 
 var Email = require('../../../../src/js/email/email'),
     ReadCtrl = require('../../../../src/js/controller/app/read'),
-    Outbox = require('../../../../src/js/email/outbox'),
     Dialog = require('../../../../src/js/util/dialog'),
     Auth = require('../../../../src/js/service/auth'),
-    Download = require('../../../../src/js/util/download');
+    Download = require('../../../../src/js/util/download'),
+    Status = require('../../../../src/js/util/status');
 
 describe('Read Controller unit test', function() {
-    var scope, ctrl, emailMock, outboxMock, dialogMock, authMock, downloadMock;
+    var scope, ctrl, emailMock, dialogMock, authMock, downloadMock, statusMock;
 
     beforeEach(function() {
-        outboxMock = sinon.createStubInstance(Outbox);
         emailMock = sinon.createStubInstance(Email);
         dialogMock = sinon.createStubInstance(Dialog);
         authMock = sinon.createStubInstance(Auth);
         downloadMock = sinon.createStubInstance(Download);
+        statusMock = sinon.createStubInstance(Status);
 
         angular.module('readtest', ['woServices']);
         angular.mock.module('readtest');
-        angular.mock.inject(function($rootScope, $controller) {
+        angular.mock.inject(function($location, $rootScope, $controller) {
             scope = $rootScope.$new();
             scope.state = {};
             ctrl = $controller(ReadCtrl, {
                 $scope: scope,
+                $location: $location,
                 $q: window.qMock,
                 email: emailMock,
-                outbox: outboxMock,
                 download: downloadMock,
-                auth: authMock,
-                dialog: dialogMock
+                dialog: dialogMock,
+                status: statusMock
             });
         });
     });
@@ -40,16 +40,15 @@ describe('Read Controller unit test', function() {
         it('should be set correctly', function() {
             expect(scope.state.read).to.exist;
             expect(scope.state.read.open).to.be.false;
-            expect(scope.state.read.toggle).to.exist;
         });
     });
 
     describe('open/close read view', function() {
         it('should open/close', function() {
             expect(scope.state.read.open).to.be.false;
-            scope.state.read.toggle(true);
+            scope.$broadcast('read', true);
             expect(scope.state.read.open).to.be.true;
-            scope.state.read.toggle(false);
+            scope.$broadcast('read', false);
             expect(scope.state.read.open).to.be.false;
         });
     });
