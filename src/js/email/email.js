@@ -1358,13 +1358,10 @@ Email.prototype.isOnline = function() {
  * This create new instances of the imap-client and mailer
  * and connects to the mail server.
  */
-Email.prototype.onOnline = function(callback) {
-    if (!this._account) {
-        // prevent connection infinite loop
-        return;
+Email.prototype.onOnline = function() {
+    if (this._account) {
+        this.connectImap();
     }
-
-    this.connectImap().then(callback, callback);
 };
 
 /**

@@ -135,16 +135,13 @@ var NavigationCtrl = function($scope, $location, $q, $timeout, account, email, o
     initializeFolders();
 
     // connect imap/smtp clients on first startup
-    email.onOnline(function(err) {
-        if (err) {
-            dialog.error(err);
-            return;
-        }
-
+    email.connectImap().then(function() {
         // select inbox if not yet selected
         if (!$scope.state.nav.currentFolder) {
             $scope.navigate(0);
         }
+    }).catch(function(err) {
+        dialog.error(err);
     });
 
     //
