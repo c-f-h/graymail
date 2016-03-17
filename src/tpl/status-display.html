@@ -1,7 +1,7 @@
 <div ng-controller="StatusDisplayCtrl">
   <span class="spinner" ng-if="account.loggingIn || account.busy || searching"></span>
-  <span class="text" ng-switch="account.online">
-    <span ng-switch-when="false">
+  <span class="text">
+    <span ng-hide="account.online">
       <svg><use xlink:href="#icon-offline" /></svg>
     </span>
     {{text}} {{time | date:'shortTime'}}

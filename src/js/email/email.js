@@ -48,12 +48,12 @@ var MSG_PART_TYPE_HTML = 'html';
  * @param {Object} devicestorage Handles persistence to the local indexed db
  * @param {Object} mailreader Parses MIME messages received from IMAP
  */
-function Email(accountStore, mailreader, dialog, auth, $rootScope) {
+function Email(accountStore, mailreader, dialog, auth, status) {
     this._devicestorage = accountStore;
     this._mailreader = mailreader;
     this._dialog = dialog;
     this._auth = auth;
-    this._rootScope = $rootScope;
+    this._status = status;
 }
 
 
@@ -81,6 +81,7 @@ Email.prototype.init = function(options) {
     self._account.busy = 0; // >0 triggers the spinner
     self._account.online = false;
     self._account.loggingIn = false;
+    self._status.update('Offline');
 
     // fetch folders from idb
     return self._devicestorage.listItems(FOLDER_DB_TYPE, true).then(function(stored) {
@@ -541,9 +542,7 @@ Email.prototype.connectImap = function(imap) {
     }
 
     self._account.loggingIn = true;
-    if (!self._rootScope.$$phase) {
-        self._rootScope.$apply();
-    }
+    self._status.update('Connecting...');
 
     // init imap/smtp clients
     return self._auth.getCredentials().then(function(credentials) {
@@ -566,13 +565,12 @@ Email.prototype.connectImap = function(imap) {
     }).catch(function(err) {
         // make sure spinner is turned off on error
         self._account.loggingIn = false;
-        self._rootScope.$apply();
+        self._status.update('Offline');
 
         throw err;
 
     }).then(function() {
         self._account.loggingIn = false;
-        self._rootScope.$apply();
         // init folders
         return self._updateFolders();
 
@@ -600,7 +598,7 @@ Email.prototype.connectImap = function(imap) {
 
         // set status to online after setting cache to prevent race condition
         self._account.online = true;
-        self._rootScope.$apply();
+        self._status.update('Online');
 
         // by default, select the inbox (if there is one) after connecting the imap client.
         // this avoids race conditions between the listening imap connection and the one where the work is done
@@ -624,28 +622,36 @@ Email.prototype.connectImap = function(imap) {
     });
 
     function onConnectionError(error) {
-        axe.debug('IMAP connection error, disconnected. Reason: ' + error.message + (error.stack ? ('\n' + error.stack) : ''));
+        axe.error('IMAP connection error, disconnected. Reason: ' +
+          error.message + (error.stack ? ('\n' + error.stack) : ''));
 
-        // clean up the _imapClient object
-        self.disconnectImap();
-
-        // propagate the online status to the status controller
-        self._rootScope.$apply();
-
-        // only try to reconnect if navigator isn't offline
-        if (!self.isOnline()) {
-            return;
-        }
-
-        axe.debug('Attempting reconnect in ' + config.reconnectInterval / 1000 + ' seconds.');
-
-        setTimeout(function() {
-            axe.debug('Reconnecting the IMAP stack');
-            // re-init client modules on error
-            self.connectImap().catch(self._dialog.error);
-        }, config.reconnectInterval);
+        self.tearDownAndReconnect();
     }
 };
+
+Email.prototype.tearDownAndReconnect = function() {
+    var self = this;
+
+    // clean up the _imapClient object
+    self.disconnectImap();
+
+    // only try to reconnect if navigator isn't offline
+    if (!self.isOnline()) {
+        return;
+    }
+
+    axe.debug('Attempting reconnect in ' + config.reconnectInterval / 1000 + ' seconds.');
+
+    setTimeout(function() {
+        axe.debug('Reconnecting the IMAP stack');
+        // re-init client modules on error
+        self.connectImap().catch(function(err) {
+            // TODO: display a toast or similar
+            axe.error('Connecting to IMAP failed: ' + err.message);
+            self.tearDownAndReconnect();
+        });
+    }, config.reconnectInterval);
+}
 
 /**
  * Discard the imap client and PlainMailer
@@ -666,6 +672,7 @@ Email.prototype.disconnectImap = function() {
 
     // discard clients
     this._account.online = false;
+    this._status.update('Offline');
 
     return Promise.resolve();
 };

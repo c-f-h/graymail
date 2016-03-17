@@ -135,13 +135,17 @@ var NavigationCtrl = function($scope, $location, $q, $timeout, account, email, o
     initializeFolders();
 
     // connect imap/smtp clients on first startup
-    email.connectImap().then(function() {
-        // select inbox if not yet selected
-        if (!$scope.state.nav.currentFolder) {
-            $scope.navigate(0);
-        }
-    }).catch(function(err) {
-        dialog.error(err);
+    $timeout(function() {
+        email.connectImap().then(function() {
+            // select inbox if not yet selected
+            if (!$scope.state.nav.currentFolder) {
+                $scope.navigate(0);
+            }
+        }).catch(function(err) {
+            // TODO: display a toast or similar
+            axe.error('Connecting to IMAP failed: ' + err.message);
+            email.tearDownAndReconnect();
+        });
     });
 
     //

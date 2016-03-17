@@ -246,15 +246,10 @@ var MailListCtrl = function($scope, $timeout, $location, $filter, $q, status, no
      */
     $scope.watchOnline = $scope.$watch('account.online', function(isOnline) {
         // wait one cycle for the status display controllers to init
-        return $timeout(function() {
-            if (isOnline) {
-                status.update('Online');
-                return openCurrentFolder();
-            } else {
-                status.update('Offline mode');
-            }
-        });
-    }, true);
+        if (isOnline) {
+            return openCurrentFolder();
+        }
+    });
 
     //
     // Helper Functions
