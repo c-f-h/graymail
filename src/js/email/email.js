@@ -86,6 +86,10 @@ Email.prototype.init = function(options) {
     return self._devicestorage.listItems(FOLDER_DB_TYPE, true).then(function(stored) {
         self._account.folders = stored[0] || [];
         self._initFolders();
+    }).then(function() {
+        // Handle offline and online gracefully ... arm dom event
+        window.addEventListener('online', self.onOnline.bind(self));
+        window.addEventListener('offline', self.onOffline.bind(self));
     });
 };
 
@@ -1348,6 +1352,29 @@ Email.prototype.checkIgnoreUploadOnSent = function(hostname) {
 Email.prototype.isOnline = function() {
     return navigator.onLine;
 };
+
+/**
+ * Event that is called when the user agent goes online.
+ * This create new instances of the imap-client and mailer
+ * and connects to the mail server.
+ */
+Email.prototype.onOnline = function(callback) {
+    if (!this._account) {
+        // prevent connection infinite loop
+        return;
+    }
+
+    this.connectImap().then(callback, callback);
+};
+
+/**
+ * Event handler that is called when the user agent goes offline.
+ */
+Email.prototype.onOffline = function() {
+    return this._emailDao.disconnectImap();
+};
+
+
 
 //
 //

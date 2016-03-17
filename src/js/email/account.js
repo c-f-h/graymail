@@ -60,36 +60,11 @@ Account.prototype.init = function(options) {
         // init the email data access object
         return self._emailDao.init({
             account: account
-        }).then(function() {
-            // Handle offline and online gracefully ... arm dom event
-            window.addEventListener('online', self.onOnline.bind(self));
-            window.addEventListener('offline', self.onOffline.bind(self));
-
-            // add account object to the accounts array for the ng controllers
-            self._accounts.push(account);
         });
+    }).then(function() {
+        // add account object to the accounts array for the ng controllers
+        self._accounts.push(account);
     });
-};
-
-/**
- * Event that is called when the user agent goes online.
- * This create new instances of the imap-client and mailer
- * and connects to the mail server.
- */
-Account.prototype.onOnline = function(callback) {
-    if (!this._emailDao || !this._emailDao._account) {
-        // prevent connection infinite loop
-        return;
-    }
-
-    this._emailDao.connectImap().then(callback).catch(callback);
-};
-
-/**
- * Event handler that is called when the user agent goes offline.
- */
-Account.prototype.onOffline = function() {
-    return this._emailDao.disconnectImap();
 };
 
 /**
