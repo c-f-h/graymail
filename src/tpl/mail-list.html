@@ -49,7 +49,7 @@
           </li>
         </ul>
         <h3 class="mail-list-entry__name">
-          <span ng-if="!email.from" class="spinner"></span>
+          <span ng-if="email.loadingBody" class="spinner"></span>
           {{email.from[0].name || email.from[0].address}}
         </h3>
         <div class="mail-list-entry__subject">
