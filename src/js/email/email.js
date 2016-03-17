@@ -563,6 +563,13 @@ Email.prototype.connectImap = function(imap) {
         // imap login
         return self._imapClient.login();
 
+    }).catch(function(err) {
+        // make sure spinner is turned off on error
+        self._account.loggingIn = false;
+        self._rootScope.$apply();
+
+        throw err;
+
     }).then(function() {
         self._account.loggingIn = false;
         self._rootScope.$apply();
@@ -595,7 +602,6 @@ Email.prototype.connectImap = function(imap) {
         self._account.online = true;
         self._rootScope.$apply();
 
-    }).then(function() {
         // by default, select the inbox (if there is one) after connecting the imap client.
         // this avoids race conditions between the listening imap connection and the one where the work is done
         var inbox = _.findWhere(self._account.folders, {
