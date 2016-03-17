@@ -1368,7 +1368,7 @@ Email.prototype.onOnline = function() {
  * Event handler that is called when the user agent goes offline.
  */
 Email.prototype.onOffline = function() {
-    return this._emailDao.disconnectImap();
+    return this.disconnectImap();
 };
 
 
