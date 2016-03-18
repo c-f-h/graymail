@@ -651,7 +651,7 @@ Email.prototype.tearDownAndReconnect = function() {
             self.tearDownAndReconnect();
         });
     }, config.reconnectInterval);
-}
+};
 
 /**
  * Discard the imap client and PlainMailer

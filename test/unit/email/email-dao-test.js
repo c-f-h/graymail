@@ -6,7 +6,8 @@ var mailreader = require('mailreader'),
     EmailDAO = require('../../../src/js/email/email'),
     DeviceStorageDAO = require('../../../src/js/service/devicestorage'),
     Auth = require('../../../src/js/service/auth'),
-    Dialog = require('../../../src/js/util/dialog');
+    Dialog = require('../../../src/js/util/dialog'),
+    Status = require('../../../src/js/util/status');
 
 
 describe('Email DAO unit tests', function() {
@@ -17,7 +18,7 @@ describe('Email DAO unit tests', function() {
     var dao;
 
     // mocks
-    var imapClientStub, plainMailerStub, devicestorageStub, parseStub, dialogStub, authStub;
+    var imapClientStub, plainMailerStub, devicestorageStub, parseStub, dialogStub, authStub, statusStub;
 
     // config
     var emailAddress, passphrase, asymKeySize, account;
@@ -25,9 +26,7 @@ describe('Email DAO unit tests', function() {
     // test data
     var folders, inboxFolder, sentFolder, draftsFolder, outboxFolder, trashFolder, flaggedFolder, otherFolder, mockKeyPair;
 
-    var $rootScope;
-    beforeEach(inject(function(_$rootScope_) {
-        $rootScope = _$rootScope_;
+    beforeEach(inject(function() {
         //
         // test data
         //
@@ -129,11 +128,12 @@ describe('Email DAO unit tests', function() {
         devicestorageStub = sinon.createStubInstance(DeviceStorageDAO);
         dialogStub = sinon.createStubInstance(Dialog);
         authStub = sinon.createStubInstance(Auth);
+        statusStub = sinon.createStubInstance(Status);
 
         //
         // setup the SUT
         //
-        dao = new EmailDAO(devicestorageStub, mailreader, dialogStub, authStub, $rootScope);
+        dao = new EmailDAO(devicestorageStub, mailreader, dialogStub, authStub, statusStub);
         dao._account = account;
         dao._imapClient = imapClientStub;
 
@@ -163,6 +163,7 @@ describe('Email DAO unit tests', function() {
                 account: account
             }).then(function() {
                 expect(devicestorageStub.listItems.calledOnce).to.be.true;
+                expect(statusStub.update.calledWith('Offline')).to.be.true;
             });
         });
     });
@@ -861,6 +862,9 @@ describe('Email DAO unit tests', function() {
                             highestModseq: '123'
                         }
                     });
+
+                    expect(statusStub.update.callCount).to.equal(2);
+                    expect(statusStub.update.calledWith('Online')).to.be.true;
                 });
             });
 
@@ -869,8 +873,31 @@ describe('Email DAO unit tests', function() {
 
                 return dao.connectImap(imapClientStub).then(function() {
                     expect(authStub.getCredentials.called).to.be.false;
+                    expect(statusStub.update.called).to.be.false;
                 });
             });
+
+            it('should fail then ImapClient cannot connect', function(done) {
+                dao.isOnline.returns(true);
+                authStub.getCredentials.returns(resolves(credentials));
+                imapClientStub.login.returns(rejects(new Error('No connection')));
+                initFoldersStub.returns(resolves());
+
+                dao.connectImap(imapClientStub).catch(function() {
+                    try {
+                        expect(imapClientStub.login.calledOnce).to.be.true;
+                        expect(imapClientStub.selectMailbox.called).to.be.false;
+                        expect(initFoldersStub.called).to.be.false;
+
+                        expect(statusStub.update.callCount).to.equal(2);
+                        expect(statusStub.update.calledWith('Offline')).to.be.true;
+                        done();
+                    } catch(err) {
+                        done(err);
+                    }
+                });
+            });
+
         });
 
         describe('#disconnectImap', function() {
@@ -883,6 +910,7 @@ describe('Email DAO unit tests', function() {
                     expect(imapClientStub.logout.calledOnce).to.be.true;
                     expect(dao._account.online).to.be.false;
                     expect(dao._imapClient).to.not.exist;
+                    expect(statusStub.update.calledWith('Offline')).to.be.true;
                 });
 
             });
