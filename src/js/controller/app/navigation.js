@@ -46,7 +46,7 @@ var NavigationCtrl = function($scope, $location, $q, $timeout, account, email, o
     };
 
     // folder index url watcher
-    $scope.$watch('(loc.search()).folder', function(folderIndex) {
+    $scope.$watch('loc.search().folder', function(folderIndex) {
         if (!$scope.account.folders || !$scope.account.folders.length) {
             // there's no folder to navigate to
             return;
@@ -67,7 +67,7 @@ var NavigationCtrl = function($scope, $location, $q, $timeout, account, email, o
     });
 
     // nav open/close state url watcher
-    $scope.$watch('(loc.search()).nav', function(open) {
+    $scope.$watch('loc.search().nav', function(open) {
         // synchronize the url to the scope state
         $scope.state.nav.toggle(!!open);
     });
@@ -77,7 +77,7 @@ var NavigationCtrl = function($scope, $location, $q, $timeout, account, email, o
     });
 
     // lightbox state url watcher
-    $scope.$watch('(loc.search()).lightbox', function(value) {
+    $scope.$watch('loc.search().lightbox', function(value) {
         // synchronize the url to the scope state
         $scope.state.lightbox = (value) ? value : undefined;
     });

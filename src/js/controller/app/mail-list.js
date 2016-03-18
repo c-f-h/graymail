@@ -40,7 +40,7 @@ var MailListCtrl = function($scope, $timeout, $location, $filter, $q, status, no
     };
 
     $scope.loc = $location;
-    $scope.$watch('(loc.search()).uid', function(uid) {
+    $scope.$watch('loc.search().uid', function(uid) {
         uid = parseInt(uid, 10);
         if (isNaN(uid)) {
             // no (or nonsensical) uid specified in url... select no message

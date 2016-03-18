@@ -28,7 +28,7 @@ var ReadCtrl = function($scope, $location, $q, email, download, dialog, status) 
 
     // read state url watcher
     $scope.loc = $location;
-    $scope.$watch('(loc.search()).uid', function(uid) {
+    $scope.$watch('loc.search().uid', function(uid) {
         // synchronize the url to the scope state
         toggle(!!uid);
     });
